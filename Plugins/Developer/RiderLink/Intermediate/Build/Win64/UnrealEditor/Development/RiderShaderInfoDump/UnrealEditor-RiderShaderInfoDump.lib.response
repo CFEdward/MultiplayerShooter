@@ -1,0 +1,11 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-RiderShaderInfoDump.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"H:\repositories\UE4 Projects\MultiplayerShooter\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderShaderInfoDump\RiderShaderInfoDump.cpp.obj"
+"H:\repositories\UE4 Projects\MultiplayerShooter\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderShaderInfoDump\Default.rc2.res"
+/OUT:"H:\repositories\UE4 Projects\MultiplayerShooter\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderShaderInfoDump\UnrealEditor-RiderShaderInfoDump.lib"
