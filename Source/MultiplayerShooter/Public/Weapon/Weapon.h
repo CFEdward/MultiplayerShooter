@@ -24,12 +24,15 @@ class MULTIPLAYERSHOOTER_API AWeapon : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+	
 	// Sets default values for this actor's properties
 	AWeapon();
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void ShowPickupWidget(bool bShowWidget);
 	
@@ -45,7 +48,7 @@ protected:
 
 	UFUNCTION()
 	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-								 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 private:
 
@@ -55,13 +58,19 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	USphereComponent* AreaSphere;
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponState, VisibleAnywhere, Category = "Weapon Properties")
 	EWeaponState WeaponState;
+
+	UFUNCTION()
+	void OnRep_WeaponState();
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	UWidgetComponent* PickupWidget;
 	
 public:	
 	
+	void SetWeaponState(EWeaponState State);
 
+	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
+	
 };
