@@ -4,8 +4,10 @@
 #include "Character/ShooterCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "ShooterComponents/CombatComponent.h"
 #include "Weapon/Weapon.h"
@@ -35,6 +37,8 @@ AShooterCharacter::AShooterCharacter()
 	Combat->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 }
 
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -56,7 +60,7 @@ void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+	AimOffset(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -164,6 +168,39 @@ void AShooterCharacter::AimButtonReleased()
 	if (Combat)
 	{
 		Combat->SetAiming(false);
+	}
+}
+
+void AShooterCharacter::AimOffset(float DeltaTime)
+{
+	if (Combat && Combat->EquippedWeapon == nullptr) return;
+	
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.0f;
+	float Speed = Velocity.Size();
+	bool bIsInAir = GetCharacterMovement()->IsFalling();
+
+	if (Speed == 0.0f && !bIsInAir)	// standing still, not jumping
+	{
+		FRotator CurrentAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		AO_Yaw = DeltaAimRotation.Yaw;
+		bUseControllerRotationYaw = false;
+	}
+	if (Speed > 0.0f || bIsInAir)	// running or jumping
+	{
+		StartingAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		AO_Yaw = 0.0f;
+		bUseControllerRotationYaw = true;
+	}
+
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if (AO_Pitch > 90.0f && !IsLocallyControlled())
+	{
+		// map Pitch from [270 -> 360) to [-90 -> 0)
+		FVector2D InRange(270.0f, 360.0f);
+		FVector2D OutRange(-90.0f, 0.0f);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
 
