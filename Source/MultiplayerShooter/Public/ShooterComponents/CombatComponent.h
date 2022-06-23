@@ -41,6 +41,8 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	void FireButtonPressed(bool bPressed);
+
 private:
 
 	UPROPERTY()
@@ -57,6 +59,8 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	float AimWalkSpeed;
+
+	bool bFireButtonPressed;
 	
 public:
 	

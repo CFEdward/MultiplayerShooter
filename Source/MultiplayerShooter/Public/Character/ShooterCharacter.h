@@ -12,6 +12,7 @@ class UCameraComponent;
 class UWidgetComponent;
 class AWeapon;
 class UCombatComponent;
+class UAnimMontage;
 
 UCLASS()
 class MULTIPLAYERSHOOTER_API AShooterCharacter : public ACharacter
@@ -33,6 +34,8 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	void PlayFireMontage(bool bAiming);
+	
 protected:
 
 	// Called when the game starts or when spawned
@@ -46,6 +49,8 @@ protected:
 	void CrouchButtonPressed();
 	void AimButtonPressed();
 	void AimButtonReleased();
+	void FireButtonPressed();
+	void FireButtonReleased();
 
 	void AimOffset(float DeltaTime);
 
@@ -81,6 +86,9 @@ private:
 
 	ETurningInPlace TurningInPlace;
 	void TurnInPlace(float DeltaTime);
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* FireWeaponMontage;
 	
 public:
 
