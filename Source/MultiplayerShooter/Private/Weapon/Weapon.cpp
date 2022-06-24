@@ -5,7 +5,9 @@
 #include "Character/ShooterCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Net/UnrealNetwork.h"
+#include "Weapon/BulletCasing.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -27,7 +29,6 @@ AWeapon::AWeapon()
 
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
 	PickupWidget->SetupAttachment(RootComponent);
-	
 }
 
 // Called when the game starts or when spawned
@@ -112,5 +113,29 @@ void AWeapon::ShowPickupWidget(bool bShowWidget)
 	if (PickupWidget)
 	{
 		PickupWidget->SetVisibility(bShowWidget);
+	}
+}
+
+void AWeapon::Fire(const FVector& HitTarget)
+{
+	if (FireAnimation)
+	{
+		WeaponMesh->PlayAnimation(FireAnimation, false);
+	}
+
+	if (BulletCasingClass)
+	{
+		const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject"));
+		if (AmmoEjectSocket)
+		{
+			FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+			
+			UWorld* World = GetWorld();
+			if (World)
+			{
+				World->SpawnActor<ABulletCasing>(BulletCasingClass, SocketTransform.GetLocation(),
+				                                 SocketTransform.GetRotation().Rotator());
+			}
+		}
 	}
 }

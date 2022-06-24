@@ -7,6 +7,10 @@
 #include "Projectile.generated.h"
 
 class UBoxComponent;
+class UProjectileMovementComponent;
+class UParticleSystem;
+class UParticleSystemComponent;
+class USoundCue;
 
 UCLASS()
 class MULTIPLAYERSHOOTER_API AProjectile : public AActor
@@ -20,16 +24,37 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void Destroyed() override;
 	
 protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	                   FVector NormalImpulse, const FHitResult& Hit);
+
 private:
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* CollisionBox;
+	
+	UPROPERTY(VisibleAnywhere)
+	UProjectileMovementComponent* ProjectileMovementComponent;
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* Tracer;
+
+	UPROPERTY()
+	UParticleSystemComponent* TracerComponent;
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ImpactParticles;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* ImpactSound;
 	
 public:	
 
