@@ -1,7 +1,7 @@
 {
   "FileVersion": 3,
   "Version": 1,
-  "VersionName": "2022.1.0.248",
+  "VersionName": "2022.2.0.153",
   "FriendlyName": "RiderLink",
   "Description": "Plugin for establishing IPC connection with JetBrains Rider IDE",
   "Category": "Programming",
@@ -40,7 +40,7 @@
       "LoadingPhase": "Default"
     },
     {
-      "Name": "RiderShaderInfoDump",
+      "Name": "RiderShaderInfo",
       "Type": "EditorNoCommandlet",
       "LoadingPhase": "PostEngineInit"
     }

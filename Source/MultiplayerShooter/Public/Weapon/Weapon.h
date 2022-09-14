@@ -10,6 +10,7 @@ class USphereComponent;
 class UWidgetComponent;
 class UAnimationAsset;
 class ABulletCasing;
+class UTexture2D;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -39,6 +40,24 @@ public:
 	void ShowPickupWidget(bool bShowWidget);
 
 	virtual void Fire(const FVector& HitTarget);
+
+	/**
+	 * Textures for the weapon crosshairs
+	 */
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsCenter;
+
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsLeft;
+
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsRight;
+
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsTop;
+
+	UPROPERTY(EditAnywhere, Category = Crosshairs)
+	UTexture2D* CrosshairsBottom;
 	
 protected:
 	
@@ -76,13 +95,22 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABulletCasing> BulletCasingClass;
+
+	/**
+	 * Zoomed FOV while aiming
+	 */
+	UPROPERTY(EditAnywhere)
+	float ZoomedFOV;
+
+	UPROPERTY(EditAnywhere)
+	float ZoomInterpSpeed;
 	
 public:	
 	
 	void SetWeaponState(EWeaponState State);
-
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
-
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
+	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
 	
 };

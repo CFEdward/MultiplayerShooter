@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "HUD/ShooterHUD.h"
 #include "CombatComponent.generated.h"
 
 class AShooterCharacter;
 class AWeapon;
+class AShooterPlayerController;
+class AShooterHUD;
 
 #define TRACE_LENGTH 80'000.0f
 
@@ -53,10 +56,18 @@ protected:
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
+	void SetHUDCrosshairs(float DeltaTime);
+
+	void InterpFOV(float DeltaTime);
+
 private:
 
 	UPROPERTY()
 	AShooterCharacter* Character;
+	UPROPERTY()
+	AShooterPlayerController* Controller;
+	UPROPERTY()
+	AShooterHUD* HUD;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
@@ -71,6 +82,32 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
+
+	/**
+	 * HUD and crosshairs
+	 */
+	float CrosshairVelocityFactor;
+	float CrosshairInAirFactor;
+	float CrosshairAimFactor;
+	float CrosshairShootingFactor;
+	
+	FVector HitTarget;
+	
+	FHUDPackage HUDPackage;
+
+	/**
+	 * Aiming and FOV
+	 */
+	// Field of view when not aiming; set to the camera's base FOV in BeginPlay
+	float DefaultFOV;
+
+	float CurrentFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ZoomedFOV;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float ZoomInterpSpeed;
 	
 public:
 	

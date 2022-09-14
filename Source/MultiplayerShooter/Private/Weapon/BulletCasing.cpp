@@ -3,6 +3,7 @@
 
 #include "Weapon/BulletCasing.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Sound/SoundCue.h"
 
 // Sets default values
@@ -28,7 +29,9 @@ void ABulletCasing::BeginPlay()
 	Super::BeginPlay();
 
 	CasingMesh->OnComponentHit.AddDynamic(this, &ABulletCasing::OnHit);
-	CasingMesh->AddImpulse(GetActorForwardVector() * ShellEjectionImpulse);
+	FVector RandomShell = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(GetActorForwardVector(),
+																			  20.0f);
+	CasingMesh->AddImpulse(RandomShell * ShellEjectionImpulse);
 
 	SetLifeSpan(3.0f);
 }

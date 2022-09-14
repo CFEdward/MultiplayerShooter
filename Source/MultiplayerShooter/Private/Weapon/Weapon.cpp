@@ -10,7 +10,9 @@
 #include "Weapon/BulletCasing.h"
 
 // Sets default values
-AWeapon::AWeapon()
+AWeapon::AWeapon() :
+	ZoomedFOV(30.0f),
+	ZoomInterpSpeed(20.0f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;

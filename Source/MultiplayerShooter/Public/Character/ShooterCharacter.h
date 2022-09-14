@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ShooterTypes/TurningInPlace.h"
+#include "Interfaces/InteractWithCrosshairsInterface.h"
 #include "ShooterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -15,7 +16,7 @@ class UCombatComponent;
 class UAnimMontage;
 
 UCLASS()
-class MULTIPLAYERSHOOTER_API AShooterCharacter : public ACharacter
+class MULTIPLAYERSHOOTER_API AShooterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
@@ -89,21 +90,22 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* FireWeaponMontage;
+
+	void HideCharacterIfCameraClose() const;
+
+	UPROPERTY(EditAnywhere)
+	float CameraThreshold;
 	
 public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
-
 	bool IsWeaponEquipped();
-
 	bool IsAiming();
-
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
-
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
-
 	AWeapon* GetEquippedWeapon();
-
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
+	FVector GetHitTarget() const;
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 };
