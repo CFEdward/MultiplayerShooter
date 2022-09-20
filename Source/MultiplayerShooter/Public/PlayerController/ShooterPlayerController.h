@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "ShooterPlayerController.generated.h"
 
+class AShooterHUD;
+
 /**
  * 
  */
@@ -13,5 +15,20 @@ UCLASS()
 class MULTIPLAYERSHOOTER_API AShooterPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+
+	void SetHUDHealth(float Health, float MaxHealth);
+	void SetHUDScore(float Score);
+	virtual void OnPossess(APawn* InPawn) override;
+	
+protected:
+	
+	virtual void BeginPlay() override;
+
+private:
+
+	UPROPERTY()
+	AShooterHUD* ShooterHUD;
 	
 };

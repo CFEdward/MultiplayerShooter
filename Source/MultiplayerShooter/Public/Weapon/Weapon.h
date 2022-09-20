@@ -34,13 +34,11 @@ public:
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	void ShowPickupWidget(bool bShowWidget);
-
 	virtual void Fire(const FVector& HitTarget);
-
+	void Dropped();
+	
 	/**
 	 * Textures for the weapon crosshairs
 	 */
@@ -58,6 +56,16 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Crosshairs)
 	UTexture2D* CrosshairsBottom;
+
+	/**
+	 * Automatic fire
+	 */
+	
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float FireDelay;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	bool bAutomatic;
 	
 protected:
 	
@@ -65,13 +73,20 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	                             const FHitResult& SweepResult);
+	virtual void OnSphereOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	                        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void OnSphereEndOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
 	
 private:
 

@@ -45,6 +45,7 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+	void Fire();
 
 	void FireButtonPressed(bool bPressed);
 
@@ -59,6 +60,17 @@ protected:
 	void SetHUDCrosshairs(float DeltaTime);
 
 	void InterpFOV(float DeltaTime);
+
+	/**
+	 * Automatic fire
+	 */
+	
+	FTimerHandle FireTimer;
+	
+	bool bCanFire;
+	
+	void StartFireTimer();
+	void FireTimerFinished();
 
 private:
 
