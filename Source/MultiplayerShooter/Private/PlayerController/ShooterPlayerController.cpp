@@ -54,3 +54,16 @@ void AShooterPlayerController::SetHUDScore(float Score)
 		ShooterHUD->CharacterOverlay->ScoreAmount->SetText(FText::FromString(ScoreText));
 	}
 }
+
+void AShooterPlayerController::SetHUDDefeats(int32 Defeats)
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+
+	if (ShooterHUD &&
+		ShooterHUD->CharacterOverlay &&
+		ShooterHUD->CharacterOverlay->DefeatsAmount)
+	{
+		const FString DefeatsText = FString::Printf(TEXT("%d"), Defeats);
+		ShooterHUD->CharacterOverlay->DefeatsAmount->SetText(FText::FromString(DefeatsText));
+	}
+}

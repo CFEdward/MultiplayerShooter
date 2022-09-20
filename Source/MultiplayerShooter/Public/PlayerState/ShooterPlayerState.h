@@ -19,14 +19,28 @@ class MULTIPLAYERSHOOTER_API AShooterPlayerState : public APlayerState
 
 public:
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	/**
+	 * Replication notifies
+	 */
+	
 	virtual void OnRep_Score() override;
-	void AddToScore(float ScoreAmount);
+	UFUNCTION()
+	void OnRep_Defeats();
+	
+	void AddToScore(const float ScoreAmount);
+	void AddToDefeats(const int32 DefeatsAmount);
 
 private:
 
 	UPROPERTY()
 	AShooterCharacter* Character;
+	
 	UPROPERTY()
 	AShooterPlayerController* Controller;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Defeats)
+	int32 Defeats;
 	
 };

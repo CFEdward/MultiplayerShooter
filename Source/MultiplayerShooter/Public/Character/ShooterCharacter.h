@@ -17,6 +17,7 @@ class UCombatComponent;
 class UAnimMontage;
 class AShooterPlayerController;
 class USoundCue;
+class AShooterPlayerState;
 
 UCLASS()
 class MULTIPLAYERSHOOTER_API AShooterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -51,21 +52,21 @@ protected:
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
-	void EquipButtonPressed();
+	void SimProxiesTurn();
+	virtual void Jump() override;
 	void CrouchButtonPressed();
+	void EquipButtonPressed();
 	void AimButtonPressed();
 	void AimButtonReleased();
 	void FireButtonPressed();
 	void FireButtonReleased();
 	float CalculateSpeed();
 	void CalculateAO_Pitch();
+	void AimOffset(float DeltaTime);
 	void PlayHitReactMontage() const;
 	void UpdateHUDHealth();
-
-	void AimOffset(float DeltaTime);
-	void SimProxiesTurn();
-
-	virtual void Jump() override;
+	// Poll for any relevant classes and initialize our HUD
+	void PollInit();
 
 	UFUNCTION()
 	void ReceiveDamage(
@@ -187,6 +188,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* ElimBotSound;
+
+	UPROPERTY()
+	AShooterPlayerState* ShooterPlayerState;
 	
 public:
 

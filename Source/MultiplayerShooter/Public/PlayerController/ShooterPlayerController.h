@@ -20,6 +20,7 @@ public:
 
 	void SetHUDHealth(float Health, float MaxHealth);
 	void SetHUDScore(float Score);
+	void SetHUDDefeats(int32 Defeats);
 	virtual void OnPossess(APawn* InPawn) override;
 	
 protected:

@@ -14,6 +14,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "PlayerController/ShooterPlayerController.h"
+#include "PlayerState/ShooterPlayerState.h"
 #include "ShooterComponents/CombatComponent.h"
 #include "Weapon/Weapon.h"
 #include "Sound/SoundCue.h"
@@ -103,6 +104,7 @@ void AShooterCharacter::Tick(float DeltaTime)
 	}
 	
 	HideCharacterIfCameraClose();
+	PollInit();
 }
 
 // Called to bind functionality to input
@@ -524,6 +526,18 @@ void AShooterCharacter::UpdateHUDHealth()
 	if (ShooterPlayerController)
 	{
 		ShooterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
+void AShooterCharacter::PollInit()
+{
+	if (ShooterPlayerState == nullptr)
+	{
+		ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
+		if (ShooterPlayerState)
+		{
+			ShooterPlayerState->AddToScore(0.0f);
+		}
 	}
 }
 
