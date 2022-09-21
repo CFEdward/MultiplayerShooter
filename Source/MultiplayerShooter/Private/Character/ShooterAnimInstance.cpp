@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Weapon/Weapon.h"
+#include "ShooterTypes/CombatState.h"
 
 void UShooterAnimInstance::NativeInitializeAnimation()
 {
@@ -39,9 +40,9 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bElimmed = ShooterCharacter->IsElimmed();
 
 	// Offset Yaw for Strafing
-	FRotator AimRotation = ShooterCharacter->GetBaseAimRotation();
-	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(ShooterCharacter->GetVelocity());
-	FRotator DeltaRot = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation);
+	const FRotator AimRotation = ShooterCharacter->GetBaseAimRotation();
+	const FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(ShooterCharacter->GetVelocity());
+	const FRotator DeltaRot = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation);
 	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRot, DeltaTime, 6.0f);
 	YawOffset = DeltaRotation.Yaw;
 
@@ -74,10 +75,10 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		if (ShooterCharacter->IsLocallyControlled())
 		{
 			bLocallyControlled = true;
-			FTransform RightHandTransform = ShooterCharacter->GetMesh()->GetSocketTransform(
+			const FTransform RightHandTransform = ShooterCharacter->GetMesh()->GetSocketTransform(
 				FName("Hand_R"),
 				ERelativeTransformSpace::RTS_World);
-			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
+			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
 				RightHandTransform.GetLocation(),
 				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - ShooterCharacter->GetHitTarget()));
 			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaTime, 30.0f);
@@ -100,4 +101,6 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			FColor::Orange);
 		*/
 	}
+
+	bUseFABRIK = ShooterCharacter->GetCombatState() != ECombatState::ECS_Reloading;
 }

@@ -7,6 +7,7 @@
 #include "ShooterTypes/TurningInPlace.h"
 #include "Interfaces/InteractWithCrosshairsInterface.h"
 #include "Components/TimelineComponent.h"
+#include "ShooterTypes/CombatState.h"
 #include "ShooterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -34,8 +35,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
-	void PlayFireMontage(bool bAiming);
-	void PlayElimMontage();
+	void PlayFireMontage(const bool bAiming) const;
+	void PlayReloadMontage() const;
+	void PlayElimMontage() const;
 	virtual void OnRep_ReplicatedMovement() override;
 	void Elim();
 	virtual void Destroyed() override;
@@ -48,21 +50,22 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void Turn(float Value);
-	void LookUp(float Value);
+	void MoveForward(const float Value);
+	void MoveRight(const float Value);
+	void Turn(const float Value);
+	void LookUp(const float Value);
 	void SimProxiesTurn();
 	virtual void Jump() override;
 	void CrouchButtonPressed();
+	void ReloadButtonPressed();
 	void EquipButtonPressed();
 	void AimButtonPressed();
 	void AimButtonReleased();
 	void FireButtonPressed();
 	void FireButtonReleased();
-	float CalculateSpeed();
+	float CalculateSpeed() const;
 	void CalculateAO_Pitch();
-	void AimOffset(float DeltaTime);
+	void AimOffset(const float DeltaTime);
 	void PlayHitReactMontage() const;
 	void UpdateHUDHealth();
 	// Poll for any relevant classes and initialize our HUD
@@ -91,9 +94,9 @@ private:
 	AWeapon* OverlappingWeapon;
 
 	UFUNCTION()
-	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon) const;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* Combat;
 
 	UFUNCTION(Server, Reliable)
@@ -105,10 +108,17 @@ private:
 	FRotator StartingAimRotation;
 
 	ETurningInPlace TurningInPlace;
-	void TurnInPlace(float DeltaTime);
+	void TurnInPlace(const float DeltaTime);
 
+	/**
+	 * Animation montages
+	 */
+	
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* FireWeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* ReloadMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* HitReactMontage;
@@ -165,7 +175,7 @@ private:
 	UCurveFloat* DissolveCurve;
 
 	UFUNCTION()
-	void UpdateDissolveMaterial(float DissolveValue);
+	void UpdateDissolveMaterial(const float DissolveValue);
 	void StartDissolve();
 
 	// Dynamic instance that we can change at runtime
@@ -195,11 +205,11 @@ private:
 public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
-	bool IsWeaponEquipped();
-	bool IsAiming();
+	bool IsWeaponEquipped() const;
+	bool IsAiming() const;
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
-	AWeapon* GetEquippedWeapon();
+	AWeapon* GetEquippedWeapon() const;
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 	FVector GetHitTarget() const;
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
@@ -207,5 +217,6 @@ public:
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetHealth() const { return Health; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
-
+	ECombatState GetCombatState() const;
+	
 };

@@ -5,7 +5,7 @@
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerState.h"
 
-void UOverheadWidget::SetDisplayText(FString TextToDisplay)
+void UOverheadWidget::SetDisplayText(const FString TextToDisplay) const
 {
 	if (DisplayText)
 	{
@@ -13,9 +13,9 @@ void UOverheadWidget::SetDisplayText(FString TextToDisplay)
 	}
 }
 
-void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
+void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn) const
 {
-	ENetRole RemoteRole = InPawn->GetRemoteRole();
+	const ENetRole RemoteRole = InPawn->GetRemoteRole();
 	FString Role;
 	switch (RemoteRole)
 	{
@@ -34,10 +34,12 @@ void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
 	case ENetRole::ROLE_None:
 		Role = FString("None");
 		break;
+		
+	default: break;
 	}
 
-	FString PawnName = InPawn->GetName();
-	FString RemoteRoleString = FString::Printf(TEXT("Remote Role: %s, Name: %s"), *Role, *PawnName);
+	const FString PawnName = InPawn->GetName();
+	const FString RemoteRoleString = FString::Printf(TEXT("Remote Role: %s, Name: %s"), *Role, *PawnName);
 	SetDisplayText(RemoteRoleString);
 }
 

@@ -7,6 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Net/UnrealNetwork.h"
+#include "PlayerController/ShooterPlayerController.h"
 #include "Weapon/BulletCasing.h"
 
 // Sets default values
@@ -56,6 +57,7 @@ void AWeapon::BeginPlay()
 }
 
 // Called every frame
+// ReSharper disable once CppParameterMayBeConst
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -67,6 +69,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, WeaponState);
+	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::OnSphereOverlap(
@@ -77,13 +80,13 @@ void AWeapon::OnSphereOverlap(
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
-	if (ShooterCharacter && PickupWidget)
+	if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor); ShooterCharacter && PickupWidget)
 	{
 		ShooterCharacter->SetOverlappingWeapon(this);
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AWeapon::OnSphereEndOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
@@ -97,7 +100,50 @@ void AWeapon::OnSphereEndOverlap(
 	}
 }
 
-void AWeapon::SetWeaponState(EWeaponState State)
+void AWeapon::SetHUDAmmo()
+{
+	ShooterOwnerCharacter =
+		ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
+	if (ShooterOwnerCharacter)
+	{
+		ShooterOwnerController =
+			ShooterOwnerController == nullptr ?
+				Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController;
+		if (ShooterOwnerController)
+		{
+			ShooterOwnerController->SetHUDWeaponAmmo(Ammo);
+		}
+	}
+}
+
+void AWeapon::SpendRound()
+{
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
+	SetHUDAmmo();
+}
+
+
+void AWeapon::OnRep_Ammo()
+{
+	SetHUDAmmo();
+}
+
+void AWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+
+	if (Owner == nullptr)
+	{
+		ShooterOwnerCharacter = nullptr;
+		ShooterOwnerController = nullptr;
+	}
+	else
+	{
+		SetHUDAmmo();
+	}
+}
+
+void AWeapon::SetWeaponState(const EWeaponState State)
 {
 	WeaponState = State;
 	switch (WeaponState)
@@ -119,10 +165,12 @@ void AWeapon::SetWeaponState(EWeaponState State)
 		WeaponMesh->SetEnableGravity(true);
 		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
+		
+	default: break;
 	}
 }
 
-void AWeapon::OnRep_WeaponState()
+void AWeapon::OnRep_WeaponState() const
 {
 	switch (WeaponState)
 	{
@@ -138,10 +186,12 @@ void AWeapon::OnRep_WeaponState()
 		WeaponMesh->SetEnableGravity(true);
 		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
+		
+	default: break;
 	}
 }
 
-void AWeapon::ShowPickupWidget(bool bShowWidget)
+void AWeapon::ShowPickupWidget(const bool bShowWidget) const
 {
 	if (PickupWidget)
 	{
@@ -158,13 +208,11 @@ void AWeapon::Fire(const FVector& HitTarget)
 
 	if (BulletCasingClass)
 	{
-		const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject"));
-		if (AmmoEjectSocket)
+		if (const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject")))
 		{
-			FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
-			
-			UWorld* World = GetWorld();
-			if (World)
+			const FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+
+			if (UWorld* World = GetWorld())
 			{
 				World->SpawnActor<ABulletCasing>(
 					BulletCasingClass,
@@ -173,6 +221,7 @@ void AWeapon::Fire(const FVector& HitTarget)
 			}
 		}
 	}
+	SpendRound();
 }
 
 void AWeapon::Dropped()
@@ -181,4 +230,11 @@ void AWeapon::Dropped()
 	const FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(DetachRules);
 	SetOwner(nullptr);
+	ShooterOwnerCharacter = nullptr;
+	ShooterOwnerController = nullptr;
+}
+
+bool AWeapon::IsEmpty() const
+{
+	return Ammo <= 0;
 }

@@ -10,6 +10,7 @@ void AProjectileBullet::OnHit(
 	UPrimitiveComponent* HitComp,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
+	// ReSharper disable once CppParameterMayBeConst
 	FVector NormalImpulse,
 	const FHitResult& Hit)
 {

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WeaponTypes.h"
 #include "Weapon.generated.h"
 
 class USphereComponent;
@@ -11,6 +12,8 @@ class UWidgetComponent;
 class UAnimationAsset;
 class ABulletCasing;
 class UTexture2D;
+class AShooterCharacter;
+class AShooterPlayerController;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -35,7 +38,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void ShowPickupWidget(bool bShowWidget);
+	virtual void OnRep_Owner() override;
+	void SetHUDAmmo();
+	void ShowPickupWidget(const bool bShowWidget) const;
 	virtual void Fire(const FVector& HitTarget);
 	void Dropped();
 	
@@ -100,7 +105,7 @@ private:
 	EWeaponState WeaponState;
 
 	UFUNCTION()
-	void OnRep_WeaponState();
+	void OnRep_WeaponState() const;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	UWidgetComponent* PickupWidget;
@@ -119,13 +124,34 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float ZoomInterpSpeed;
+
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo)
+	int32 Ammo;
+
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	void SpendRound();
+
+	UPROPERTY(EditAnywhere)
+	int32 MagCapacity;
+
+	UPROPERTY()
+	AShooterCharacter* ShooterOwnerCharacter;
+	UPROPERTY()
+	AShooterPlayerController* ShooterOwnerController;
+
+	UPROPERTY(EditAnywhere)
+	EWeaponType WeaponType;
 	
 public:	
 	
-	void SetWeaponState(EWeaponState State);
+	void SetWeaponState(const EWeaponState State);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
 	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
+	bool IsEmpty() const;
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 	
 };

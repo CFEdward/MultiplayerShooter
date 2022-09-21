@@ -18,9 +18,11 @@ class MULTIPLAYERSHOOTER_API AShooterPlayerController : public APlayerController
 
 public:
 
-	void SetHUDHealth(float Health, float MaxHealth);
-	void SetHUDScore(float Score);
-	void SetHUDDefeats(int32 Defeats);
+	void SetHUDHealth(const float Health, const float MaxHealth);
+	void SetHUDScore(const float Score);
+	void SetHUDDefeats(const int32 Defeats);
+	void SetHUDWeaponAmmo(const int32 Ammo);
+	void SetHUDCarriedAmmo(const int32 Ammo);
 	virtual void OnPossess(APawn* InPawn) override;
 	
 protected:

@@ -63,7 +63,11 @@ void AShooterHUD::DrawHUD()
 	}
 }
 
-void AShooterHUD::DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor)
+void AShooterHUD::DrawCrosshair(
+	UTexture2D* Texture,
+	const FVector2D ViewportCenter,
+	const FVector2D Spread,
+	const FLinearColor CrosshairColor)
 {
 	const float TextureWidth = Texture->GetSizeX();
 	const float TextureHeight = Texture->GetSizeY();

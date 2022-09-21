@@ -3,7 +3,6 @@
 
 #include "Weapon/Projectile.h"
 
-#include "Character/ShooterCharacter.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -64,6 +63,7 @@ void AProjectile::OnHit(
 }
 
 // Called every frame
+// ReSharper disable once CppParameterMayBeConst
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

@@ -26,7 +26,7 @@ void AShooterPlayerController::OnPossess(APawn* InPawn)
 	}
 }
 
-void AShooterPlayerController::SetHUDHealth(float Health, float MaxHealth)
+void AShooterPlayerController::SetHUDHealth(const float Health, const float MaxHealth)
 {
 	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
 	
@@ -42,7 +42,7 @@ void AShooterPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 }
 
-void AShooterPlayerController::SetHUDScore(float Score)
+void AShooterPlayerController::SetHUDScore(const float Score)
 {
 	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
 
@@ -55,7 +55,7 @@ void AShooterPlayerController::SetHUDScore(float Score)
 	}
 }
 
-void AShooterPlayerController::SetHUDDefeats(int32 Defeats)
+void AShooterPlayerController::SetHUDDefeats(const int32 Defeats)
 {
 	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
 
@@ -65,5 +65,31 @@ void AShooterPlayerController::SetHUDDefeats(int32 Defeats)
 	{
 		const FString DefeatsText = FString::Printf(TEXT("%d"), Defeats);
 		ShooterHUD->CharacterOverlay->DefeatsAmount->SetText(FText::FromString(DefeatsText));
+	}
+}
+
+void AShooterPlayerController::SetHUDWeaponAmmo(const int32 Ammo)
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+
+	if (ShooterHUD &&
+		ShooterHUD->CharacterOverlay &&
+		ShooterHUD->CharacterOverlay->WeaponAmmoAmount)
+	{
+		const FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
+		ShooterHUD->CharacterOverlay->WeaponAmmoAmount->SetText(FText::FromString(AmmoText));
+	}
+}
+
+void AShooterPlayerController::SetHUDCarriedAmmo(const int32 Ammo)
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+
+	if (ShooterHUD &&
+		ShooterHUD->CharacterOverlay &&
+		ShooterHUD->CharacterOverlay->CarriedAmmoAmount)
+	{
+		const FString CarriedAmmoText = FString::Printf(TEXT("%d"), Ammo);
+		ShooterHUD->CharacterOverlay->CarriedAmmoAmount->SetText(FText::FromString(CarriedAmmoText));
 	}
 }

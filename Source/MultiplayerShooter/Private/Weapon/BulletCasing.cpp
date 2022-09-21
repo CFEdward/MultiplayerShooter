@@ -29,15 +29,20 @@ void ABulletCasing::BeginPlay()
 	Super::BeginPlay();
 
 	CasingMesh->OnComponentHit.AddDynamic(this, &ABulletCasing::OnHit);
-	FVector RandomShell = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(GetActorForwardVector(),
-																			  20.0f);
+	const FVector RandomShell = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(
+		GetActorForwardVector(),
+		20.0f);
 	CasingMesh->AddImpulse(RandomShell * ShellEjectionImpulse);
 
 	SetLifeSpan(3.0f);
 }
 
-void ABulletCasing::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
+void ABulletCasing::OnHit(
+	UPrimitiveComponent* HitComp,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse,
+	const FHitResult& Hit)
 {
 	if (ShellSound)
 	{

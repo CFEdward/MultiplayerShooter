@@ -21,10 +21,10 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* DisplayText;
 
-	void SetDisplayText(FString TextToDisplay);
+	void SetDisplayText(const FString TextToDisplay) const;
 
 	UFUNCTION(BlueprintCallable)
-	void ShowPlayerNetRole(APawn* InPawn);
+	void ShowPlayerNetRole(APawn* InPawn) const;
 
 protected:
 

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "HUD/ShooterHUD.h"
+#include "Weapon/WeaponTypes.h"
+#include "ShooterTypes/CombatState.h"
 #include "CombatComponent.generated.h"
 
 class AShooterCharacter;
@@ -28,26 +30,29 @@ public:
 	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	void Reload();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
 
 protected:
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void SetAiming(bool bIsAiming);
+	void SetAiming(const bool bIsAiming);
 
 	UFUNCTION(Server, Reliable)
-	void ServerSetAiming(bool bIsAiming);
+	void ServerSetAiming(const bool bIsAiming);
 
 	UFUNCTION()
-	void OnRep_EquippedWeapon();
+	void OnRep_EquippedWeapon() const;
 	void Fire();
 
-	void FireButtonPressed(bool bPressed);
+	void FireButtonPressed(const bool bPressed);
 
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
@@ -57,9 +62,9 @@ protected:
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
-	void SetHUDCrosshairs(float DeltaTime);
+	void SetHUDCrosshairs(const float DeltaTime);
 
-	void InterpFOV(float DeltaTime);
+	void InterpFOV(const float DeltaTime);
 
 	/**
 	 * Automatic fire
@@ -71,6 +76,13 @@ protected:
 	
 	void StartFireTimer();
 	void FireTimerFinished();
+
+	bool CanFire() const;
+
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+
+	void HandleReload() const;
 
 private:
 
@@ -120,9 +132,25 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ZoomInterpSpeed;
+
+	// Carried ammo for the currently equipped weapon
+	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
+	int32 CarriedAmmo;
+
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+
+	UPROPERTY(EditAnywhere)
+	TMap<EWeaponType, int32> CarriedAmmoMap;
+
+	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	ECombatState CombatState;
+
+	UFUNCTION()
+	void OnRep_CombatState() const;
 	
 public:
 	
 
-		
+	
 };

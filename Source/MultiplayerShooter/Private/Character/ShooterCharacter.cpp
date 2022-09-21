@@ -18,6 +18,7 @@
 #include "ShooterComponents/CombatComponent.h"
 #include "Weapon/Weapon.h"
 #include "Sound/SoundCue.h"
+#include "Weapon/WeaponTypes.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter() :
@@ -85,6 +86,7 @@ void AShooterCharacter::BeginPlay()
 }
 
 // Called every frame
+// ReSharper disable once CppParameterMayBeConst
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -119,6 +121,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AShooterCharacter::AimButtonReleased);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AShooterCharacter::FireButtonPressed);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AShooterCharacter::FireButtonReleased);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterCharacter::ReloadButtonPressed);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AShooterCharacter::MoveRight);
@@ -166,6 +169,10 @@ void AShooterCharacter::Destroyed()
 
 void AShooterCharacter::MulticastElim_Implementation()
 {
+	if (ShooterPlayerController)
+	{
+		ShooterPlayerController->SetHUDWeaponAmmo(0);
+	}
 	bElimmed = true;
 	PlayElimMontage();
 
@@ -214,7 +221,7 @@ void AShooterCharacter::ElimTimerFinished()
 	}
 }
 
-void AShooterCharacter::MoveForward(float Value)
+void AShooterCharacter::MoveForward(const float Value)
 {
 	if (Controller != nullptr && Value != 0.0f)
 	{
@@ -224,7 +231,7 @@ void AShooterCharacter::MoveForward(float Value)
 	}
 }
 
-void AShooterCharacter::MoveRight(float Value)
+void AShooterCharacter::MoveRight(const float Value)
 {
 	if (Controller != nullptr && Value != 0.0f)
 	{
@@ -234,12 +241,12 @@ void AShooterCharacter::MoveRight(float Value)
 	}
 }
 
-void AShooterCharacter::Turn(float Value)
+void AShooterCharacter::Turn(const float Value)
 {
 	AddControllerYawInput(Value);
 }
 
-void AShooterCharacter::LookUp(float Value)
+void AShooterCharacter::LookUp(const float Value)
 {
 	AddControllerPitchInput(Value);
 }
@@ -279,6 +286,15 @@ void AShooterCharacter::CrouchButtonPressed()
 	}
 }
 
+void AShooterCharacter::ReloadButtonPressed()
+{
+	if (Combat)
+	{
+		Combat->Reload();
+	}
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::AimButtonPressed()
 {
 	if (Combat)
@@ -287,6 +303,7 @@ void AShooterCharacter::AimButtonPressed()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::AimButtonReleased()
 {
 	if (Combat)
@@ -295,6 +312,7 @@ void AShooterCharacter::AimButtonReleased()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::FireButtonPressed()
 {
 	if (Combat)
@@ -303,6 +321,7 @@ void AShooterCharacter::FireButtonPressed()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::FireButtonReleased()
 {
 	if (Combat)
@@ -311,25 +330,27 @@ void AShooterCharacter::FireButtonReleased()
 	}
 }
 
-float AShooterCharacter::CalculateSpeed()
+float AShooterCharacter::CalculateSpeed() const
 {
 	FVector Velocity = GetVelocity();
 	Velocity.Z = 0.0f;
 	return Velocity.Size();
 }
 
-void AShooterCharacter::AimOffset(float DeltaTime)
+void AShooterCharacter::AimOffset(const float DeltaTime)
 {
 	if (Combat && Combat->EquippedWeapon == nullptr) return;
-	
-	float Speed = CalculateSpeed();
-	bool bIsInAir = GetCharacterMovement()->IsFalling();
+
+	const float Speed = CalculateSpeed();
+	const bool bIsInAir = GetCharacterMovement()->IsFalling();
 
 	if (Speed == 0.0f && !bIsInAir)	// standing still, not jumping
 	{
 		bRotateRootBone = true;
-		FRotator CurrentAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
-		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		const FRotator CurrentAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
+		const FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(
+			CurrentAimRotation,
+			StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
 		if (TurningInPlace == ETurningInPlace::ETIP_NotTurning)
 		{
@@ -356,8 +377,8 @@ void AShooterCharacter::CalculateAO_Pitch()
 	if (AO_Pitch > 90.0f && !IsLocallyControlled())
 	{
 		// map Pitch from [270 -> 360) to [-90 -> 0)
-		FVector2D InRange(270.0f, 360.0f);
-		FVector2D OutRange(-90.0f, 0.0f);
+		const FVector2D InRange(270.0f, 360.0f);
+		const FVector2D OutRange(-90.0f, 0.0f);
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
@@ -367,9 +388,8 @@ void AShooterCharacter::SimProxiesTurn()
 	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
 
 	bRotateRootBone = false;
-	
-	float Speed = CalculateSpeed();
-	if (Speed > 0.0f)
+
+	if (const float Speed = CalculateSpeed(); Speed > 0.0f)
 	{
 		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 		return;
@@ -412,6 +432,7 @@ void AShooterCharacter::Jump()
 
 void AShooterCharacter::ReceiveDamage(
 	AActor* DamagedActor,
+	// ReSharper disable once CppParameterMayBeConst
 	float Damage,
 	const UDamageType* DamageType,
 	AController* InstigatorController,
@@ -433,23 +454,41 @@ void AShooterCharacter::ReceiveDamage(
 	}
 }
 
-void AShooterCharacter::PlayFireMontage(bool bAiming)
+void AShooterCharacter::PlayFireMontage(const bool bAiming) const
 {
 	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && FireWeaponMontage)
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && FireWeaponMontage)
 	{
 		AnimInstance->Montage_Play(FireWeaponMontage);
-		FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		const FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
 		AnimInstance->Montage_JumpToSection(SectionName);
 	}
 }
 
-void AShooterCharacter::PlayElimMontage()
+void AShooterCharacter::PlayReloadMontage() const
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && ElimMontage)
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
+
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ReloadMontage)
+	{
+		AnimInstance->Montage_Play(ReloadMontage);
+		FName SectionName;
+		switch (Combat->EquippedWeapon->GetWeaponType())
+		{
+		case EWeaponType::EWT_AssaultRifle:
+			SectionName = FName("Rifle");
+			break;
+			
+		default: break;
+		}
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+void AShooterCharacter::PlayElimMontage() const
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ElimMontage)
 	{
 		AnimInstance->Montage_Play(ElimMontage);
 	}
@@ -459,8 +498,7 @@ void AShooterCharacter::PlayHitReactMontage() const
 {
 	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && HitReactMontage)
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && HitReactMontage)
 	{
 		AnimInstance->Montage_Play(HitReactMontage);
 		const FName SectionName("FromFront");
@@ -468,7 +506,7 @@ void AShooterCharacter::PlayHitReactMontage() const
 	}
 }
 
-void AShooterCharacter::TurnInPlace(float DeltaTime)
+void AShooterCharacter::TurnInPlace(const float DeltaTime)
 {
 	if (AO_Yaw > 90.0f)
 	{
@@ -537,11 +575,13 @@ void AShooterCharacter::PollInit()
 		if (ShooterPlayerState)
 		{
 			ShooterPlayerState->AddToScore(0.0f);
+			ShooterPlayerState->AddToDefeats(0);
 		}
 	}
 }
 
-void AShooterCharacter::UpdateDissolveMaterial(float DissolveValue)
+// ReSharper disable once CppMemberFunctionMayBeConst
+void AShooterCharacter::UpdateDissolveMaterial(const float DissolveValue)
 {
 	if (DynamicDissolveMaterialInstance)
 	{
@@ -578,7 +618,7 @@ void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 	}
 }
 
-void AShooterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+void AShooterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 {
 	if (OverlappingWeapon)
 	{
@@ -590,17 +630,17 @@ void AShooterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 	}
 }
 
-bool AShooterCharacter::IsWeaponEquipped()
+bool AShooterCharacter::IsWeaponEquipped() const
 {
 	return (Combat && Combat->EquippedWeapon);
 }
 
-bool AShooterCharacter::IsAiming()
+bool AShooterCharacter::IsAiming() const
 {
 	return (Combat && Combat->bAiming);
 }
 
-AWeapon* AShooterCharacter::GetEquippedWeapon()
+AWeapon* AShooterCharacter::GetEquippedWeapon() const
 {
 	if (Combat == nullptr) return nullptr;
 	return Combat->EquippedWeapon;
@@ -610,4 +650,10 @@ FVector AShooterCharacter::GetHitTarget() const
 {
 	if (Combat == nullptr) return FVector();
 	return Combat->HitTarget;
+}
+
+ECombatState AShooterCharacter::GetCombatState() const
+{
+	if (Combat == nullptr) return ECombatState::ECS_MAX;
+	return Combat->CombatState;
 }
