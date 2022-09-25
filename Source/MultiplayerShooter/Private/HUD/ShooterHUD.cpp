@@ -5,13 +5,19 @@
 
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
+#include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
+
+AShooterHUD::AShooterHUD() :
+	CrosshairSpreadMax(16.0f)
+{
+	
+}
 
 void AShooterHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AddCharacterOverlay();
 }
 
 void AShooterHUD::AddCharacterOverlay()
@@ -20,6 +26,15 @@ void AShooterHUD::AddCharacterOverlay()
 	{
 		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
 		CharacterOverlay->AddToViewport();
+	}
+}
+
+void AShooterHUD::AddAnnouncement()
+{
+	if (APlayerController* PlayerController = GetOwningPlayerController(); PlayerController && AnnouncementClass)
+	{
+		Announcement = CreateWidget<UAnnouncement>(PlayerController, AnnouncementClass);
+		Announcement->AddToViewport();
 	}
 }
 
@@ -73,7 +88,8 @@ void AShooterHUD::DrawCrosshair(
 	const float TextureHeight = Texture->GetSizeY();
 	const FVector2D TextureDrawPoint(
 		ViewportCenter.X - (TextureWidth / 2.0f) + Spread.X,
-		ViewportCenter.Y - (TextureHeight / 2.0f) + Spread.Y);
+		ViewportCenter.Y - (TextureHeight / 2.0f) + Spread.Y
+	);
 
 	DrawTexture(
 		Texture,
@@ -85,5 +101,6 @@ void AShooterHUD::DrawCrosshair(
 		0.0f,
 		1.0f,
 		1.0f,
-		CrosshairColor);
+		CrosshairColor
+	);
 }

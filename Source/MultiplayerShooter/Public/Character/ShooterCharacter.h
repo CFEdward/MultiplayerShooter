@@ -36,7 +36,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(const bool bAiming) const;
-	void PlayReloadMontage() const;
+	void PlayReloadMontage();
+	void ReloadMontageInterrupted(UAnimMontage* Montage, bool bInterrupted);
 	void PlayElimMontage() const;
 	virtual void OnRep_ReplicatedMovement() override;
 	void Elim();
@@ -45,11 +46,15 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
 
+	UPROPERTY(Replicated)
+	bool bDisableGameplay;
+	
 protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
+	void RotateInPlace(const float DeltaTime);
 	void MoveForward(const float Value);
 	void MoveRight(const float Value);
 	void Turn(const float Value);
@@ -94,7 +99,7 @@ private:
 	AWeapon* OverlappingWeapon;
 
 	UFUNCTION()
-	void OnRep_OverlappingWeapon(AWeapon* LastWeapon) const;
+	void OnRep_OverlappingWeapon(const AWeapon* LastWeapon) const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* Combat;
@@ -218,5 +223,7 @@ public:
 	FORCEINLINE float GetHealth() const { return Health; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	ECombatState GetCombatState() const;
+	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
+	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 	
 };

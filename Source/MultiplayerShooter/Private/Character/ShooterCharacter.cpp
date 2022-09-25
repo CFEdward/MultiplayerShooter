@@ -22,6 +22,7 @@
 
 // Sets default values
 AShooterCharacter::AShooterCharacter() :
+	bDisableGameplay(false),
 	CameraThreshold(200.0f),
 	TurnThreshold(0.5f),
 	TimeSinceLastMovementReplication(0.0f),
@@ -71,6 +72,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME_CONDITION(AShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(AShooterCharacter, Health);
+	DOREPLIFETIME(AShooterCharacter, bDisableGameplay);
 }
 
 // Called when the game starts or when spawned
@@ -91,6 +93,20 @@ void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	RotateInPlace(DeltaTime);
+	HideCharacterIfCameraClose();
+	PollInit();
+}
+
+void AShooterCharacter::RotateInPlace(const float DeltaTime)
+{
+	if (bDisableGameplay)
+	{
+		bUseControllerRotationYaw = false;
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+		return;
+	}
+	
 	if (GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
 	{
 		AimOffset(DeltaTime);
@@ -104,9 +120,6 @@ void AShooterCharacter::Tick(float DeltaTime)
 		}
 		CalculateAO_Pitch();
 	}
-	
-	HideCharacterIfCameraClose();
-	PollInit();
 }
 
 // Called to bind functionality to input
@@ -165,6 +178,13 @@ void AShooterCharacter::Destroyed()
 	{
 		ElimBotComponent->DestroyComponent();
 	}
+
+	const AShooterGameMode* ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
+	const bool bMatchNotInProgress = ShooterGameMode && ShooterGameMode->GetMatchState() != MatchState::InProgress;
+	if (Combat && Combat->EquippedWeapon && bMatchNotInProgress)
+	{
+		Combat->EquippedWeapon->Destroy();
+	}
 }
 
 void AShooterCharacter::MulticastElim_Implementation()
@@ -187,12 +207,12 @@ void AShooterCharacter::MulticastElim_Implementation()
 	StartDissolve();
 
 	// Disable character movement
-	GetCharacterMovement()->DisableMovement();
-	GetCharacterMovement()->StopMovementImmediately();
-	if (ShooterPlayerController)
+	bDisableGameplay = true;
+	if (Combat)
 	{
-		DisableInput(ShooterPlayerController);
+		Combat->FireButtonPressed(false);
 	}
+	
 	// Disable collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -205,7 +225,8 @@ void AShooterCharacter::MulticastElim_Implementation()
 			GetWorld(),
 			ElimBotEffect,
 			ElimBotSpawnPoint, 
-			GetActorRotation());
+			GetActorRotation()
+		);
 	}
 	if (ElimBotSound)
 	{
@@ -223,6 +244,8 @@ void AShooterCharacter::ElimTimerFinished()
 
 void AShooterCharacter::MoveForward(const float Value)
 {
+	if (bDisableGameplay) return;
+	
 	if (Controller != nullptr && Value != 0.0f)
 	{
 		const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
@@ -233,6 +256,8 @@ void AShooterCharacter::MoveForward(const float Value)
 
 void AShooterCharacter::MoveRight(const float Value)
 {
+	if (bDisableGameplay) return;
+	
 	if (Controller != nullptr && Value != 0.0f)
 	{
 		const FRotator YawRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
@@ -253,6 +278,8 @@ void AShooterCharacter::LookUp(const float Value)
 
 void AShooterCharacter::EquipButtonPressed()
 {
+	if (bDisableGameplay) return;
+	
 	if (Combat)
 	{
 		if (HasAuthority())
@@ -276,6 +303,8 @@ void AShooterCharacter::ServerEquipButtonPressed_Implementation()
 
 void AShooterCharacter::CrouchButtonPressed()
 {
+	if (bDisableGameplay) return;
+	
 	if (bIsCrouched)
 	{
 		UnCrouch();
@@ -288,6 +317,8 @@ void AShooterCharacter::CrouchButtonPressed()
 
 void AShooterCharacter::ReloadButtonPressed()
 {
+	if (bDisableGameplay) return;
+	
 	if (Combat)
 	{
 		Combat->Reload();
@@ -297,6 +328,8 @@ void AShooterCharacter::ReloadButtonPressed()
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::AimButtonPressed()
 {
+	if (bDisableGameplay) return;
+	
 	if (Combat)
 	{
 		Combat->SetAiming(true);
@@ -306,6 +339,8 @@ void AShooterCharacter::AimButtonPressed()
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::AimButtonReleased()
 {
+	if (bDisableGameplay) return;
+	
 	if (Combat)
 	{
 		Combat->SetAiming(false);
@@ -315,6 +350,8 @@ void AShooterCharacter::AimButtonReleased()
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::FireButtonPressed()
 {
+	if (bDisableGameplay) return;
+	
 	if (Combat)
 	{
 		Combat->FireButtonPressed(true);
@@ -324,6 +361,8 @@ void AShooterCharacter::FireButtonPressed()
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::FireButtonReleased()
 {
+	if (bDisableGameplay) return;
+	
 	if (Combat)
 	{
 		Combat->FireButtonPressed(false);
@@ -350,7 +389,8 @@ void AShooterCharacter::AimOffset(const float DeltaTime)
 		const FRotator CurrentAimRotation = FRotator(0.0f, GetBaseAimRotation().Yaw, 0.0f);
 		const FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(
 			CurrentAimRotation,
-			StartingAimRotation);
+			StartingAimRotation
+		);
 		AO_Yaw = DeltaAimRotation.Yaw;
 		if (TurningInPlace == ETurningInPlace::ETIP_NotTurning)
 		{
@@ -420,6 +460,8 @@ void AShooterCharacter::SimProxiesTurn()
 
 void AShooterCharacter::Jump()
 {
+	if (bDisableGameplay) return;
+	
 	if (bIsCrouched)
 	{
 		UnCrouch();
@@ -466,13 +508,18 @@ void AShooterCharacter::PlayFireMontage(const bool bAiming) const
 	}
 }
 
-void AShooterCharacter::PlayReloadMontage() const
+void AShooterCharacter::PlayReloadMontage()
 {
 	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
 
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ReloadMontage)
 	{
 		AnimInstance->Montage_Play(ReloadMontage);
+		// Using this delegate to make sure the combat state is returned to unoccupied in case ReloadMontage is interrupted
+		FOnMontageEnded BlendOutDelegate;
+		BlendOutDelegate.BindUObject(this, &AShooterCharacter::ReloadMontageInterrupted);
+		AnimInstance->Montage_SetBlendingOutDelegate(BlendOutDelegate, ReloadMontage);
+		
 		FName SectionName;
 		switch (Combat->EquippedWeapon->GetWeaponType())
 		{
@@ -484,6 +531,12 @@ void AShooterCharacter::PlayReloadMontage() const
 		}
 		AnimInstance->Montage_JumpToSection(SectionName);
 	}
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void AShooterCharacter::ReloadMontageInterrupted(UAnimMontage* Montage, bool bInterrupted)
+{
+	Combat->FinishReloading();
 }
 
 void AShooterCharacter::PlayElimMontage() const
@@ -618,7 +671,7 @@ void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 	}
 }
 
-void AShooterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
+void AShooterCharacter::OnRep_OverlappingWeapon(const AWeapon* LastWeapon) const
 {
 	if (OverlappingWeapon)
 	{

@@ -38,11 +38,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
 
+	void FireButtonPressed(const bool bPressed);
+	
 protected:
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
 	void SetAiming(const bool bIsAiming);
 
 	UFUNCTION(Server, Reliable)
@@ -52,8 +53,6 @@ protected:
 	void OnRep_EquippedWeapon() const;
 	void Fire();
 
-	void FireButtonPressed(const bool bPressed);
-
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
@@ -61,9 +60,7 @@ protected:
 	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
-
 	void SetHUDCrosshairs(const float DeltaTime);
-
 	void InterpFOV(const float DeltaTime);
 
 	/**
@@ -71,18 +68,16 @@ protected:
 	 */
 	
 	FTimerHandle FireTimer;
-	
 	bool bCanFire;
-	
 	void StartFireTimer();
 	void FireTimerFinished();
-
 	bool CanFire() const;
 
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
 
 	void HandleReload() const;
+	int32 AmountToReload();
 
 private:
 
@@ -147,10 +142,12 @@ private:
 	ECombatState CombatState;
 
 	UFUNCTION()
-	void OnRep_CombatState() const;
+	void OnRep_CombatState();
+
+	void UpdateAmmoValue();
 	
 public:
 	
-
+	FORCEINLINE void SetCombatState(const ECombatState State) { CombatState = State; }
 	
 };

@@ -43,7 +43,8 @@ void AProjectile::BeginPlay()
 			FName(),
 			GetActorLocation(),
 			GetActorRotation(),
-			EAttachLocation::KeepWorldPosition);
+			EAttachLocation::KeepWorldPosition
+		);
 	}
 
 	if (HasAuthority())

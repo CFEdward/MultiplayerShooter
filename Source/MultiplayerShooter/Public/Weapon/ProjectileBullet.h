@@ -21,5 +21,6 @@ protected:
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse,
-		const FHitResult& Hit) override;
+		const FHitResult& Hit
+	) override;
 };

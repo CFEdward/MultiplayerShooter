@@ -217,7 +217,8 @@ void AWeapon::Fire(const FVector& HitTarget)
 				World->SpawnActor<ABulletCasing>(
 					BulletCasingClass,
 					SocketTransform.GetLocation(),
-					SocketTransform.GetRotation().Rotator());
+					SocketTransform.GetRotation().Rotator()
+				);
 			}
 		}
 	}
@@ -232,6 +233,12 @@ void AWeapon::Dropped()
 	SetOwner(nullptr);
 	ShooterOwnerCharacter = nullptr;
 	ShooterOwnerController = nullptr;
+}
+
+void AWeapon::AddAmmo(const int32 AmmoToAdd)
+{
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	SetHUDAmmo();
 }
 
 bool AWeapon::IsEmpty() const

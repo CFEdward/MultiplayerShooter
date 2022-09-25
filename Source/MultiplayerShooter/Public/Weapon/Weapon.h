@@ -14,6 +14,7 @@ class ABulletCasing;
 class UTexture2D;
 class AShooterCharacter;
 class AShooterPlayerController;
+class USoundCue;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -43,6 +44,7 @@ public:
 	void ShowPickupWidget(const bool bShowWidget) const;
 	virtual void Fire(const FVector& HitTarget);
 	void Dropped();
+	void AddAmmo(const int32 AmmoToAdd);
 	
 	/**
 	 * Textures for the weapon crosshairs
@@ -71,6 +73,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	bool bAutomatic;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* EquipSound;
 	
 protected:
 	
@@ -84,14 +89,16 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
-		const FHitResult& SweepResult);
-
+		const FHitResult& SweepResult
+	);
+	
 	UFUNCTION()
 	void OnSphereEndOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex);
+		int32 OtherBodyIndex
+	);
 	
 private:
 
@@ -153,5 +160,7 @@ public:
 	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
 	bool IsEmpty() const;
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
+	FORCEINLINE int32 GetAmmo() const { return Ammo; }
+	FORCEINLINE int32 GetMagCapacity() const { return MagCapacity; }
 	
 };

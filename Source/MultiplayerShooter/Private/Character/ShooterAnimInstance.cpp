@@ -60,7 +60,8 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	{
 		LeftHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(
 			FName("LeftHandSocket"),
-			ERelativeTransformSpace::RTS_World);
+			ERelativeTransformSpace::RTS_World
+		);
 		FVector OutPosition;
 		FRotator OutRotation;
 		ShooterCharacter->GetMesh()->TransformToBoneSpace(
@@ -68,7 +69,8 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			LeftHandTransform.GetLocation(),
 			FRotator::ZeroRotator,
 			OutPosition,
-			OutRotation);
+			OutRotation
+		);
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
 
@@ -77,10 +79,12 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 			bLocallyControlled = true;
 			const FTransform RightHandTransform = ShooterCharacter->GetMesh()->GetSocketTransform(
 				FName("Hand_R"),
-				ERelativeTransformSpace::RTS_World);
+				ERelativeTransformSpace::RTS_World
+				);
 			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
 				RightHandTransform.GetLocation(),
-				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - ShooterCharacter->GetHitTarget()));
+				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - ShooterCharacter->GetHitTarget())
+				);
 			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaTime, 30.0f);
 		}
 
@@ -103,4 +107,8 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	}
 
 	bUseFABRIK = ShooterCharacter->GetCombatState() != ECombatState::ECS_Reloading;
+	bUseAimOffsets =
+		ShooterCharacter->GetCombatState() != ECombatState::ECS_Reloading && !ShooterCharacter->GetDisableGameplay();
+	bTransformRightHand =
+		ShooterCharacter->GetCombatState() != ECombatState::ECS_Reloading && !ShooterCharacter->GetDisableGameplay();
 }

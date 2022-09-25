@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PlayerController/ShooterPlayerController.h"
+#include "Sound/SoundCue.h"
 #include "Weapon/Weapon.h"
 
 // Sets default values for this component's properties
@@ -103,7 +104,7 @@ void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& T
 {
 	if (EquippedWeapon == nullptr) return;
 	
-	if (Character)
+	if (Character && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		Character->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire(TraceHitTarget);
@@ -118,7 +119,8 @@ void UCombatComponent::StartFireTimer()
 		FireTimer,
 		this,
 		&ThisClass::FireTimerFinished,
-		EquippedWeapon->FireDelay);
+		EquippedWeapon->FireDelay
+	);
 }
 
 void UCombatComponent::FireTimerFinished()
@@ -129,13 +131,17 @@ void UCombatComponent::FireTimerFinished()
 	{
 		Fire();
 	}
+	if (EquippedWeapon->IsEmpty())
+	{
+		Reload();
+	}
 }
 
 bool UCombatComponent::CanFire() const
 {
 	if (EquippedWeapon == nullptr) return false;
 
-	return !EquippedWeapon->IsEmpty() || !bCanFire;
+	return !EquippedWeapon->IsEmpty() && bCanFire && CombatState == ECombatState::ECS_Unoccupied;
 }
 
 void UCombatComponent::OnRep_CarriedAmmo()
@@ -213,6 +219,20 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
 	}
+
+	if (EquippedWeapon->EquipSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			EquippedWeapon->EquipSound,
+			Character->GetActorLocation()
+		);
+	}
+
+	if (EquippedWeapon->IsEmpty())
+	{
+		Reload();
+	}
 	
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	Character->bUseControllerRotationYaw = true;
@@ -228,8 +248,8 @@ void UCombatComponent::Reload()
 
 void UCombatComponent::ServerReload_Implementation()
 {
-	if (Character == nullptr) return;
-
+	if (Character == nullptr || EquippedWeapon == nullptr) return;
+	
 	CombatState = ECombatState::ECS_Reloading;
 	HandleReload();
 }
@@ -241,16 +261,45 @@ void UCombatComponent::FinishReloading()
 	if (Character->HasAuthority())
 	{
 		CombatState = ECombatState::ECS_Unoccupied;
+		UpdateAmmoValue();
+	}
+	if (bFireButtonPressed)
+	{
+		Fire();
 	}
 }
 
-void UCombatComponent::OnRep_CombatState() const
+void UCombatComponent::UpdateAmmoValue()
+{
+	if (EquippedWeapon == nullptr) return;
+	
+	const int32 ReloadAmount = AmountToReload();
+	if (CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= ReloadAmount;
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+	if (Controller)
+	{
+		Controller->SetHUDCarriedAmmo(CarriedAmmo);
+	}
+	EquippedWeapon->AddAmmo(ReloadAmount);
+}
+
+void UCombatComponent::OnRep_CombatState()
 {
 	switch (CombatState)
 	{
 	case ECombatState::ECS_Reloading:
 		HandleReload();
 		break;
+
+	case ECombatState::ECS_Unoccupied:
+		if (bFireButtonPressed)
+		{
+			Fire();
+		}
 
 	default: break;
 	}
@@ -259,6 +308,21 @@ void UCombatComponent::OnRep_CombatState() const
 void UCombatComponent::HandleReload() const
 {
 	Character->PlayReloadMontage();
+}
+
+int32 UCombatComponent::AmountToReload()
+{
+	if (EquippedWeapon == nullptr) return 0;
+
+	const int32 RoomInMag = EquippedWeapon->GetMagCapacity() - EquippedWeapon->GetAmmo();
+	if (CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		const int32 AmountCarried = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+		const int32 Least = FMath::Min(RoomInMag, AmountCarried);
+		return FMath::Clamp(RoomInMag, 0, Least);
+	}
+	
+	return 0;
 }
 
 void UCombatComponent::OnRep_EquippedWeapon() const
@@ -272,6 +336,15 @@ void UCombatComponent::OnRep_EquippedWeapon() const
 		}
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
+
+		if (EquippedWeapon->EquipSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
+				this,
+				EquippedWeapon->EquipSound,
+				Character->GetActorLocation()
+			);
+		}
 	}
 }
 

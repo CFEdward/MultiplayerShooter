@@ -8,6 +8,7 @@
 
 class UTexture2D;
 class UCharacterOverlay;
+class UAnnouncement;
 
 USTRUCT(BlueprintType)
 struct FHUDPackage
@@ -42,18 +43,27 @@ class MULTIPLAYERSHOOTER_API AShooterHUD : public AHUD
 
 public:
 
+	AShooterHUD();
+
 	virtual void DrawHUD() override;
 
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
+	void AddCharacterOverlay();
 
 	UPROPERTY()
 	UCharacterOverlay* CharacterOverlay;
+	
+	UPROPERTY(EditAnywhere, Category = "Announcements")
+	TSubclassOf<UUserWidget> AnnouncementClass;
+	void AddAnnouncement();
 
+	UPROPERTY()
+	UAnnouncement* Announcement;
+	
 protected:
 
 	virtual void BeginPlay() override;
-	void AddCharacterOverlay();
 
 private:
 
@@ -63,10 +73,11 @@ private:
 		UTexture2D* Texture,
 		const FVector2D ViewportCenter,
 		const FVector2D Spread,
-		const FLinearColor CrosshairColor);
+		const FLinearColor CrosshairColor
+	);
 
 	UPROPERTY(EditAnywhere)
-	float CrosshairSpreadMax = 16.0f;
+	float CrosshairSpreadMax;
 
 public:
 

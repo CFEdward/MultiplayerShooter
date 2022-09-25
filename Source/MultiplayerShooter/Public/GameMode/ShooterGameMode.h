@@ -6,6 +6,11 @@
 #include "GameFramework/GameMode.h"
 #include "ShooterGameMode.generated.h"
 
+namespace MatchState
+{
+    extern MULTIPLAYERSHOOTER_API const FName Cooldown;	// Match duration has been reached. Display winner and begin cooldown timer
+}
+
 class AShooterCharacter;
 class AShooterPlayerController;
 
@@ -19,11 +24,38 @@ class MULTIPLAYERSHOOTER_API AShooterGameMode : public AGameMode
 
 public:
 
+	AShooterGameMode();
+	virtual void Tick(float DeltaTime) override;
 	virtual void PlayerEliminated(
 		AShooterCharacter* ElimmedCharacter,
 		AShooterPlayerController* VictimController,
-		AShooterPlayerController* AttackerController);
+		AShooterPlayerController* AttackerController
+	);
 
 	virtual void RequestRespawn(ACharacter* ElimmedCharacter, AController* ElimmedController);
+
+	UPROPERTY(EditDefaultsOnly)
+	float WarmupTime;
+
+	UPROPERTY(EditDefaultsOnly)
+	float MatchTime;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CooldownTime;
+	
+	float LevelStartingTime;
+
+protected:
+
+	virtual void BeginPlay() override;
+	virtual void OnMatchStateSet() override;
+
+private:
+	
+	float CountdownTime;
+
+public:
+
+	FORCEINLINE float GetCountdownTime() const { return CountdownTime; }
 	
 };
