@@ -112,7 +112,7 @@ private:
 	EWeaponState WeaponState;
 
 	UFUNCTION()
-	void OnRep_WeaponState() const;
+	void OnRep_WeaponState();
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	UWidgetComponent* PickupWidget;

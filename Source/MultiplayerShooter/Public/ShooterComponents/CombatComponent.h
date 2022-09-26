@@ -14,8 +14,6 @@ class AWeapon;
 class AShooterPlayerController;
 class AShooterHUD;
 
-#define TRACE_LENGTH 80'000.0f
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MULTIPLAYERSHOOTER_API UCombatComponent : public UActorComponent
 {

@@ -14,6 +14,7 @@ public class MultiplayerShooter : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"InputCore",
+			"Niagara",
 			"Networking",
 			"Sockets",
 			"UMG"

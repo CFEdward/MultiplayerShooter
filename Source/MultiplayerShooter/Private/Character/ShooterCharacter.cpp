@@ -208,6 +208,7 @@ void AShooterCharacter::MulticastElim_Implementation()
 
 	// Disable character movement
 	bDisableGameplay = true;
+	GetCharacterMovement()->DisableMovement();
 	if (Combat)
 	{
 		Combat->FireButtonPressed(false);
@@ -524,6 +525,22 @@ void AShooterCharacter::PlayReloadMontage()
 		switch (Combat->EquippedWeapon->GetWeaponType())
 		{
 		case EWeaponType::EWT_AssaultRifle:
+			SectionName = FName("Rifle");
+			break;
+			
+		case EWeaponType::EWT_RocketLauncher:
+			SectionName = FName("Rifle");
+			break;
+
+		case EWeaponType::EWT_Pistol:
+			SectionName = FName("Rifle");
+			break;
+
+		case EWeaponType::EWT_SubmachineGun:
+			SectionName = FName("Rifle");
+			break;
+
+		case EWeaponType::EWT_Shotgun:
 			SectionName = FName("Rifle");
 			break;
 			
