@@ -20,6 +20,7 @@ class MULTIPLAYERSHOOTER_API AShooterPlayerController : public APlayerController
 
 public:
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetHUDHealth(const float Health, const float MaxHealth);
 	void SetHUDScore(const float Score);
 	void SetHUDDefeats(const int32 Defeats);
@@ -27,9 +28,9 @@ public:
 	void SetHUDCarriedAmmo(const int32 Ammo);
 	void SetHUDMatchCountdown(const float CountdownTime);
 	void SetHUDAnnouncementCountdown(const float CountdownTime);
+	void SetHUDSniperScope(const bool bIsAiming);
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual float GetServerTime();	// Synced with server world clock
 	virtual void ReceivedPlayer() override;	// Sync with server clock as soon as possible
@@ -67,7 +68,13 @@ protected:
 	void ServerCheckMatchState();
 
 	UFUNCTION(Client, Reliable)
-	void ClientJoinMidgame(const FName StateOfMatch, const float Warmup, const float Match, const float Cooldown, const float StartingTime);
+	void ClientJoinMidgame(
+		const FName StateOfMatch,
+		const float Warmup,
+		const float Match,
+		const float Cooldown,
+		const float StartingTime
+	);
 	
 private:
 

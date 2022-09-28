@@ -11,6 +11,7 @@
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
 #include "HUD/ShooterHUD.h"
+#include "HUD/SniperScope.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PlayerState/ShooterPlayerState.h"
@@ -223,6 +224,31 @@ void AShooterPlayerController::SetHUDAnnouncementCountdown(const float Countdown
 	}
 }
 
+void AShooterPlayerController::SetHUDSniperScope(const bool bIsAiming)
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	if (!ShooterHUD->SniperScope)
+	{
+		ShooterHUD->AddSniperScope();
+	}
+	if (ShooterHUD && ShooterHUD->SniperScope && ShooterHUD->SniperScope->ScopeZoomIn)
+	{
+		if (bIsAiming)
+		{
+			ShooterHUD->SniperScope->PlayAnimation(ShooterHUD->SniperScope->ScopeZoomIn);
+		}
+		else
+		{
+			ShooterHUD->SniperScope->PlayAnimation(
+				ShooterHUD->SniperScope->ScopeZoomIn,
+				0.0f,
+				1,
+				EUMGSequencePlayMode::Reverse
+			);
+		}
+	}
+}
+
 void AShooterPlayerController::SetHUDTime()
 {
 	ShooterGameMode = ShooterGameMode == nullptr ?
@@ -369,10 +395,10 @@ void AShooterPlayerController::HandleCooldown()
 			ShooterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
 			const FString AnnouncementText("New Match Starts In: ");
 			ShooterHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
-			
-			AShooterGameState* ShooterGameState =
+
+			const AShooterGameState* ShooterGameState =
 				Cast<AShooterGameState>(UGameplayStatics::GetGameState(this));
-			AShooterPlayerState* ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
+			const AShooterPlayerState* ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
 			if (ShooterGameState && ShooterPlayerState)
 			{
 				TArray<AShooterPlayerState*> TopPlayers = ShooterGameState->TopScoringPlayers;

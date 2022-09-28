@@ -22,21 +22,22 @@ public:
 
 protected:
 
-	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget);
-
-private:
-
-	UPROPERTY(EditAnywhere)
-	float Damage;
+	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget) const;
+	void WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutHit) const;
 
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* ImpactParticles;
+	
+	UPROPERTY(EditAnywhere)
+	USoundCue* HitSound;
+	
+	UPROPERTY(EditAnywhere)
+	float Damage;
+	
+private:
 
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* BeamParticles;
-
-	UPROPERTY(EditAnywhere)
-	USoundCue* HitSound;
 
 	/**
 	 * Trace end with scatter

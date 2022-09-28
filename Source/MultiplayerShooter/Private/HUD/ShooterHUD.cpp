@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
+#include "HUD/SniperScope.h"
 
 AShooterHUD::AShooterHUD() :
 	CrosshairSpreadMax(16.0f)
@@ -35,6 +36,15 @@ void AShooterHUD::AddAnnouncement()
 	{
 		Announcement = CreateWidget<UAnnouncement>(PlayerController, AnnouncementClass);
 		Announcement->AddToViewport();
+	}
+}
+
+void AShooterHUD::AddSniperScope()
+{
+	if (APlayerController* PlayerController = GetOwningPlayerController(); PlayerController && SniperScopeClass)
+	{
+		SniperScope = CreateWidget<USniperScope>(PlayerController, SniperScopeClass);
+		SniperScope->AddToViewport();
 	}
 }
 

@@ -13,6 +13,7 @@ class AShooterCharacter;
 class AWeapon;
 class AShooterPlayerController;
 class AShooterHUD;
+class USoundCue;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MULTIPLAYERSHOOTER_API UCombatComponent : public UActorComponent
@@ -143,6 +144,12 @@ private:
 	void OnRep_CombatState();
 
 	void UpdateAmmoValue();
+
+	UPROPERTY(EditAnywhere, Category = "Scope Sound")
+	USoundCue* ZoomInSniperRifle;
+
+	UPROPERTY(EditAnywhere, Category = "Scope Sound")
+	USoundCue* ZoomOutSniperRifle;
 	
 public:
 	

@@ -4,13 +4,17 @@
 #include "Weapon/Projectile.h"
 
 #include "Components/BoxComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "MultiplayerShooter/MultiplayerShooter.h"
 
 // Sets default values
 AProjectile::AProjectile() :
-	Damage(20.0f)
+	Damage(20.0f),
+	DestroyTime(3.0f),
+	DamageInnerRadius(200.0f),
+	DamageOuterRadius(500.0f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -59,12 +63,61 @@ void AProjectile::OnHit(
 	Destroy();
 }
 
+void AProjectile::SpawnTrailSystem()
+{
+	if (TrailSystem)
+	{
+		TrailSystemComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			TrailSystem,
+			GetRootComponent(),
+			FName(),
+			GetActorLocation(),
+			GetActorRotation(),
+			EAttachLocation::KeepWorldPosition,
+			false
+		);
+	}
+}
+
 // Called every frame
 // ReSharper disable once CppParameterMayBeConst
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AProjectile::StartDestroyTimer()
+{
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ThisClass::DestroyTimerFinished, DestroyTime);
+}
+
+void AProjectile::DestroyTimerFinished()
+{
+	Destroy();
+}
+
+void AProjectile::ExplodeDamage()
+{
+	if (const APawn* FiringPawn = GetInstigator(); FiringPawn && HasAuthority())
+	{
+		if (AController* FiringController = FiringPawn->GetController())
+		{
+			UGameplayStatics::ApplyRadialDamageWithFalloff(
+				this,
+				Damage,
+				10.0f,
+				GetActorLocation(),
+				DamageInnerRadius,
+				DamageOuterRadius,
+				1.0f, 
+				UDamageType::StaticClass(),
+				TArray<AActor*>(),
+				this,
+				FiringController	// InstigatorController
+			);
+		}
+	}
 }
 
 void AProjectile::Destroyed()

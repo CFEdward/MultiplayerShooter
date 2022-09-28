@@ -162,10 +162,10 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 	}
 
 	const FVector2D CrosshairLocation(ViewportSize.X / 2.0f, ViewportSize.Y / 2.0f);
+	
 	FVector CrosshairWorldPosition;
 	FVector CrosshairWorldDirection;
-
-	if (const bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+	if (UGameplayStatics::DeprojectScreenToWorld(
 			UGameplayStatics::GetPlayerController(this,0),
 			CrosshairLocation,
 			CrosshairWorldPosition,
@@ -181,6 +181,7 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		const FVector End = Start + CrosshairWorldDirection * TRACE_LENGTH;
 		
 		GetWorld()->LineTraceSingleByChannel(TraceHitResult, Start, End, ECollisionChannel::ECC_Visibility);
+		if (!TraceHitResult.bBlockingHit) TraceHitResult.ImpactPoint = End; // Just aim forward if there is no bBlockingHit
 		if (TraceHitResult.GetActor() && TraceHitResult.GetActor()->Implements<UInteractWithCrosshairsInterface>())
 		{
 			HUDPackage.CrosshairsColor = FLinearColor::Red;
@@ -442,11 +443,30 @@ void UCombatComponent::InterpFOV(const float DeltaTime)
 
 void UCombatComponent::SetAiming(const bool bIsAiming)
 {
+	if (Character == nullptr || EquippedWeapon == nullptr) return;
+	
 	bAiming = bIsAiming;		// Cosmetic purposes | executed before the RPC reaches the server
 	ServerSetAiming(bIsAiming);
 	if (Character)
 	{
 		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
+	
+	if (Character->IsLocallyControlled() && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
+	{
+		Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+		if (Controller)
+		{
+			Controller->SetHUDSniperScope(bIsAiming);
+			if (bIsAiming && ZoomInSniperRifle && ZoomOutSniperRifle)
+			{
+				UGameplayStatics::PlaySound2D(this, ZoomInSniperRifle);
+			}
+			else
+			{
+				UGameplayStatics::PlaySound2D(this, ZoomOutSniperRifle);
+			}
+		}
 	}
 }
 

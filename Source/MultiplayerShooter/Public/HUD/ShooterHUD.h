@@ -9,6 +9,7 @@
 class UTexture2D;
 class UCharacterOverlay;
 class UAnnouncement;
+class USniperScope;
 
 USTRUCT(BlueprintType)
 struct FHUDPackage
@@ -60,6 +61,13 @@ public:
 
 	UPROPERTY()
 	UAnnouncement* Announcement;
+
+	UPROPERTY(EditAnywhere, Category = "Sniper")
+	TSubclassOf<UUserWidget> SniperScopeClass;
+	void AddSniperScope();
+	
+	UPROPERTY()
+	USniperScope* SniperScope;
 	
 protected:
 

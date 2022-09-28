@@ -11,6 +11,8 @@ class UProjectileMovementComponent;
 class UParticleSystem;
 class UParticleSystemComponent;
 class USoundCue;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class MULTIPLAYERSHOOTER_API AProjectile : public AActor
@@ -41,6 +43,11 @@ protected:
 		const FHitResult& Hit
 	);
 
+	void SpawnTrailSystem();
+	void StartDestroyTimer();
+	void DestroyTimerFinished();
+	void ExplodeDamage();
+
 	UPROPERTY(EditAnywhere)
 	float Damage;
 
@@ -55,7 +62,16 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	UProjectileMovementComponent* ProjectileMovementComponent;
-	
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* TrailSystem;
+
+	UPROPERTY()
+	UNiagaraComponent* TrailSystemComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* ProjectileMesh;
+
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -63,6 +79,17 @@ private:
 
 	UPROPERTY()
 	UParticleSystemComponent* TracerComponent;
+
+	FTimerHandle DestroyTimer;
+
+	UPROPERTY(EditAnywhere)
+	float DestroyTime;
+
+	UPROPERTY(EditAnywhere)
+	float DamageInnerRadius;
+
+	UPROPERTY(EditAnywhere)
+	float DamageOuterRadius;
 	
 public:	
 
