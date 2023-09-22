@@ -28,5 +28,5 @@ public:
 
 protected:
 
-	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
+	virtual void NativeDestruct() override;
 };
