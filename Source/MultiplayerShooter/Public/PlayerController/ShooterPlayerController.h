@@ -29,6 +29,7 @@ public:
 	void SetHUDMatchCountdown(const float CountdownTime);
 	void SetHUDAnnouncementCountdown(const float CountdownTime);
 	void SetHUDSniperScope(const bool bIsAiming);
+	void SetHUDGrenades(int32 Grenades);
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 
@@ -104,5 +105,6 @@ private:
 	float HUDMaxHealth;
 	float HUDScore;
 	int32 HUDDefeats;
+	int32 HUDGrenades;
 	
 };

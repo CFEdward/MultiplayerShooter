@@ -164,9 +164,18 @@ private:
 	USoundCue* ZoomInSniperRifle;
 	UPROPERTY(EditAnywhere, Category = "Scope Sound")
 	USoundCue* ZoomOutSniperRifle;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Grenades)
+	int32 Grenades = 4;
+	UFUNCTION()
+	void OnRep_Grenades();
+	UPROPERTY(EditAnywhere)
+	int32 MaxGrenades = 4;
+	void UpdateHUDGrenades();
 	
 public:
 	
 	FORCEINLINE void SetCombatState(const ECombatState State) { CombatState = State; }
+	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	
 };

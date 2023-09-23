@@ -498,6 +498,7 @@ void AShooterCharacter::ReceiveDamage(
 	AController* InstigatorController,
 	AActor* DamageCauser)
 {
+	if (bElimmed) return;
 	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
 	UpdateHUDHealth();
 	PlayHitReactMontage();

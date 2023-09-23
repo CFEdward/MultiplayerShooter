@@ -249,6 +249,23 @@ void AShooterPlayerController::SetHUDSniperScope(const bool bIsAiming)
 	}
 }
 
+void AShooterPlayerController::SetHUDGrenades(int32 Grenades)
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+
+	if (ShooterHUD &&
+		ShooterHUD->CharacterOverlay &&
+		ShooterHUD->CharacterOverlay->GrenadesText)
+	{
+		const FString GrenadesString = FString::Printf(TEXT("%d"), Grenades);
+		ShooterHUD->CharacterOverlay->GrenadesText->SetText(FText::FromString(GrenadesString));
+	}
+	else
+	{
+		HUDGrenades = Grenades;
+	}
+}
+
 void AShooterPlayerController::SetHUDTime()
 {
 	ShooterGameMode = ShooterGameMode == nullptr ?
@@ -309,6 +326,11 @@ void AShooterPlayerController::PollInit()
 				SetHUDHealth(HUDHealth, HUDMaxHealth);
 				SetHUDScore(HUDScore);
 				SetHUDDefeats(HUDDefeats);
+
+				if (const AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn()); ShooterCharacter && ShooterCharacter->GetCombat())
+				{
+					SetHUDGrenades(HUDGrenades);
+				}
 			}
 		}
 	}
