@@ -9,6 +9,7 @@
 #include "ShooterTypes/CombatState.h"
 #include "CombatComponent.generated.h"
 
+class AProjectile;
 class AShooterCharacter;
 class AWeapon;
 class AShooterPlayerController;
@@ -95,6 +96,8 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerThrowGrenade();
 	void ShowAttachedGrenade(bool bShowGrenade) const;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectile> GrenadeClass;
 
 private:
 

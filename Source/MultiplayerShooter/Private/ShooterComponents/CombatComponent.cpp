@@ -11,6 +11,7 @@
 #include "Net/UnrealNetwork.h"
 #include "PlayerController/ShooterPlayerController.h"
 #include "Sound/SoundCue.h"
+#include "Weapon/Projectile.h"
 #include "Weapon/Weapon.h"
 
 // Sets default values for this component's properties
@@ -241,7 +242,7 @@ void UCombatComponent::JumpToShotgunEnd() const
 
 void UCombatComponent::ThrowGrenade()
 {
-	if (CombatState != ECombatState::ECS_Unoccupied) return;
+	if (CombatState != ECombatState::ECS_Unoccupied || EquippedWeapon == nullptr) return;
 	
 	CombatState = ECombatState::ECS_ThrowingGrenade;
 	if (Character)
@@ -284,6 +285,18 @@ void UCombatComponent::ThrowGrenadeFinished()
 void UCombatComponent::LaunchGrenade()
 {
 	ShowAttachedGrenade(false);
+	if (Character && Character->HasAuthority() && GrenadeClass && Character->GetAttachedGrenade())
+	{
+		const FVector StartingLocation = Character->GetAttachedGrenade()->GetComponentLocation();
+		const FVector ToTarget = HitTarget - StartingLocation;
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = Character;
+		SpawnParams.Instigator = Character;
+		if (UWorld* World = GetWorld())
+		{
+			World->SpawnActor<AProjectile>(GrenadeClass, StartingLocation, ToTarget.Rotation(), SpawnParams);
+		}
+	}
 }
 
 void UCombatComponent::SetAiming(const bool bIsAiming)
