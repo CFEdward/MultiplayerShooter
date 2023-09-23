@@ -38,6 +38,11 @@ public:
 	void FinishReloading();
 
 	void FireButtonPressed(const bool bPressed);
+
+	UFUNCTION(BlueprintCallable)
+	void ShotgunShellReload();
+	
+	void JumpToShotgunEnd() const;
 	
 protected:
 	
@@ -143,7 +148,8 @@ private:
 	UFUNCTION()
 	void OnRep_CombatState();
 
-	void UpdateAmmoValue();
+	void UpdateAmmoValues();
+	void UpdateShotgunAmmoValues();
 
 	UPROPERTY(EditAnywhere, Category = "Scope Sound")
 	USoundCue* ZoomInSniperRifle;
