@@ -48,6 +48,8 @@ public:
 	void ThrowGrenadeFinished();
 	UFUNCTION(BlueprintCallable)
 	void LaunchGrenade();
+	UFUNCTION(Server, Reliable)
+	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
 	
 protected:
 	
