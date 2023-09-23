@@ -211,6 +211,12 @@ private:
 
 	UPROPERTY()
 	AShooterPlayerState* ShooterPlayerState;
+
+	/**
+	 * Grenade
+	 */
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* AttachedGrenade;
 	
 public:
 
