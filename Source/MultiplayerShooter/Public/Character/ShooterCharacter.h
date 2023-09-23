@@ -39,6 +39,7 @@ public:
 	void PlayReloadMontage();
 	void ReloadMontageInterrupted(UAnimMontage* Montage, bool bInterrupted);
 	void PlayElimMontage() const;
+	void PlayThrowGrenadeMontage() const;
 	virtual void OnRep_ReplicatedMovement() override;
 	void Elim();
 	virtual void Destroyed() override;
@@ -68,6 +69,7 @@ protected:
 	void AimButtonReleased();
 	void FireButtonPressed();
 	void FireButtonReleased();
+	void GrenadeButtonPressed();
 	float CalculateSpeed() const;
 	void CalculateAO_Pitch();
 	void AimOffset(const float DeltaTime);
@@ -130,6 +132,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* ElimMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* ThrowGrenadeMontage;
 
 	void HideCharacterIfCameraClose() const;
 

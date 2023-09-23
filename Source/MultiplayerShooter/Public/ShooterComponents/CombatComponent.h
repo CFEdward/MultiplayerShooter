@@ -43,6 +43,9 @@ public:
 	void ShotgunShellReload();
 	
 	void JumpToShotgunEnd() const;
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowGrenadeFinished();
 	
 protected:
 	
@@ -66,6 +69,10 @@ protected:
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 	void SetHUDCrosshairs(const float DeltaTime);
 	void InterpFOV(const float DeltaTime);
+
+	void ThrowGrenade();
+	UFUNCTION(Server, Reliable)
+	void ServerThrowGrenade();
 
 	/**
 	 * Automatic fire
