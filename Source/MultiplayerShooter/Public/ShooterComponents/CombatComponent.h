@@ -32,16 +32,15 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	
+	void FireButtonPressed(const bool bPressed);
+	
 	void Reload();
-
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
-
-	void FireButtonPressed(const bool bPressed);
-
 	UFUNCTION(BlueprintCallable)
 	void ShotgunShellReload();
-	
+
 	void JumpToShotgunEnd() const;
 
 	UFUNCTION(BlueprintCallable)
@@ -51,44 +50,48 @@ protected:
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	
 	void SetAiming(const bool bIsAiming);
-
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(const bool bIsAiming);
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon() const;
+	void AttachActorToRightHand(AActor* ActorToAttach) const;
+	void AttachActorToLeftHand(AActor* ActorToAttach) const;
+	void UpdateCarriedAmmo();
+	void PlayEquippedWeaponSound() const;
+	void ReloadEmptyWeapon();
+	
+	void DropEquippedWeapon() const;
+	
 	void Fire();
-
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
-
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
-
-	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
-	void SetHUDCrosshairs(const float DeltaTime);
-	void InterpFOV(const float DeltaTime);
-
-	void ThrowGrenade();
-	UFUNCTION(Server, Reliable)
-	void ServerThrowGrenade();
-
-	/**
-	 * Automatic fire
-	 */
 	
+	/** Automatic fire */
 	FTimerHandle FireTimer;
 	bool bCanFire;
 	void StartFireTimer();
 	void FireTimerFinished();
 	bool CanFire() const;
-
+	/** Automatic fire */
+	
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
-
 	void HandleReload() const;
 	int32 AmountToReload();
+
+	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
+	void SetHUDCrosshairs(const float DeltaTime);
+	
+	void InterpFOV(const float DeltaTime);
+
+	void ThrowGrenade();
+	UFUNCTION(Server, Reliable)
+	void ServerThrowGrenade();
 
 private:
 
@@ -96,53 +99,45 @@ private:
 	AShooterCharacter* Character;
 	UPROPERTY()
 	AShooterPlayerController* Controller;
-	UPROPERTY()
-	AShooterHUD* HUD;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
-
-	UPROPERTY(Replicated)
-	bool bAiming;
+	bool bFireButtonPressed;
 
 	UPROPERTY(EditAnywhere)
 	float BaseWalkSpeed;
-	
 	UPROPERTY(EditAnywhere)
 	float AimWalkSpeed;
-
-	bool bFireButtonPressed;
 
 	/**
 	 * HUD and crosshairs
 	 */
+	UPROPERTY()
+	AShooterHUD* HUD;
+	FHUDPackage HUDPackage;
 	float CrosshairVelocityFactor;
 	float CrosshairInAirFactor;
 	float CrosshairAimFactor;
 	float CrosshairShootingFactor;
 	
 	FVector HitTarget;
-	
-	FHUDPackage HUDPackage;
 
 	/**
 	 * Aiming and FOV
 	 */
+	UPROPERTY(Replicated)
+	bool bAiming;
 	// Field of view when not aiming; set to the camera's base FOV in BeginPlay
 	float DefaultFOV;
-
 	float CurrentFOV;
-
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ZoomedFOV;
-
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ZoomInterpSpeed;
 
 	// Carried ammo for the currently equipped weapon
 	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
 	int32 CarriedAmmo;
-
 	UFUNCTION()
 	void OnRep_CarriedAmmo();
 
@@ -151,7 +146,6 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
 	ECombatState CombatState;
-
 	UFUNCTION()
 	void OnRep_CombatState();
 
@@ -160,7 +154,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Scope Sound")
 	USoundCue* ZoomInSniperRifle;
-
 	UPROPERTY(EditAnywhere, Category = "Scope Sound")
 	USoundCue* ZoomOutSniperRifle;
 	
