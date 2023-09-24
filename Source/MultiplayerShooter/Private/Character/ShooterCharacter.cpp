@@ -663,10 +663,13 @@ void AShooterCharacter::HideCharacterIfCameraClose() const
 	}
 }
 
-void AShooterCharacter::OnRep_Health()
+void AShooterCharacter::OnRep_Health(const float LastHealth)
 {
 	UpdateHUDHealth();
-	PlayHitReactMontage();
+	if (Health < LastHealth)
+	{
+		PlayHitReactMontage();
+	}
 }
 
 void AShooterCharacter::UpdateHUDHealth()

@@ -45,6 +45,8 @@ public:
 	void Elim();
 	virtual void Destroyed() override;
 	
+	void UpdateHUDHealth();
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
 
@@ -75,7 +77,7 @@ protected:
 	void CalculateAO_Pitch();
 	void AimOffset(const float DeltaTime);
 	void PlayHitReactMontage() const;
-	void UpdateHUDHealth();
+	
 	// Poll for any relevant classes and initialize our HUD
 	void PollInit();
 
@@ -163,7 +165,7 @@ private:
 	float Health;
 
 	UFUNCTION()
-	void OnRep_Health();
+	void OnRep_Health(float LastHealth);
 
 	UPROPERTY()
 	AShooterPlayerController* ShooterPlayerController;
@@ -227,18 +229,20 @@ public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped() const;
 	bool IsAiming() const;
+	AWeapon* GetEquippedWeapon() const;
+	FVector GetHitTarget() const;
+	ECombatState GetCombatState() const;
+	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
+	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
-	AWeapon* GetEquippedWeapon() const;
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
-	FVector GetHitTarget() const;
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE bool ShouldRotateRootBone()	const { return bRotateRootBone; }
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetHealth() const { return Health; }
+	FORCEINLINE void SetHealth(const float Amount) { Health = Amount; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
-	ECombatState GetCombatState() const;
-	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 	FORCEINLINE UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
 	FORCEINLINE UStaticMeshComponent* GetAttachedGrenade() const { return AttachedGrenade; }

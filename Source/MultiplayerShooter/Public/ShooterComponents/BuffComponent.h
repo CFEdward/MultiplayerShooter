@@ -7,6 +7,7 @@
 #include "BuffComponent.generated.h"
 
 
+class UNiagaraSystem;
 class AShooterCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -19,6 +20,8 @@ public:
 	UBuffComponent();
 
 	friend AShooterCharacter;
+
+	void Heal(float HealAmount, float HealingTime);
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
@@ -26,13 +29,18 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	void HealRampUp(float DeltaTime);
+
 private:
 
 	UPROPERTY()
-	AShooterCharacter* Character;
+	TObjectPtr<AShooterCharacter> Character;
 
-public:	
+	bool bHealing;
+	float HealingRate;
+	float AmountToHeal;
 
-	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> HealingEffect;
 	
 };
