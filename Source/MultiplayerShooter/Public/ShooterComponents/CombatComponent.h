@@ -117,6 +117,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	float BaseWalkSpeed;
 	UPROPERTY(EditAnywhere)
+	float BaseCrouchSpeed;
+	UPROPERTY(EditAnywhere)
 	float AimWalkSpeed;
 
 	/**
@@ -179,7 +181,8 @@ private:
 	void UpdateHUDGrenades();
 	
 public:
-	
+
+	void SetWalkSpeeds(float BaseSpeed, float CrouchSpeed);
 	FORCEINLINE void SetCombatState(const ECombatState State) { CombatState = State; }
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	

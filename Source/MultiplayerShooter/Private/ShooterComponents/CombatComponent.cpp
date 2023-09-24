@@ -17,16 +17,17 @@
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent() :
 	bCanFire(true),
-	ZoomedFOV(30.0f),
-	ZoomInterpSpeed(20.0f),
+	ZoomedFOV(30.f),
+	ZoomInterpSpeed(20.f),
 	CombatState(ECombatState::ECS_Unoccupied)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	BaseWalkSpeed = 600.0f;
-	AimWalkSpeed = 450.0f;
+	BaseWalkSpeed = 600.f;
+	BaseCrouchSpeed = 300.f;
+	AimWalkSpeed = 450.f;
 }
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -286,6 +287,12 @@ void UCombatComponent::UpdateHUDGrenades()
 	{
 		Controller->SetHUDGrenades(Grenades);
 	}
+}
+
+void UCombatComponent::SetWalkSpeeds(float BaseSpeed, float CrouchSpeed)
+{
+	BaseWalkSpeed = BaseSpeed;
+	BaseCrouchSpeed = CrouchSpeed;
 }
 
 void UCombatComponent::OnRep_Grenades()

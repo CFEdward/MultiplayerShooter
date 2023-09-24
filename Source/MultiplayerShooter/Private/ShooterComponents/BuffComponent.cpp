@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Character/ShooterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ShooterComponents/CombatComponent.h"
 
 
 UBuffComponent::UBuffComponent() :
@@ -85,4 +86,8 @@ void UBuffComponent::MulticastSpeedBuff_Implementation(const float BaseSpeed, co
 {
 	Character->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
 	Character->GetCharacterMovement()->MaxWalkSpeedCrouched = CrouchSpeed;
+	if (Character->GetCombat())
+	{
+		Character->GetCombat()->SetWalkSpeeds(BaseSpeed, CrouchSpeed);
+	}
 }
