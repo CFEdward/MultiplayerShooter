@@ -20,10 +20,12 @@ public:
 	UBuffComponent();
 
 	friend AShooterCharacter;
-
-	void Heal(float HealAmount, float HealingTime);
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void Heal(float HealAmount, float HealingTime);
+
+	void BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float BuffTime);
 	
 protected:
 	
@@ -36,11 +38,27 @@ private:
 	UPROPERTY()
 	TObjectPtr<AShooterCharacter> Character;
 
+	/**
+	 *  Heal buff
+	 */
 	bool bHealing;
 	float HealingRate;
 	float AmountToHeal;
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> HealingEffect;
+
+	/**
+	 * Speed buff
+	 */
+	FTimerHandle SpeedBuffTimer;
+	void ResetSpeeds();
+	float InitialBaseSpeed;
+	float InitialCrouchSpeed;
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpeedBuff(float BaseSpeed, float CrouchSpeed);
+
+public:
+
+	void SetInitialSpeeds(float BaseSpeed, float CrouchSpeed);
 	
 };

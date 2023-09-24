@@ -4,20 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Pickups/Pickup.h"
-#include "HealthPickup.generated.h"
+#include "SpeedPickup.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MULTIPLAYERSHOOTER_API AHealthPickup : public APickup
+class MULTIPLAYERSHOOTER_API ASpeedPickup : public APickup
 {
 	GENERATED_BODY()
 
 public:
 
-	AHealthPickup();
-	
+	ASpeedPickup();
+
 protected:
 
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent,
@@ -30,8 +30,11 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere)
-	float HealAmount;
+	float BaseSpeedBuff;
 	UPROPERTY(EditAnywhere)
-	float HealingTime;
+	float CrouchSpeedBuff;
+
+	UPROPERTY(EditAnywhere)
+	float SpeedBuffTime;
 	
 };
