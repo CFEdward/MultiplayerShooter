@@ -329,7 +329,7 @@ void AShooterPlayerController::PollInit()
 
 				if (const AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn()); ShooterCharacter && ShooterCharacter->GetCombat())
 				{
-					SetHUDGrenades(HUDGrenades);
+					SetHUDGrenades(ShooterCharacter->GetCombat()->GetGrenades());
 				}
 			}
 		}
