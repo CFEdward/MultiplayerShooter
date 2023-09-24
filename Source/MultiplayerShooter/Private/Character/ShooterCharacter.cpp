@@ -15,6 +15,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "PlayerController/ShooterPlayerController.h"
 #include "PlayerState/ShooterPlayerState.h"
+#include "ShooterComponents/BuffComponent.h"
 #include "ShooterComponents/CombatComponent.h"
 #include "Weapon/Weapon.h"
 #include "Sound/SoundCue.h"
@@ -51,6 +52,9 @@ AShooterCharacter::AShooterCharacter() :
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
+
+	Buff = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComponent"));
+	Buff->SetIsReplicated(true);
 
 	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComponent"));
 
@@ -158,6 +162,10 @@ void AShooterCharacter::PostInitializeComponents()
 	if (Combat)
 	{
 		Combat->Character = this;
+	}
+	if (Buff)
+	{
+		Buff->Character = this;
 	}
 }
 

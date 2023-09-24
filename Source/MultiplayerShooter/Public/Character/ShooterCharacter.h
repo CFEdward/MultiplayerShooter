@@ -10,6 +10,7 @@
 #include "ShooterTypes/CombatState.h"
 #include "ShooterCharacter.generated.h"
 
+class UBuffComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UWidgetComponent;
@@ -105,6 +106,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* Combat;
+
+	UPROPERTY(VisibleAnywhere)
+	UBuffComponent* Buff;
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
