@@ -34,6 +34,9 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult);
 
+	UPROPERTY(EditAnywhere)
+	float BaseTurnRate;
+
 private:
 
 	UPROPERTY(EditAnywhere)
