@@ -10,12 +10,8 @@
 
 
 UBuffComponent::UBuffComponent() :
-	bHealing(false),
-	HealingRate(0.f),
-	AmountToHeal(0.f),
-	InitialBaseSpeed(0.f),
-	InitialCrouchSpeed(0.f),
-	InitialJumpVelocity(0.f)
+	bHealing(false), HealingRate(0.f), AmountToHeal(0.f), bReplenishingShield(false), ShieldReplenishRate(0.f), ShieldReplenishAmount(0.f),
+	InitialBaseSpeed(0.f), InitialCrouchSpeed(0.f), InitialJumpVelocity(0.f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -25,6 +21,7 @@ void UBuffComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UBuffComponent, HealingEffect);
+	DOREPLIFETIME(UBuffComponent, ShieldEffect);
 	DOREPLIFETIME(UBuffComponent, SpeedEffect);
 	DOREPLIFETIME(UBuffComponent, JumpEffect);
 }
@@ -33,6 +30,14 @@ void UBuffComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void UBuffComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	HealRampUp(DeltaTime);
+	ShieldRampUp(DeltaTime);
 }
 
 void UBuffComponent::SetInitialSpeeds(const float BaseSpeed, const float CrouchSpeed)
@@ -44,13 +49,6 @@ void UBuffComponent::SetInitialSpeeds(const float BaseSpeed, const float CrouchS
 void UBuffComponent::SetInitialJumpVelocity(const float Velocity)
 {
 	InitialJumpVelocity = Velocity;
-}
-
-void UBuffComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	HealRampUp(DeltaTime);	
 }
 
 void UBuffComponent::MulticastSpawnCharacterEffect_Implementation(UNiagaraSystem* Effect)
@@ -67,7 +65,10 @@ void UBuffComponent::Heal(const float HealAmount, const float HealingTime)
 	AmountToHeal += HealAmount;
 	HealingRate = HealAmount / HealingTime;
 
-	MulticastSpawnCharacterEffect(HealingEffect);
+	if (HealingEffect)
+	{
+		MulticastSpawnCharacterEffect(HealingEffect);
+	}
 }
 
 void UBuffComponent::HealRampUp(const float DeltaTime)
@@ -83,6 +84,35 @@ void UBuffComponent::HealRampUp(const float DeltaTime)
 	{
 		bHealing = false;
 		AmountToHeal = 0.f;
+	}
+}
+
+void UBuffComponent::ReplenishShield(const float ShieldAmount, const float ReplenishTime)
+{
+	bReplenishingShield = true;
+	ShieldReplenishAmount += ShieldAmount;
+	ShieldReplenishRate = ShieldAmount / ReplenishTime;
+
+	if (ShieldEffect)
+	{
+		MulticastSpawnCharacterEffect(ShieldEffect);
+	}
+	
+}
+
+void UBuffComponent::ShieldRampUp(const float DeltaTime)
+{
+	if (!bReplenishingShield || Character == nullptr || Character->IsElimmed()) return;
+
+	const float ReplenishThisFrame = ShieldReplenishRate * DeltaTime;
+	Character->SetShield(FMath::Clamp(Character->GetShield() + ReplenishThisFrame, 0.f, Character->GetMaxShield()));
+	Character->UpdateHUDShield();
+	ShieldReplenishAmount -= ReplenishThisFrame;
+	
+	if (ShieldReplenishAmount <= 0.f || Character->GetShield() >= Character->GetMaxShield())
+	{
+		bReplenishingShield = false;
+		ShieldReplenishAmount = 0.f;
 	}
 }
 
@@ -104,7 +134,7 @@ void UBuffComponent::ResetSpeeds()
 	
 void UBuffComponent::MulticastSpeedBuff_Implementation(const float BaseSpeed, const float CrouchSpeed)
 {
-	if (BaseSpeed > Character->GetCharacterMovement()->MaxWalkSpeed)
+	if (BaseSpeed > Character->GetCharacterMovement()->MaxWalkSpeed && SpeedEffect)
 	{
 		MulticastSpawnCharacterEffect(SpeedEffect);
 	}
@@ -128,7 +158,7 @@ void UBuffComponent::BuffJump(const float BuffJumpVelocity, const float BuffTime
 
 void UBuffComponent::MulticastJumpBuff_Implementation(const float JumpVelocity)
 {
-	if (JumpVelocity > Character->GetCharacterMovement()->JumpZVelocity)
+	if (JumpVelocity > Character->GetCharacterMovement()->JumpZVelocity && JumpEffect)
 	{
 		MulticastSpawnCharacterEffect(JumpEffect);
 	}

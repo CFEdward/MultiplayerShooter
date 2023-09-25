@@ -30,7 +30,7 @@ AShooterCharacter::AShooterCharacter() :
 	MaxHealth(100.0f),
 	Health(MaxHealth),
 	MaxShield(100.f),
-	Shield(100.f),
+	Shield(0.f),
 	bElimmed(false),
 	ElimDelay(3.0f)
 {

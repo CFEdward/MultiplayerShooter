@@ -26,6 +26,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Heal(float HealAmount, float HealingTime);
+	void ReplenishShield(float ShieldAmount, float ReplenishTime);
 	void BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float BuffTime);
 	void BuffJump(float BuffJumpVelocity, float BuffTime);
 	
@@ -35,11 +36,16 @@ protected:
 
 	void HealRampUp(float DeltaTime);
 
+	void ShieldRampUp(float DeltaTime);
+
 private:
 
 	UPROPERTY()
 	TObjectPtr<AShooterCharacter> Character;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpawnCharacterEffect(UNiagaraSystem* Effect);
+	
 	/**
 	 *  Heal buff
 	 */
@@ -48,9 +54,15 @@ private:
 	float AmountToHeal;
 	UPROPERTY(EditAnywhere, Replicated)
 	TObjectPtr<UNiagaraSystem> HealingEffect;
-	
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSpawnCharacterEffect(UNiagaraSystem* Effect);
+
+	/**
+	 * Shield buff
+	 */
+	bool bReplenishingShield;
+	float ShieldReplenishRate;
+	float ShieldReplenishAmount;
+	UPROPERTY(EditAnywhere, Replicated)
+	TObjectPtr<UNiagaraSystem> ShieldEffect;
 
 	/**
 	 * Speed buff
