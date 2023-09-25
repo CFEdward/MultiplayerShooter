@@ -14,7 +14,8 @@ UBuffComponent::UBuffComponent() :
 	HealingRate(0.f),
 	AmountToHeal(0.f),
 	InitialBaseSpeed(0.f),
-	InitialCrouchSpeed(0.f)
+	InitialCrouchSpeed(0.f),
+	InitialJumpVelocity(0.f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -25,6 +26,7 @@ void UBuffComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(UBuffComponent, HealingEffect);
 	DOREPLIFETIME(UBuffComponent, SpeedEffect);
+	DOREPLIFETIME(UBuffComponent, JumpEffect);
 }
 
 void UBuffComponent::BeginPlay()
@@ -39,11 +41,24 @@ void UBuffComponent::SetInitialSpeeds(const float BaseSpeed, const float CrouchS
 	InitialCrouchSpeed = CrouchSpeed;
 }
 
+void UBuffComponent::SetInitialJumpVelocity(const float Velocity)
+{
+	InitialJumpVelocity = Velocity;
+}
+
 void UBuffComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	HealRampUp(DeltaTime);	
+}
+
+void UBuffComponent::MulticastSpawnCharacterEffect_Implementation(UNiagaraSystem* Effect)
+{
+	if (Character)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(Effect, Character->GetMesh(), FName("AttachPoint"), Character->GetActorLocation(), Character->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+	}
 }
 
 void UBuffComponent::Heal(const float HealAmount, const float HealingTime)
@@ -102,10 +117,28 @@ void UBuffComponent::MulticastSpeedBuff_Implementation(const float BaseSpeed, co
 	}
 }
 
-void UBuffComponent::MulticastSpawnCharacterEffect_Implementation(UNiagaraSystem* Effect)
+void UBuffComponent::BuffJump(const float BuffJumpVelocity, const float BuffTime)
 {
-	if (Character)
+	if (Character == nullptr || Character->GetCharacterMovement() == nullptr) return;
+
+	Character->GetWorldTimerManager().SetTimer(JumpBuffTimer, this, &ThisClass::ResetJump, BuffTime);
+
+	MulticastJumpBuff(BuffJumpVelocity);
+}
+
+void UBuffComponent::MulticastJumpBuff_Implementation(const float JumpVelocity)
+{
+	if (JumpVelocity > Character->GetCharacterMovement()->JumpZVelocity)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(Effect, Character->GetMesh(), FName("AttachPoint"), Character->GetActorLocation(), Character->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
+		MulticastSpawnCharacterEffect(JumpEffect);
 	}
+	
+	Character->GetCharacterMovement()->JumpZVelocity = JumpVelocity;
+}
+
+void UBuffComponent::ResetJump()
+{
+	if (Character == nullptr || Character->GetCharacterMovement() == nullptr) return;
+	
+	MulticastJumpBuff(InitialJumpVelocity);
 }

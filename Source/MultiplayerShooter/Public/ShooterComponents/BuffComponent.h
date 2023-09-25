@@ -26,8 +26,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Heal(float HealAmount, float HealingTime);
-
 	void BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float BuffTime);
+	void BuffJump(float BuffJumpVelocity, float BuffTime);
 	
 protected:
 	
@@ -64,8 +64,21 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpeedBuff(float BaseSpeed, float CrouchSpeed);
 
+	/**
+	 * Jump buff
+	 */
+	FTimerHandle JumpBuffTimer;
+	void ResetJump();
+	float InitialJumpVelocity;
+	UPROPERTY(EditAnywhere, Replicated)
+	TObjectPtr<UNiagaraSystem> JumpEffect;
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastJumpBuff(float JumpVelocity);
+
 public:
 
 	void SetInitialSpeeds(float BaseSpeed, float CrouchSpeed);
+
+	void SetInitialJumpVelocity(float Velocity);
 	
 };
