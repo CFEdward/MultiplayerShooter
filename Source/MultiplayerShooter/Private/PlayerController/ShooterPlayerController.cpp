@@ -17,6 +17,14 @@
 #include "ShooterComponents/CombatComponent.h"
 
 
+AShooterPlayerController::AShooterPlayerController() :
+	ClientServerDelta(0.f), TimeSyncFrequency(5.f), TimeSyncRunningTime(0.f), LevelStartingTime(0.f), MatchTime(0.f),
+	WarmupTime(0.f), CooldownTime(0.f), CountdownInt(0), bInitializeCharacterOverlay(false), HUDHealth(0.f),
+	HUDMaxHealth(0.f), HUDShield(0.f), HUDMaxShield(0.f), HUDScore(0.f), HUDDefeats(0), HUDGrenades(0)
+{
+	
+}
+
 void AShooterPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -115,6 +123,28 @@ void AShooterPlayerController::SetHUDHealth(const float Health, const float MaxH
 		bInitializeCharacterOverlay = true;
 		HUDHealth = Health;
 		HUDMaxHealth = MaxHealth;
+	}
+}
+
+void AShooterPlayerController::SetHUDShield(const float Shield, const float MaxShield)
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	
+	if (ShooterHUD &&
+		ShooterHUD->CharacterOverlay &&
+		ShooterHUD->CharacterOverlay->ShieldBar &&
+		ShooterHUD->CharacterOverlay->ShieldText)
+	{
+		const float ShieldPercent = Shield / MaxShield;
+		ShooterHUD->CharacterOverlay->ShieldBar->SetPercent(ShieldPercent);
+		const FString ShieldText = FString::Printf(TEXT("%d/%d"), FMath::CeilToInt(Shield), FMath::CeilToInt(MaxShield));
+		ShooterHUD->CharacterOverlay->ShieldText->SetText(FText::FromString(ShieldText));
+	}
+	else
+	{
+		bInitializeCharacterOverlay = true;
+		HUDShield = Shield;
+		HUDMaxShield = MaxShield;
 	}
 }
 
@@ -324,6 +354,7 @@ void AShooterPlayerController::PollInit()
 			if (CharacterOverlay)
 			{
 				SetHUDHealth(HUDHealth, HUDMaxHealth);
+				SetHUDShield(HUDShield, HUDMaxShield);
 				SetHUDScore(HUDScore);
 				SetHUDDefeats(HUDDefeats);
 

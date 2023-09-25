@@ -20,8 +20,11 @@ class MULTIPLAYERSHOOTER_API AShooterPlayerController : public APlayerController
 
 public:
 
+	AShooterPlayerController();
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetHUDHealth(const float Health, const float MaxHealth);
+	void SetHUDShield(const float Shield, const float MaxShield);
 	void SetHUDScore(const float Score);
 	void SetHUDDefeats(const int32 Defeats);
 	void SetHUDWeaponAmmo(const int32 Ammo);
@@ -57,12 +60,12 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientReportServerTime(const float TimeOfClientRequest, const float TimeServerReceivedClientRequest);
 	
-	float ClientServerDelta = 0.0f;	// Difference between client and server time
+	float ClientServerDelta;	// Difference between client and server time
 
 	UPROPERTY(EditAnywhere, Category = "Time")
-	float TimeSyncFrequency = 5.0f;
+	float TimeSyncFrequency;
 
-	float TimeSyncRunningTime = 0.0f;
+	float TimeSyncRunningTime;
 	void CheckTimeSync(const float DeltaTime);
 
 	UFUNCTION(Server, Reliable)
@@ -85,24 +88,27 @@ private:
 	UPROPERTY()
 	TObjectPtr<AShooterGameMode> ShooterGameMode;
 
-	float LevelStartingTime = 0.0f;
-	float MatchTime = 0.0f;
-	float WarmupTime = 0.0f;
-	float CooldownTime = 0.0f;
-	uint32 CountdownInt = 0;
+	float LevelStartingTime;
+	float MatchTime;
+	float WarmupTime;
+	float CooldownTime;
+	uint32 CountdownInt;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
 	FName MatchState;
-
 	UFUNCTION()
 	void OnRep_MatchState();
 
 	UPROPERTY()
 	TObjectPtr<UCharacterOverlay> CharacterOverlay;
-	bool bInitializeCharacterOverlay = false;
+	bool bInitializeCharacterOverlay;
 
 	float HUDHealth;
 	float HUDMaxHealth;
+
+	float HUDShield;
+	float HUDMaxShield;
+	
 	float HUDScore;
 	int32 HUDDefeats;
 	int32 HUDGrenades;

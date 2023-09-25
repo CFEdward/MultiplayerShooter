@@ -46,6 +46,7 @@ public:
 	virtual void Destroyed() override;
 	
 	void UpdateHUDHealth();
+	void UpdateHUDShield();
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
@@ -64,7 +65,15 @@ protected:
 	void Turn(const float Value);
 	void LookUp(const float Value);
 	void SimProxiesTurn();
+	
 	virtual void Jump() override;
+	
+	float CalculateSpeed() const;
+	void CalculateAO_Pitch();
+	void AimOffset(const float DeltaTime);
+	
+	void PlayHitReactMontage() const;
+	
 	void CrouchButtonPressed();
 	void ReloadButtonPressed();
 	void EquipButtonPressed();
@@ -73,10 +82,6 @@ protected:
 	void FireButtonPressed();
 	void FireButtonReleased();
 	void GrenadeButtonPressed();
-	float CalculateSpeed() const;
-	void CalculateAO_Pitch();
-	void AimOffset(const float DeltaTime);
-	void PlayHitReactMontage() const;
 	
 	// Poll for any relevant classes and initialize our HUD
 	void PollInit();
@@ -102,7 +107,6 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	TObjectPtr<AWeapon> OverlappingWeapon;
-
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(const AWeapon* LastWeapon) const;
 
@@ -126,7 +130,6 @@ private:
 	/**
 	 * Animation montages
 	 */
-	
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
 
@@ -143,7 +146,6 @@ private:
 	TObjectPtr<UAnimMontage> ThrowGrenadeMontage;
 
 	void HideCharacterIfCameraClose() const;
-
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold;
 
@@ -157,47 +159,46 @@ private:
 	/**
 	 * Player Health
 	 */
-
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	float MaxHealth;
-
 	UPROPERTY(ReplicatedUsing = OnRep_Health, VisibleAnywhere, Category = "Player Stats")
 	float Health;
-
 	UFUNCTION()
 	void OnRep_Health(float LastHealth);
 
+	/**
+	 * Player Shield
+	 */
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
+	float MaxShield;
+	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, Category = "Player Stats")
+	float Shield;
+	UFUNCTION()
+	void OnRep_Shield(float LastShield);
+	
 	UPROPERTY()
 	TObjectPtr<AShooterPlayerController> ShooterPlayerController;
 
 	bool bElimmed;
-
 	FTimerHandle ElimTimer;
-
 	UPROPERTY(EditDefaultsOnly)
 	float ElimDelay;
-
 	void ElimTimerFinished();
 
 	/**
 	 * Dissolve effect
 	 */
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UTimelineComponent> DissolveTimeline;
 	FOnTimelineFloat DissolveTrack;
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCurveFloat> DissolveCurve;
-
 	UFUNCTION()
 	void UpdateDissolveMaterial(const float DissolveValue);
 	void StartDissolve();
-
 	// Dynamic instance that we can change at runtime
 	UPROPERTY(VisibleAnywhere, Category = "Elim")
 	TObjectPtr<UMaterialInstanceDynamic> DynamicDissolveMaterialInstance;
-
 	// Material instance set on the Blueprint, used with the dynamic material instance
 	UPROPERTY(EditAnywhere, Category = "Elim")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
@@ -205,13 +206,10 @@ private:
 	/**
 	 * Elim bot
 	 */
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> ElimBotEffect;
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UParticleSystemComponent> ElimBotComponent;
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundCue> ElimBotSound;
 

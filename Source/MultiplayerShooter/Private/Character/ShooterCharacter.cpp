@@ -29,6 +29,8 @@ AShooterCharacter::AShooterCharacter() :
 	TimeSinceLastMovementReplication(0.0f),
 	MaxHealth(100.0f),
 	Health(MaxHealth),
+	MaxShield(100.f),
+	Shield(100.f),
 	bElimmed(false),
 	ElimDelay(3.0f)
 {
@@ -79,6 +81,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME_CONDITION(AShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(AShooterCharacter, Health);
+	DOREPLIFETIME(AShooterCharacter, Shield);
 	DOREPLIFETIME(AShooterCharacter, bDisableGameplay);
 }
 
@@ -665,14 +668,32 @@ void AShooterCharacter::OnRep_Health(const float LastHealth)
 	}
 }
 
+void AShooterCharacter::OnRep_Shield(const float LastShield)
+{
+	UpdateHUDShield();
+	if (Shield < LastShield)
+	{
+		PlayHitReactMontage();
+	}
+}
+
 void AShooterCharacter::UpdateHUDHealth()
 {
-	ShooterPlayerController =
-		ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
 	
 	if (ShooterPlayerController)
 	{
 		ShooterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
+void AShooterCharacter::UpdateHUDShield()
+{
+	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	
+	if (ShooterPlayerController)
+	{
+		ShooterPlayerController->SetHUDShield(Shield, MaxShield);
 	}
 }
 
