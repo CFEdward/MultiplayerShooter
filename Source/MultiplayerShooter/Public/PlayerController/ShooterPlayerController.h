@@ -101,16 +101,20 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UCharacterOverlay> CharacterOverlay;
-	bool bInitializeCharacterOverlay;
 
 	float HUDHealth;
+	bool bInitializeHealth;
 	float HUDMaxHealth;
 
 	float HUDShield;
+	bool bInitializeShield;
 	float HUDMaxShield;
 	
 	float HUDScore;
+	bool bInitializeScore;
 	int32 HUDDefeats;
+	bool bInitializeDefeats;
 	int32 HUDGrenades;
+	bool bInitializeGrenades;
 	
 };
