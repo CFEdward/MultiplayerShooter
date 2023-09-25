@@ -11,6 +11,7 @@
 #include "ShooterComponents/CombatComponent.h"
 #include "Weapon/BulletCasing.h"
 
+
 // Sets default values
 AWeapon::AWeapon() :
 	FireDelay(0.15f),
@@ -40,7 +41,7 @@ AWeapon::AWeapon() :
 	PickupWidget->SetupAttachment(RootComponent);
 }
 
-void AWeapon::EnableCustomDepth(bool bEnable) const
+void AWeapon::EnableCustomDepth(const bool bEnable) const
 {
 	if (WeaponMesh)
 	{

@@ -27,7 +27,7 @@ public:
 private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
-	AShooterCharacter* ShooterCharacter;
+	TObjectPtr<AShooterCharacter> ShooterCharacter;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float Speed;
@@ -42,7 +42,7 @@ private:
 	bool bWeaponEquipped;
 
 	UPROPERTY()
-	AWeapon* EquippedWeapon;
+	TObjectPtr<AWeapon> EquippedWeapon;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	bool bIsCrouched;

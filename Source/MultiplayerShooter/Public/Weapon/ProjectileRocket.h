@@ -35,17 +35,17 @@ protected:
 	) override;
 
 	UPROPERTY(VisibleAnywhere)
-	URocketMovementComponent* RocketMovementComponent;
+	TObjectPtr<URocketMovementComponent> RocketMovementComponent;
 	
 private:
 
 	UPROPERTY(EditAnywhere)
-	USoundCue* ProjectileLoop;
+	TObjectPtr<USoundCue> ProjectileLoop;
 
 	UPROPERTY()
-	UAudioComponent* ProjectileLoopComponent;
+	TObjectPtr<UAudioComponent> ProjectileLoopComponent;
 
 	UPROPERTY(EditAnywhere)
-	USoundAttenuation* LoopingSoundAttenuation;
+	TObjectPtr<USoundAttenuation> LoopingSoundAttenuation;
 	
 };

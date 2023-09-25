@@ -2,7 +2,6 @@
 
 
 #include "Pickups/Pickup.h"
-
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"

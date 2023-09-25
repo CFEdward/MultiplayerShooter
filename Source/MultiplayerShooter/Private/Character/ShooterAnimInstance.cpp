@@ -8,6 +8,7 @@
 #include "Weapon/Weapon.h"
 #include "ShooterTypes/CombatState.h"
 
+
 void UShooterAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();

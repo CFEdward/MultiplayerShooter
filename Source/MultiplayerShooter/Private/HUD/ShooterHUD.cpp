@@ -2,14 +2,15 @@
 
 
 #include "HUD/ShooterHUD.h"
-
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
 #include "HUD/SniperScope.h"
 
+
 AShooterHUD::AShooterHUD() :
+	HUDPackage(),
 	CrosshairSpreadMax(16.0f)
 {
 	

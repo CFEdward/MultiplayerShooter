@@ -5,6 +5,7 @@
 #include "Character/ShooterCharacter.h"
 #include "ShooterComponents/BuffComponent.h"
 
+
 AHealthPickup::AHealthPickup() :
 	HealAmount(100.f),
 	HealingTime(5.f)

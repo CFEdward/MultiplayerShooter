@@ -19,15 +19,15 @@ struct FHUDPackage
 public:
 
 	UPROPERTY()
-	UTexture2D* CrosshairsCenter;
+	TObjectPtr<UTexture2D> CrosshairsCenter;
 	UPROPERTY()
-	UTexture2D* CrosshairsLeft;
+	TObjectPtr<UTexture2D> CrosshairsLeft;
 	UPROPERTY()
-	UTexture2D* CrosshairsRight;
+	TObjectPtr<UTexture2D> CrosshairsRight;
 	UPROPERTY()
-	UTexture2D* CrosshairsTop;
+	TObjectPtr<UTexture2D> CrosshairsTop;
 	UPROPERTY()
-	UTexture2D* CrosshairsBottom;
+	TObjectPtr<UTexture2D> CrosshairsBottom;
 	
 	float CrosshairSpread;
 	FLinearColor CrosshairsColor;
@@ -53,21 +53,21 @@ public:
 	void AddCharacterOverlay();
 
 	UPROPERTY()
-	UCharacterOverlay* CharacterOverlay;
+	TObjectPtr<UCharacterOverlay> CharacterOverlay;
 	
 	UPROPERTY(EditAnywhere, Category = "Announcements")
 	TSubclassOf<UUserWidget> AnnouncementClass;
 	void AddAnnouncement();
 
 	UPROPERTY()
-	UAnnouncement* Announcement;
+	TObjectPtr<UAnnouncement> Announcement;
 
 	UPROPERTY(EditAnywhere, Category = "Sniper")
 	TSubclassOf<UUserWidget> SniperScopeClass;
 	void AddSniperScope();
 	
 	UPROPERTY()
-	USniperScope* SniperScope;
+	TObjectPtr<USniperScope> SniperScope;
 	
 protected:
 

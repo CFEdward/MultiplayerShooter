@@ -2,9 +2,9 @@
 
 
 #include "GameState/ShooterGameState.h"
-
 #include "Net/UnrealNetwork.h"
 #include "PlayerState/ShooterPlayerState.h"
+
 
 AShooterGameState::AShooterGameState() :
 	TopScore(0.0f)

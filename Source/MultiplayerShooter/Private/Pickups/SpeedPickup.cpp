@@ -5,6 +5,7 @@
 #include "Character/ShooterCharacter.h"
 #include "ShooterComponents/BuffComponent.h"
 
+
 ASpeedPickup::ASpeedPickup() :
 	BaseSpeedBuff(1600.f),
 	CrouchSpeedBuff(850.f),

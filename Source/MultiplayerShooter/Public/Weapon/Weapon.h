@@ -50,19 +50,19 @@ public:
 	 * Textures for the weapon crosshairs
 	 */
 	UPROPERTY(EditAnywhere, Category = Crosshairs)
-	UTexture2D* CrosshairsCenter;
+	TObjectPtr<UTexture2D> CrosshairsCenter;
 
 	UPROPERTY(EditAnywhere, Category = Crosshairs)
-	UTexture2D* CrosshairsLeft;
+	TObjectPtr<UTexture2D> CrosshairsLeft;
 
 	UPROPERTY(EditAnywhere, Category = Crosshairs)
-	UTexture2D* CrosshairsRight;
+	TObjectPtr<UTexture2D> CrosshairsRight;
 
 	UPROPERTY(EditAnywhere, Category = Crosshairs)
-	UTexture2D* CrosshairsTop;
+	TObjectPtr<UTexture2D> CrosshairsTop;
 
 	UPROPERTY(EditAnywhere, Category = Crosshairs)
-	UTexture2D* CrosshairsBottom;
+	TObjectPtr<UTexture2D> CrosshairsBottom;
 
 	/**
 	 * Automatic fire
@@ -75,7 +75,7 @@ public:
 	bool bAutomatic;
 
 	UPROPERTY(EditAnywhere)
-	USoundCue* EquipSound;
+	TObjectPtr<USoundCue> EquipSound;
 
 	/**
 	 * Enable or disable custom depth
@@ -108,10 +108,10 @@ protected:
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	USkeletalMeshComponent* WeaponMesh;
+	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	USphereComponent* AreaSphere;
+	TObjectPtr<USphereComponent> AreaSphere;
 
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponState, VisibleAnywhere, Category = "Weapon Properties")
 	EWeaponState WeaponState;
@@ -120,10 +120,10 @@ private:
 	void OnRep_WeaponState();
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
-	UWidgetComponent* PickupWidget;
+	TObjectPtr<UWidgetComponent> PickupWidget;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
-	UAnimationAsset* FireAnimation;
+	TObjectPtr<UAnimationAsset> FireAnimation;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABulletCasing> BulletCasingClass;
@@ -149,9 +149,9 @@ private:
 	int32 MagCapacity;
 
 	UPROPERTY()
-	AShooterCharacter* ShooterOwnerCharacter;
+	TObjectPtr<AShooterCharacter> ShooterOwnerCharacter;
 	UPROPERTY()
-	AShooterPlayerController* ShooterOwnerController;
+	TObjectPtr<AShooterPlayerController> ShooterOwnerController;
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;

@@ -2,9 +2,9 @@
 
 
 #include "Pickups/AmmoPickup.h"
-
 #include "Character/ShooterCharacter.h"
 #include "ShooterComponents/CombatComponent.h"
+
 
 AAmmoPickup::AAmmoPickup() :
 	AmmoAmount(30),

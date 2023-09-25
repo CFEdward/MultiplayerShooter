@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Character/ShooterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "ShooterComponents/CombatComponent.h"
 
 
@@ -14,9 +15,15 @@ UBuffComponent::UBuffComponent() :
 	AmountToHeal(0.f),
 	InitialBaseSpeed(0.f),
 	InitialCrouchSpeed(0.f)
-
 {
 	PrimaryComponentTick.bCanEverTick = true;
+}
+
+void UBuffComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UBuffComponent, HealingEffect);
 }
 
 void UBuffComponent::BeginPlay()
@@ -25,7 +32,7 @@ void UBuffComponent::BeginPlay()
 	
 }
 
-void UBuffComponent::SetInitialSpeeds(float BaseSpeed, float CrouchSpeed)
+void UBuffComponent::SetInitialSpeeds(const float BaseSpeed, const float CrouchSpeed)
 {
 	InitialBaseSpeed = BaseSpeed;
 	InitialCrouchSpeed = CrouchSpeed;
@@ -44,10 +51,7 @@ void UBuffComponent::Heal(const float HealAmount, const float HealingTime)
 	AmountToHeal += HealAmount;
 	HealingRate = HealAmount / HealingTime;
 
-	if (Character)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(HealingEffect, Character->GetMesh(), FName("AttachPoint"), Character->GetActorLocation(), Character->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
-	}
+	MulticastSpawnCharacterEffect(HealingEffect);
 }
 
 void UBuffComponent::HealRampUp(const float DeltaTime)
@@ -89,5 +93,13 @@ void UBuffComponent::MulticastSpeedBuff_Implementation(const float BaseSpeed, co
 	if (Character->GetCombat())
 	{
 		Character->GetCombat()->SetWalkSpeeds(BaseSpeed, CrouchSpeed);
+	}
+}
+
+void UBuffComponent::MulticastSpawnCharacterEffect_Implementation(UNiagaraSystem* Effect)
+{
+	if (Character)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(Effect, Character->GetMesh(), FName("AttachPoint"), Character->GetActorLocation(), Character->GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
 	}
 }

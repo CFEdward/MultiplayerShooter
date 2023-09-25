@@ -17,6 +17,6 @@ class MULTIPLAYERSHOOTER_API USniperScope : public UUserWidget
 public:
 
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
-	UWidgetAnimation* ScopeZoomIn;
+	TObjectPtr<UWidgetAnimation> ScopeZoomIn;
 	
 };

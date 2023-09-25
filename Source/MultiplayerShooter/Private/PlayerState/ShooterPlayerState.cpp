@@ -2,10 +2,10 @@
 
 
 #include "PlayerState/ShooterPlayerState.h"
-
 #include "Character/ShooterCharacter.h"
 #include "PlayerController/ShooterPlayerController.h"
 #include "Net/UnrealNetwork.h"
+
 
 void AShooterPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

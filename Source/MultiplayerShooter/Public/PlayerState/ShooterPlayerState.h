@@ -35,10 +35,10 @@ public:
 private:
 
 	UPROPERTY()
-	AShooterCharacter* Character;
+	TObjectPtr<AShooterCharacter> Character;
 	
 	UPROPERTY()
-	AShooterPlayerController* Controller;
+	TObjectPtr<AShooterPlayerController> Controller;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Defeats)
 	int32 Defeats;

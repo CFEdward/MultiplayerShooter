@@ -19,11 +19,11 @@ class MULTIPLAYERSHOOTER_API UAnnouncement : public UUserWidget
 public:
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* WarmupTime;
+	TObjectPtr<UTextBlock> WarmupTime;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* AnnouncementText;
+	TObjectPtr<UTextBlock> AnnouncementText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* InfoText;
+	TObjectPtr<UTextBlock> InfoText;
 };

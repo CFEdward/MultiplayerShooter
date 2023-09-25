@@ -2,11 +2,11 @@
 
 
 #include "Weapon/Shotgun.h"
-
 #include "Character/ShooterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+
 
 AShotgun::AShotgun() :
 	NumberOfPellets(10)

@@ -29,6 +29,6 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere)
-	USoundCue* BounceSound;
+	TObjectPtr<USoundCue> BounceSound;
 	
 };

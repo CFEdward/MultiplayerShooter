@@ -3,9 +3,9 @@
 
 #include "HUD/OverheadWidget.h"
 #include "Components/TextBlock.h"
-#include "GameFramework/PlayerState.h"
 
-void UOverheadWidget::SetDisplayText(const FString TextToDisplay) const
+
+void UOverheadWidget::SetDisplayText(const FString& TextToDisplay) const
 {
 	if (DisplayText)
 	{

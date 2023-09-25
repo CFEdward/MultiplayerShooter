@@ -21,6 +21,8 @@ public:
 
 	friend AShooterCharacter;
 	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Heal(float HealAmount, float HealingTime);
@@ -44,8 +46,11 @@ private:
 	bool bHealing;
 	float HealingRate;
 	float AmountToHeal;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Replicated)
 	TObjectPtr<UNiagaraSystem> HealingEffect;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpawnCharacterEffect(UNiagaraSystem* Effect);
 
 	/**
 	 * Speed buff

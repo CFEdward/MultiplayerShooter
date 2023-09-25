@@ -106,12 +106,12 @@ protected:
 private:
 
 	UPROPERTY()
-	AShooterCharacter* Character;
+	TObjectPtr<AShooterCharacter> Character;
 	UPROPERTY()
-	AShooterPlayerController* Controller;
+	TObjectPtr<AShooterPlayerController> Controller;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
-	AWeapon* EquippedWeapon;
+	TObjectPtr<AWeapon> EquippedWeapon;
 	bool bFireButtonPressed;
 
 	UPROPERTY(EditAnywhere)
@@ -125,7 +125,7 @@ private:
 	 * HUD and crosshairs
 	 */
 	UPROPERTY()
-	AShooterHUD* HUD;
+	TObjectPtr<AShooterHUD> HUD;
 	FHUDPackage HUDPackage;
 	float CrosshairVelocityFactor;
 	float CrosshairInAirFactor;
@@ -142,8 +142,6 @@ private:
 	// Field of view when not aiming; set to the camera's base FOV in BeginPlay
 	float DefaultFOV;
 	float CurrentFOV;
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	float ZoomedFOV;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ZoomInterpSpeed;
 
@@ -168,9 +166,9 @@ private:
 	void UpdateShotgunAmmoValues();
 
 	UPROPERTY(EditAnywhere, Category = "Scope Sound")
-	USoundCue* ZoomInSniperRifle;
+	TObjectPtr<USoundCue> ZoomInSniperRifle;
 	UPROPERTY(EditAnywhere, Category = "Scope Sound")
-	USoundCue* ZoomOutSniperRifle;
+	TObjectPtr<USoundCue> ZoomOutSniperRifle;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Grenades)
 	int32 Grenades = 4;

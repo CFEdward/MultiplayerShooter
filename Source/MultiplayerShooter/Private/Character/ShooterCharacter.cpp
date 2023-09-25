@@ -21,7 +21,7 @@
 #include "Sound/SoundCue.h"
 #include "Weapon/WeaponTypes.h"
 
-// Sets default values
+
 AShooterCharacter::AShooterCharacter() :
 	bDisableGameplay(false),
 	CameraThreshold(200.0f),
@@ -32,7 +32,6 @@ AShooterCharacter::AShooterCharacter() :
 	bElimmed(false),
 	ElimDelay(3.0f)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -83,7 +82,6 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AShooterCharacter, bDisableGameplay);
 }
 
-// Called when the game starts or when spawned
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -99,8 +97,6 @@ void AShooterCharacter::BeginPlay()
 	}
 }
 
-// Called every frame
-// ReSharper disable once CppParameterMayBeConst
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -134,7 +130,6 @@ void AShooterCharacter::RotateInPlace(const float DeltaTime)
 	}
 }
 
-// Called to bind functionality to input
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -344,7 +339,6 @@ void AShooterCharacter::ReloadButtonPressed()
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::AimButtonPressed()
 {
 	if (bDisableGameplay) return;
@@ -355,7 +349,6 @@ void AShooterCharacter::AimButtonPressed()
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::AimButtonReleased()
 {
 	if (bDisableGameplay) return;
@@ -366,7 +359,6 @@ void AShooterCharacter::AimButtonReleased()
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::FireButtonPressed()
 {
 	if (bDisableGameplay) return;
@@ -377,7 +369,6 @@ void AShooterCharacter::FireButtonPressed()
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::FireButtonReleased()
 {
 	if (bDisableGameplay) return;

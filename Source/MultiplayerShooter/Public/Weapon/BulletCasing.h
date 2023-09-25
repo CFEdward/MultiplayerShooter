@@ -35,12 +35,12 @@ protected:
 private:	
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* CasingMesh;
+	TObjectPtr<UStaticMeshComponent> CasingMesh;
 
 	UPROPERTY(EditAnywhere)
 	float ShellEjectionImpulse;
 
 	UPROPERTY(EditAnywhere)
-	USoundCue* ShellSound;
+	TObjectPtr<USoundCue> ShellSound;
 	
 };

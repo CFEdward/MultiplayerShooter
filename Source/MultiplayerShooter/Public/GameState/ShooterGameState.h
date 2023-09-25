@@ -24,7 +24,7 @@ public:
 	void UpdateTopScore(AShooterPlayerState* ScoringPlayer);
 	
 	UPROPERTY(Replicated)
-	TArray<AShooterPlayerState*> TopScoringPlayers;
+	TArray<TObjectPtr<AShooterPlayerState>> TopScoringPlayers;
 
 private:
 

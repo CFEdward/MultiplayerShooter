@@ -80,10 +80,10 @@ protected:
 private:
 
 	UPROPERTY()
-	AShooterHUD* ShooterHUD;
+	TObjectPtr<AShooterHUD> ShooterHUD;
 
 	UPROPERTY()
-	AShooterGameMode* ShooterGameMode;
+	TObjectPtr<AShooterGameMode> ShooterGameMode;
 
 	float LevelStartingTime = 0.0f;
 	float MatchTime = 0.0f;
@@ -98,7 +98,7 @@ private:
 	void OnRep_MatchState();
 
 	UPROPERTY()
-	UCharacterOverlay* CharacterOverlay;
+	TObjectPtr<UCharacterOverlay> CharacterOverlay;
 	bool bInitializeCharacterOverlay = false;
 
 	float HUDHealth;

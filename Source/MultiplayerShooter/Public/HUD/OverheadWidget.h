@@ -19,9 +19,9 @@ class MULTIPLAYERSHOOTER_API UOverheadWidget : public UUserWidget
 public:
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* DisplayText;
+	TObjectPtr<UTextBlock> DisplayText;
 
-	void SetDisplayText(const FString TextToDisplay) const;
+	void SetDisplayText(const FString& TextToDisplay) const;
 
 	UFUNCTION(BlueprintCallable)
 	void ShowPlayerNetRole(APawn* InPawn) const;

@@ -2,12 +2,12 @@
 
 
 #include "Weapon/Projectile.h"
-
 #include "Components/BoxComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "MultiplayerShooter/MultiplayerShooter.h"
+
 
 // Sets default values
 AProjectile::AProjectile() :

@@ -92,25 +92,25 @@ protected:
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	USpringArmComponent* CameraBoom;
+	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	UCameraComponent* FollowCamera;
+	TObjectPtr<UCameraComponent> FollowCamera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWidgetComponent* OverheadWidget;
+	TObjectPtr<UWidgetComponent> OverheadWidget;
 
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
-	AWeapon* OverlappingWeapon;
+	TObjectPtr<AWeapon> OverlappingWeapon;
 
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(const AWeapon* LastWeapon) const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UCombatComponent* Combat;
+	TObjectPtr<UCombatComponent> Combat;
 
 	UPROPERTY(VisibleAnywhere)
-	UBuffComponent* Buff;
+	TObjectPtr<UBuffComponent> Buff;
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
@@ -128,19 +128,19 @@ private:
 	 */
 	
 	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* FireWeaponMontage;
+	TObjectPtr<UAnimMontage> FireWeaponMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* ReloadMontage;
+	TObjectPtr<UAnimMontage> ReloadMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* HitReactMontage;
+	TObjectPtr<UAnimMontage> HitReactMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* ElimMontage;
+	TObjectPtr<UAnimMontage> ElimMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* ThrowGrenadeMontage;
+	TObjectPtr<UAnimMontage> ThrowGrenadeMontage;
 
 	void HideCharacterIfCameraClose() const;
 
@@ -168,7 +168,7 @@ private:
 	void OnRep_Health(float LastHealth);
 
 	UPROPERTY()
-	AShooterPlayerController* ShooterPlayerController;
+	TObjectPtr<AShooterPlayerController> ShooterPlayerController;
 
 	bool bElimmed;
 
@@ -184,11 +184,11 @@ private:
 	 */
 
 	UPROPERTY(VisibleAnywhere)
-	UTimelineComponent* DissolveTimeline;
+	TObjectPtr<UTimelineComponent> DissolveTimeline;
 	FOnTimelineFloat DissolveTrack;
 
 	UPROPERTY(EditAnywhere)
-	UCurveFloat* DissolveCurve;
+	TObjectPtr<UCurveFloat> DissolveCurve;
 
 	UFUNCTION()
 	void UpdateDissolveMaterial(const float DissolveValue);
@@ -196,33 +196,33 @@ private:
 
 	// Dynamic instance that we can change at runtime
 	UPROPERTY(VisibleAnywhere, Category = "Elim")
-	UMaterialInstanceDynamic* DynamicDissolveMaterialInstance;
+	TObjectPtr<UMaterialInstanceDynamic> DynamicDissolveMaterialInstance;
 
 	// Material instance set on the Blueprint, used with the dynamic material instance
 	UPROPERTY(EditAnywhere, Category = "Elim")
-	UMaterialInstance* DissolveMaterialInstance;
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
 
 	/**
 	 * Elim bot
 	 */
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* ElimBotEffect;
+	TObjectPtr<UParticleSystem> ElimBotEffect;
 
 	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* ElimBotComponent;
+	TObjectPtr<UParticleSystemComponent> ElimBotComponent;
 
 	UPROPERTY(EditAnywhere)
-	USoundCue* ElimBotSound;
+	TObjectPtr<USoundCue> ElimBotSound;
 
 	UPROPERTY()
-	AShooterPlayerState* ShooterPlayerState;
+	TObjectPtr<AShooterPlayerState> ShooterPlayerState;
 
 	/**
 	 * Grenade
 	 */
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* AttachedGrenade;
+	TObjectPtr<UStaticMeshComponent> AttachedGrenade;
 	
 public:
 

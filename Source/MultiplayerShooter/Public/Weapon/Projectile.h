@@ -52,33 +52,33 @@ protected:
 	float Damage;
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* ImpactParticles;
+	TObjectPtr<UParticleSystem> ImpactParticles;
 
 	UPROPERTY(EditAnywhere)
-	USoundCue* ImpactSound;
+	TObjectPtr<USoundCue> ImpactSound;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* CollisionBox;
+	TObjectPtr<UBoxComponent> CollisionBox;
 	
 	UPROPERTY(VisibleAnywhere)
-	UProjectileMovementComponent* ProjectileMovementComponent;
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
 
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* TrailSystem;
+	TObjectPtr<UNiagaraSystem> TrailSystem;
 
 	UPROPERTY()
-	UNiagaraComponent* TrailSystemComponent;
+	TObjectPtr<UNiagaraComponent> TrailSystemComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* ProjectileMesh;
+	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
 
 private:
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* Tracer;
+	TObjectPtr<UParticleSystem> Tracer;
 
 	UPROPERTY()
-	UParticleSystemComponent* TracerComponent;
+	TObjectPtr<UParticleSystemComponent> TracerComponent;
 
 	FTimerHandle DestroyTimer;
 

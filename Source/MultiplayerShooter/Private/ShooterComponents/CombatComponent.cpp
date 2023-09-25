@@ -2,7 +2,6 @@
 
 
 #include "ShooterComponents/CombatComponent.h"
-
 #include "Camera/CameraComponent.h"
 #include "Character/ShooterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -14,15 +13,12 @@
 #include "Weapon/Projectile.h"
 #include "Weapon/Weapon.h"
 
-// Sets default values for this component's properties
+
 UCombatComponent::UCombatComponent() :
-	bCanFire(true),
-	ZoomedFOV(30.f),
-	ZoomInterpSpeed(20.f),
-	CombatState(ECombatState::ECS_Unoccupied)
+	bCanFire(true), bFireButtonPressed(false), HUDPackage(), CrosshairVelocityFactor(0.f), CrosshairInAirFactor(0.f),
+	CrosshairAimFactor(0.f), CrosshairShootingFactor(0.f), bAiming(false), DefaultFOV(0.f), CurrentFOV(0.f),
+	ZoomInterpSpeed(20.f), CarriedAmmo(0), CombatState(ECombatState::ECS_Unoccupied)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 	BaseWalkSpeed = 600.f;
@@ -41,7 +37,6 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, CombatState);
 }
 
-// Called when the game starts
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -58,8 +53,6 @@ void UCombatComponent::BeginPlay()
 	}
 }
 
-// Called every frame
-// ReSharper disable once CppParameterMayBeConst
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -289,7 +282,7 @@ void UCombatComponent::UpdateHUDGrenades()
 	}
 }
 
-void UCombatComponent::SetWalkSpeeds(float BaseSpeed, float CrouchSpeed)
+void UCombatComponent::SetWalkSpeeds(const float BaseSpeed, const float CrouchSpeed)
 {
 	BaseWalkSpeed = BaseSpeed;
 	BaseCrouchSpeed = CrouchSpeed;
@@ -300,7 +293,7 @@ void UCombatComponent::OnRep_Grenades()
 	UpdateHUDGrenades();
 }
 
-void UCombatComponent::ShowAttachedGrenade(bool bShowGrenade) const
+void UCombatComponent::ShowAttachedGrenade(const bool bShowGrenade) const
 {
 	if (Character && Character->GetAttachedGrenade())
 	{
@@ -590,7 +583,7 @@ void UCombatComponent::InterpFOV(const float DeltaTime)
 	}
 }
 
-void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
+void UCombatComponent::PickupAmmo(const EWeaponType WeaponType, const int32 AmmoAmount)
 {
 	if (CarriedAmmoMap.Contains(WeaponType))
 	{
@@ -610,12 +603,10 @@ void UCombatComponent::OnRep_CarriedAmmo()
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
 	}
-	bool bJumpToShotgunEnd =
-		CombatState == ECombatState::ECS_Reloading &&
+	if (CombatState == ECombatState::ECS_Reloading &&
 		EquippedWeapon != nullptr &&
 		EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun &&
-		CarriedAmmo == 0;
-	if (bJumpToShotgunEnd)
+		CarriedAmmo == 0)
 	{
 		JumpToShotgunEnd();
 	}

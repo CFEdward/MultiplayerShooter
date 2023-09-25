@@ -2,7 +2,6 @@
 
 
 #include "PlayerController/ShooterPlayerController.h"
-
 #include "Character/ShooterCharacter.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -16,6 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "PlayerState/ShooterPlayerState.h"
 #include "ShooterComponents/CombatComponent.h"
+
 
 void AShooterPlayerController::BeginPlay()
 {
@@ -249,7 +249,7 @@ void AShooterPlayerController::SetHUDSniperScope(const bool bIsAiming)
 	}
 }
 
-void AShooterPlayerController::SetHUDGrenades(int32 Grenades)
+void AShooterPlayerController::SetHUDGrenades(const int32 Grenades)
 {
 	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
 

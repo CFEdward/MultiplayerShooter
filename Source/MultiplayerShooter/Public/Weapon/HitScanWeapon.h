@@ -26,10 +26,10 @@ protected:
 	void WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutHit) const;
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* ImpactParticles;
+	TObjectPtr<UParticleSystem> ImpactParticles;
 	
 	UPROPERTY(EditAnywhere)
-	USoundCue* HitSound;
+	TObjectPtr<USoundCue> HitSound;
 	
 	UPROPERTY(EditAnywhere)
 	float Damage;
@@ -37,7 +37,7 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* BeamParticles;
+	TObjectPtr<UParticleSystem> BeamParticles;
 
 	/**
 	 * Trace end with scatter

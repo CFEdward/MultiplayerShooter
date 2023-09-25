@@ -20,27 +20,27 @@ class MULTIPLAYERSHOOTER_API UCharacterOverlay : public UUserWidget
 public:
 
 	UPROPERTY(meta = (BindWidget))
-	UProgressBar* HealthBar;
+	TObjectPtr<UProgressBar> HealthBar;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* HealthText;
+	TObjectPtr<UTextBlock> HealthText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* ScoreAmount;
+	TObjectPtr<UTextBlock> ScoreAmount;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* DefeatsAmount;
+	TObjectPtr<UTextBlock> DefeatsAmount;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* WeaponAmmoAmount;
+	TObjectPtr<UTextBlock> WeaponAmmoAmount;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* CarriedAmmoAmount;
+	TObjectPtr<UTextBlock> CarriedAmmoAmount;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* MatchCountdownText;
+	TObjectPtr<UTextBlock> MatchCountdownText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* GrenadesText;
+	TObjectPtr<UTextBlock> GrenadesText;
 	
 };
