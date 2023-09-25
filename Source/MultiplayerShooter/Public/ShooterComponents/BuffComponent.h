@@ -59,6 +59,8 @@ private:
 	void ResetSpeeds();
 	float InitialBaseSpeed;
 	float InitialCrouchSpeed;
+	UPROPERTY(EditAnywhere, Replicated)
+	TObjectPtr<UNiagaraSystem> SpeedEffect;
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpeedBuff(float BaseSpeed, float CrouchSpeed);
 

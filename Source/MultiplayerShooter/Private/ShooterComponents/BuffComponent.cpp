@@ -24,6 +24,7 @@ void UBuffComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UBuffComponent, HealingEffect);
+	DOREPLIFETIME(UBuffComponent, SpeedEffect);
 }
 
 void UBuffComponent::BeginPlay()
@@ -88,6 +89,11 @@ void UBuffComponent::ResetSpeeds()
 	
 void UBuffComponent::MulticastSpeedBuff_Implementation(const float BaseSpeed, const float CrouchSpeed)
 {
+	if (BaseSpeed > Character->GetCharacterMovement()->MaxWalkSpeed)
+	{
+		MulticastSpawnCharacterEffect(SpeedEffect);
+	}
+	
 	Character->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
 	Character->GetCharacterMovement()->MaxWalkSpeedCrouched = CrouchSpeed;
 	if (Character->GetCombat())
