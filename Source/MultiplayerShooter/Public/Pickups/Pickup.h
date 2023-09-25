@@ -55,8 +55,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> PickupEffect;
 
-public:
-	
-	
+	FTimerHandle BindOverlapTimer;
+	float BindOverlapTime;
+	void BindOverlapTimerFinished();
 
 };

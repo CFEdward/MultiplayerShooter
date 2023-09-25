@@ -11,7 +11,8 @@
 
 
 APickup::APickup() :
-	BaseTurnRate(45.f)
+	BaseTurnRate(45.f),
+	BindOverlapTime(.25f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -43,7 +44,7 @@ void APickup::BeginPlay()
 
 	if (HasAuthority())
 	{
-		OverlapSphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
+		GetWorldTimerManager().SetTimer(BindOverlapTimer, this, &ThisClass::BindOverlapTimerFinished, BindOverlapTime);
 	}
 }
 
@@ -61,6 +62,11 @@ void APickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
+}
+
+void APickup::BindOverlapTimerFinished()
+{
+	OverlapSphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
 }
 
 void APickup::Destroyed()
