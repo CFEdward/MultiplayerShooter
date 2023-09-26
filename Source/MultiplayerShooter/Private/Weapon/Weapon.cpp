@@ -12,14 +12,12 @@
 #include "Weapon/BulletCasing.h"
 
 
-// Sets default values
 AWeapon::AWeapon() :
 	FireDelay(0.15f),
 	bAutomatic(true),
 	ZoomedFOV(30.0f),
 	ZoomInterpSpeed(20.0f)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
@@ -49,7 +47,6 @@ void AWeapon::EnableCustomDepth(const bool bEnable) const
 	}
 }
 
-// Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
@@ -69,8 +66,6 @@ void AWeapon::BeginPlay()
 	}
 }
 
-// Called every frame
-// ReSharper disable once CppParameterMayBeConst
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -99,7 +94,6 @@ void AWeapon::OnSphereOverlap(
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 void AWeapon::OnSphereEndOverlap(
 	UPrimitiveComponent* OverlappedComponent,
 	AActor* OtherActor,
@@ -115,13 +109,10 @@ void AWeapon::OnSphereEndOverlap(
 
 void AWeapon::SetHUDAmmo()
 {
-	ShooterOwnerCharacter =
-		ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
+	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
 	if (ShooterOwnerCharacter)
 	{
-		ShooterOwnerController =
-			ShooterOwnerController == nullptr ?
-				Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController;
+		ShooterOwnerController = ShooterOwnerController == nullptr ? Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController;
 		if (ShooterOwnerController)
 		{
 			ShooterOwnerController->SetHUDWeaponAmmo(Ammo);
@@ -172,6 +163,7 @@ void AWeapon::SetWeaponState(const EWeaponState State)
 		WeaponMesh->SetSimulatePhysics(false);
 		WeaponMesh->SetEnableGravity(false);
 		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetRelativeScale3D(FVector(1.f));
 		SetReplicateMovement(false);
 		if (WeaponType == EWeaponType::EWT_SubmachineGun)
 		{
@@ -195,6 +187,7 @@ void AWeapon::SetWeaponState(const EWeaponState State)
 		WeaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 		WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		WeaponMesh->AddImpulse(ShooterOwnerCharacter->GetActorForwardVector() * FVector(1000.f, 0.f, 200.f));
 		
 		WeaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_BLUE);
 		WeaponMesh->MarkRenderStateDirty();

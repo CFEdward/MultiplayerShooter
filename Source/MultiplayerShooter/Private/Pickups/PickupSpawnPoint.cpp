@@ -6,8 +6,8 @@
 
 
 APickupSpawnPoint::APickupSpawnPoint() :
-	SpawnPickupTimeMin(0),
-	SpawnPickupTimeMax(0)
+	SpawnPickupTimeMin(0.f),
+	SpawnPickupTimeMax(0.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -35,6 +35,7 @@ void APickupSpawnPoint::SpawnPickup()
 
 		if (HasAuthority() && SpawnedPickup)
 		{
+			GetWorldTimerManager().ClearTimer(SpawnPickupTimer);
 			SpawnedPickup->OnDestroyed.AddDynamic(this, &ThisClass::StartSpawnPickupTimer);
 		}
 	}

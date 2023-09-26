@@ -76,6 +76,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	DropEquippedWeapon();
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	EquippedWeapon->OnEquip.Broadcast();
 	
 	AttachActorToRightHand(EquippedWeapon);
 	EquippedWeapon->SetOwner(Character);
