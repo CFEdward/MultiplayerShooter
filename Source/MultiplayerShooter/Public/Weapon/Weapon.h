@@ -149,6 +149,17 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
+
+	UPROPERTY(EditAnywhere)
+	float DropWeaponImpulse;
+
+	FTimerHandle DestroyDroppedWeaponTimerHandle;
+	UPROPERTY(EditAnywhere)
+	float DestroyDroppedWeaponTime;
+	void DestroyDroppedWeapon();
+
+	UPROPERTY(EditAnywhere)
+	float BaseTurnRate;
 	
 public:	
 	

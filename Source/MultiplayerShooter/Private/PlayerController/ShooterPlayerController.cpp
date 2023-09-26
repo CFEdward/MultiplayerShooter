@@ -21,7 +21,8 @@ AShooterPlayerController::AShooterPlayerController() :
 	ClientServerDelta(0.f), TimeSyncFrequency(5.f), TimeSyncRunningTime(0.f), LevelStartingTime(0.f), MatchTime(0.f),
 	WarmupTime(0.f), CooldownTime(0.f), CountdownInt(0), HUDHealth(0.f), bInitializeHealth(false),
 	HUDMaxHealth(0.f), HUDShield(0.f), bInitializeShield(false), HUDMaxShield(0.f), HUDScore(0.f),
-	bInitializeScore(false), HUDDefeats(0), bInitializeDefeats(false), HUDGrenades(0), bInitializeGrenades(false)
+	bInitializeScore(false), HUDDefeats(0), bInitializeDefeats(false), HUDGrenades(0), bInitializeGrenades(false),
+	HUDCarriedAmmo(0.f), bInitializeCarriedAmmo(false), HUDWeaponAmmo(0.f), bInitializeWeaponAmmo(false)
 {
 	
 }
@@ -197,6 +198,11 @@ void AShooterPlayerController::SetHUDWeaponAmmo(const int32 Ammo)
 		const FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		ShooterHUD->CharacterOverlay->WeaponAmmoAmount->SetText(FText::FromString(AmmoText));
 	}
+	else
+	{
+		bInitializeWeaponAmmo = true;
+		HUDWeaponAmmo = Ammo;
+	}
 }
 
 void AShooterPlayerController::SetHUDCarriedAmmo(const int32 Ammo)
@@ -209,6 +215,11 @@ void AShooterPlayerController::SetHUDCarriedAmmo(const int32 Ammo)
 	{
 		const FString CarriedAmmoText = FString::Printf(TEXT("%d"), Ammo);
 		ShooterHUD->CharacterOverlay->CarriedAmmoAmount->SetText(FText::FromString(CarriedAmmoText));
+	}
+	else
+	{
+		bInitializeCarriedAmmo = true;
+		HUDCarriedAmmo = Ammo;
 	}
 }
 
@@ -360,6 +371,8 @@ void AShooterPlayerController::PollInit()
 				if (bInitializeShield) SetHUDShield(HUDShield, HUDMaxShield);
 				if (bInitializeScore) SetHUDScore(HUDScore);
 				if (bInitializeDefeats) SetHUDDefeats(HUDDefeats);
+				if (bInitializeWeaponAmmo) SetHUDWeaponAmmo(HUDWeaponAmmo);
+				if (bInitializeCarriedAmmo) SetHUDCarriedAmmo(HUDCarriedAmmo);
 
 				if (const AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn()); ShooterCharacter && ShooterCharacter->GetCombat())
 				{

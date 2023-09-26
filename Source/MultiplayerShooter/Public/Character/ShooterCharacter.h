@@ -47,9 +47,12 @@ public:
 	
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
+	void UpdateHUDAmmo();
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
+
+	void SpawnDefaultWeapon();
 
 	UPROPERTY(Replicated)
 	bool bDisableGameplay;
@@ -221,6 +224,12 @@ private:
 	 */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> AttachedGrenade;
+
+	/**
+	 * Default Weapon
+	 */
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWeapon> DefaultWeaponClass;
 	
 public:
 

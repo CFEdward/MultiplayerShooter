@@ -88,9 +88,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UpdateHUDHealth();
-	UpdateHUDShield();
+	
 	if (HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ThisClass::ReceiveDamage);
@@ -709,8 +707,45 @@ void AShooterCharacter::UpdateHUDShield()
 	}
 }
 
+void AShooterCharacter::UpdateHUDAmmo()
+{
+	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	
+	if (ShooterPlayerController && Combat && Combat->EquippedWeapon)
+	{
+		ShooterPlayerController->SetHUDCarriedAmmo(Combat->CarriedAmmo);
+		ShooterPlayerController->SetHUDWeaponAmmo(Combat->EquippedWeapon->GetAmmo());
+	}
+}
+
+void AShooterCharacter::SpawnDefaultWeapon()
+{
+	AShooterGameMode* ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
+	UWorld* World = GetWorld();
+	if (ShooterGameMode && World && !bElimmed && DefaultWeaponClass)
+	{
+		AWeapon* StartingWeapon = World->SpawnActor<AWeapon>(DefaultWeaponClass);
+		if (Combat)
+		{
+			Combat->EquipWeapon(StartingWeapon);
+		}
+	}
+}
+
 void AShooterCharacter::PollInit()
 {
+	if (ShooterPlayerController == nullptr)
+	{
+		ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+		if (ShooterPlayerController)
+		{
+			SpawnDefaultWeapon();
+			UpdateHUDAmmo();
+			UpdateHUDHealth();
+			UpdateHUDShield();
+		}
+	}
+	
 	if (ShooterPlayerState == nullptr)
 	{
 		ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
@@ -722,7 +757,6 @@ void AShooterCharacter::PollInit()
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::UpdateDissolveMaterial(const float DissolveValue)
 {
 	if (DynamicDissolveMaterialInstance)

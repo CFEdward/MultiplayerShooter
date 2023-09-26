@@ -16,9 +16,12 @@ AWeapon::AWeapon() :
 	FireDelay(0.15f),
 	bAutomatic(true),
 	ZoomedFOV(30.0f),
-	ZoomInterpSpeed(20.0f)
+	ZoomInterpSpeed(20.0f),
+	DropWeaponImpulse(1000.f),
+	DestroyDroppedWeaponTime(60.f),
+	BaseTurnRate(45.f)
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
@@ -70,6 +73,10 @@ void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (WeaponState == EWeaponState::EWS_Initial)
+	{
+		AddActorWorldRotation(FRotator(0.f, BaseTurnRate * DeltaTime, 0.f));
+	}
 }
 
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -158,6 +165,7 @@ void AWeapon::SetWeaponState(const EWeaponState State)
 	switch (WeaponState)
 	{
 	case EWeaponState::EWS_Equipped:
+		GetWorldTimerManager().ClearTimer(DestroyDroppedWeaponTimerHandle);
 		ShowPickupWidget(false);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		WeaponMesh->SetSimulatePhysics(false);
@@ -187,7 +195,7 @@ void AWeapon::SetWeaponState(const EWeaponState State)
 		WeaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 		WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
-		WeaponMesh->AddImpulse(ShooterOwnerCharacter->GetActorForwardVector() * FVector(1000.f, 0.f, 200.f));
+		WeaponMesh->AddImpulse(ShooterOwnerCharacter->GetActorForwardVector() * DropWeaponImpulse);
 		
 		WeaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_BLUE);
 		WeaponMesh->MarkRenderStateDirty();
@@ -203,6 +211,7 @@ void AWeapon::OnRep_WeaponState()
 	switch (WeaponState)
 	{
 	case EWeaponState::EWS_Equipped:
+		GetWorldTimerManager().ClearTimer(DestroyDroppedWeaponTimerHandle);
 		ShowPickupWidget(false);
 		WeaponMesh->SetSimulatePhysics(false);
 		WeaponMesh->SetEnableGravity(false);
@@ -225,6 +234,7 @@ void AWeapon::OnRep_WeaponState()
 		WeaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 		WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		//WeaponMesh->AddImpulse(ShooterOwnerCharacter->GetActorForwardVector() * DropWeaponImpulse);
 		
 		WeaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_BLUE);
 		WeaponMesh->MarkRenderStateDirty();
@@ -277,6 +287,8 @@ void AWeapon::Dropped()
 	SetOwner(nullptr);
 	ShooterOwnerCharacter = nullptr;
 	ShooterOwnerController = nullptr;
+	GetWorldTimerManager().SetTimer(DestroyDroppedWeaponTimerHandle, this, &ThisClass::DestroyDroppedWeapon, DestroyDroppedWeaponTime);
+	UE_LOG(LogTemp, Warning, TEXT("Setting timer now"));
 }
 
 void AWeapon::AddAmmo(const int32 AmmoToAdd)
@@ -293,4 +305,10 @@ bool AWeapon::IsEmpty() const
 bool AWeapon::IsFull() const
 {
 	return Ammo == MagCapacity;
+}
+
+void AWeapon::DestroyDroppedWeapon()
+{
+	Destroy();
+	UE_LOG(LogTemp, Warning, TEXT("Should be destroying now"));
 }
