@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Pickup.generated.h"
 
+class AShooterCharacter;
 class UNiagaraSystem;
 class UNiagaraComponent;
 class USoundCue;
@@ -35,6 +36,8 @@ protected:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+	
+	virtual void OnOverlap(AShooterCharacter* ShooterCharacter);
 
 	UPROPERTY(EditAnywhere)
 	float BaseTurnRate;
@@ -58,5 +61,7 @@ private:
 	FTimerHandle BindOverlapTimer;
 	float BindOverlapTime;
 	void BindOverlapTimerFinished();
+
+	AActor* GetClosestPlayerToPickup(const TArray<AActor*>& Players) const;
 
 };

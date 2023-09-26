@@ -13,17 +13,14 @@ AAmmoPickup::AAmmoPickup() :
 	
 }
 
-void AAmmoPickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AAmmoPickup::OnOverlap(AShooterCharacter* ShooterCharacter)
 {
-	Super::OnSphereOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-
-	if (const AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor))
+	Super::OnOverlap(ShooterCharacter);
+	
+	if (UCombatComponent* Combat = ShooterCharacter->GetCombat())
 	{
-		if (UCombatComponent* Combat = ShooterCharacter->GetCombat())
-		{
-			Combat->PickupAmmo(WeaponType, AmmoAmount);
-		}
+		Combat->PickupAmmo(WeaponType, AmmoAmount);
 	}
+	
 	Destroy();
 }

@@ -14,17 +14,13 @@ ASpeedPickup::ASpeedPickup() :
 	
 }
 
-void ASpeedPickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ASpeedPickup::OnOverlap(AShooterCharacter* ShooterCharacter)
 {
-	Super::OnSphereOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-
-	if (const AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor))
+	Super::OnOverlap(ShooterCharacter);
+	
+	if (UBuffComponent* Buff = ShooterCharacter->GetBuff())
 	{
-		if (UBuffComponent* Buff = ShooterCharacter->GetBuff())
-		{
-			Buff->BuffSpeed(BaseSpeedBuff, CrouchSpeedBuff, SpeedBuffTime);
-		}
+		Buff->BuffSpeed(BaseSpeedBuff, CrouchSpeedBuff, SpeedBuffTime);
 	}
 
 	Destroy();
