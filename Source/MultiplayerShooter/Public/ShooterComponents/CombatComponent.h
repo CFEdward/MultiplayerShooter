@@ -62,12 +62,17 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(const bool bIsAiming);
 
+	void EquipPrimaryWeapon(AWeapon* WeaponToEquip);
 	UFUNCTION()
 	void OnRep_EquippedWeapon() const;
+	void EquipSecondaryWeapon(AWeapon* WeaponToEquip);
+	UFUNCTION()
+	void OnRep_SecondaryWeapon();
 	void AttachActorToRightHand(AActor* ActorToAttach) const;
 	void AttachActorToLeftHand(AActor* ActorToAttach) const;
+	void AttachActorToBackpack(AActor* ActorToAttach) const;
 	void UpdateCarriedAmmo();
-	void PlayEquippedWeaponSound() const;
+	void PlayEquippedWeaponSound(const AWeapon* WeaponToEquip) const;
 	void ReloadEmptyWeapon();
 	
 	void DropEquippedWeapon() const;
@@ -112,6 +117,9 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	TObjectPtr<AWeapon> EquippedWeapon;
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
+	TObjectPtr<AWeapon> SecondaryWeapon;
+	
 	bool bFireButtonPressed;
 
 	UPROPERTY(EditAnywhere)
