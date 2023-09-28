@@ -45,6 +45,7 @@ void AWeaponSpawnPoint::StartSpawnWeaponTimer()
 {
 	const float SpawnTime = FMath::FRandRange(SpawnWeaponTimeMin, SpawnWeaponTimeMax);
 	GetWorldTimerManager().SetTimer(SpawnWeaponTimer, this, &ThisClass::SpawnWeaponTimerFinished, SpawnTime);
+	UE_LOG(LogTemp, Warning, TEXT("Spawn timer set for %s"), *GetName());
 }
 
 void AWeaponSpawnPoint::SpawnWeaponTimerFinished()

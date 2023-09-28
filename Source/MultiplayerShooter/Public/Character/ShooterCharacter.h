@@ -43,6 +43,7 @@ public:
 	void PlayThrowGrenadeMontage() const;
 	virtual void OnRep_ReplicatedMovement() override;
 	void Elim();
+	void DropWeapons() const;
 	virtual void Destroyed() override;
 	
 	void UpdateHUDHealth();
@@ -80,6 +81,7 @@ protected:
 	void CrouchButtonPressed();
 	void ReloadButtonPressed();
 	void EquipButtonPressed();
+	void SwapWeaponsPressed();
 	void AimButtonPressed();
 	void AimButtonReleased();
 	void FireButtonPressed();
@@ -121,6 +123,8 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
+	UFUNCTION(Server, Reliable)
+	void ServerSwapWeaponPressed();
 
 	float AO_Yaw;
 	float InterpAO_Yaw;

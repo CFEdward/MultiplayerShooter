@@ -145,6 +145,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AShooterCharacter::FireButtonReleased);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterCharacter::ReloadButtonPressed);
 	PlayerInputComponent->BindAction("ThrowGrenade", IE_Pressed, this, &AShooterCharacter::GrenadeButtonPressed);
+	PlayerInputComponent->BindAction("SwapWeapons", IE_Pressed, this, &AShooterCharacter::SwapWeaponsPressed);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AShooterCharacter::MoveRight);
@@ -176,12 +177,21 @@ void AShooterCharacter::OnRep_ReplicatedMovement()
 	TimeSinceLastMovementReplication = 0.0f;
 }
 
-void AShooterCharacter::Elim()
+void AShooterCharacter::DropWeapons() const
 {
 	if (Combat && Combat->EquippedWeapon)
 	{
 		Combat->EquippedWeapon->Dropped();
 	}
+	if (Combat && Combat->SecondaryWeapon)
+	{
+		Combat->SecondaryWeapon->Dropped();
+	}
+}
+
+void AShooterCharacter::Elim()
+{
+	DropWeapons();
 	MulticastElim();
 	GetWorldTimerManager().SetTimer(ElimTimer, this, &ThisClass::ElimTimerFinished, ElimDelay);
 }
@@ -308,6 +318,24 @@ void AShooterCharacter::ServerEquipButtonPressed_Implementation()
 	if (Combat)
 	{
 		Combat->EquipWeapon(OverlappingWeapon);
+	}
+}
+
+void AShooterCharacter::SwapWeaponsPressed()
+{
+	if (bDisableGameplay) return;
+	
+	if (Combat && Combat->ShouldSwapWeapons())
+	{
+		ServerSwapWeaponPressed();
+	}
+}
+
+void AShooterCharacter::ServerSwapWeaponPressed_Implementation()
+{
+	if (Combat && Combat->ShouldSwapWeapons())
+	{
+		Combat->SwapWeapons();
 	}
 }
 

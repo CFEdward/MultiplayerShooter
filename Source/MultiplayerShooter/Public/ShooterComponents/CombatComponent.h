@@ -33,7 +33,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
-	
+	void SwapWeapons();
 	void FireButtonPressed(const bool bPressed);
 	
 	void Reload();
@@ -191,5 +191,6 @@ public:
 	void SetWalkSpeeds(float BaseSpeed, float CrouchSpeed);
 	FORCEINLINE void SetCombatState(const ECombatState State) { CombatState = State; }
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
+	bool ShouldSwapWeapons() const;
 	
 };
