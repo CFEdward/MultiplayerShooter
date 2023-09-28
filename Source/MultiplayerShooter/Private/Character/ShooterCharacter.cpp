@@ -24,6 +24,7 @@
 
 AShooterCharacter::AShooterCharacter() :
 	bDisableGameplay(false),
+	bShouldStopReload(false),
 	CameraThreshold(200.0f),
 	TurnThreshold(0.5f),
 	TimeSinceLastMovementReplication(0.0f),
@@ -315,8 +316,9 @@ void AShooterCharacter::EquipButtonPressed()
 
 void AShooterCharacter::ServerEquipButtonPressed_Implementation()
 {
-	if (Combat)
+	if (Combat && OverlappingWeapon)
 	{
+		OverlappingWeapon->OnEquip.Broadcast();
 		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
@@ -335,7 +337,13 @@ void AShooterCharacter::ServerSwapWeaponPressed_Implementation()
 {
 	if (Combat && Combat->ShouldSwapWeapons())
 	{
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance->Montage_IsPlaying(ReloadMontage))
+		{
+			AnimInstance->Montage_Stop(.5f, ReloadMontage);
+			bShouldStopReload = true;
+		}
 		Combat->SwapWeapons();
+		bShouldStopReload = false;
 	}
 }
 
@@ -612,10 +620,14 @@ void AShooterCharacter::PlayReloadMontage()
 	}
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 void AShooterCharacter::ReloadMontageInterrupted(UAnimMontage* Montage, bool bInterrupted)
 {
-	Combat->FinishReloading();
+	if (bShouldStopReload)
+	{
+		Combat->FinishReloading();
+		UE_LOG(LogTemp, Warning, TEXT("Reload Montage interrupted"));
+	}
+	Combat->CombatState = ECombatState::ECS_Unoccupied;
 }
 
 void AShooterCharacter::PlayElimMontage() const

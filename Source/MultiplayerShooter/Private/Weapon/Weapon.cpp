@@ -204,7 +204,6 @@ void AWeapon::OnEquipped()
 	{
 		GetWorldTimerManager().ClearTimer(DestroyDroppedWeaponTimerHandle);
 	}
-	OnEquip.Broadcast();
 	ShowPickupWidget(false);
 	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponMesh->SetSimulatePhysics(false);
@@ -227,7 +226,6 @@ void AWeapon::OnEquippedSecondary()
 	{
 		GetWorldTimerManager().ClearTimer(DestroyDroppedWeaponTimerHandle);
 	}
-	OnEquip.Broadcast();
 	ShowPickupWidget(false);
 	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponMesh->SetSimulatePhysics(false);
