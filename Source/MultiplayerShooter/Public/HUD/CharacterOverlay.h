@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "CharacterOverlay.generated.h"
 
+class UImage;
 class UProgressBar;
 class UTextBlock;
 
@@ -43,5 +44,10 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> MatchCountdownText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> HighPingImage;
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> HighPingAnimation;
 	
 };

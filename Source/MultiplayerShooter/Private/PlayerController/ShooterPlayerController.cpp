@@ -3,6 +3,7 @@
 
 #include "PlayerController/ShooterPlayerController.h"
 #include "Character/ShooterCharacter.h"
+#include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameMode/ShooterGameMode.h"
@@ -22,7 +23,8 @@ AShooterPlayerController::AShooterPlayerController() :
 	WarmupTime(0.f), CooldownTime(0.f), CountdownInt(0), HUDHealth(0.f), bInitializeHealth(false),
 	HUDMaxHealth(0.f), HUDShield(0.f), bInitializeShield(false), HUDMaxShield(0.f), HUDScore(0.f),
 	bInitializeScore(false), HUDDefeats(0), bInitializeDefeats(false), HUDGrenades(0), bInitializeGrenades(false),
-	HUDCarriedAmmo(0.f), bInitializeCarriedAmmo(false), HUDWeaponAmmo(0.f), bInitializeWeaponAmmo(false)
+	HUDCarriedAmmo(0.f), bInitializeCarriedAmmo(false), HUDWeaponAmmo(0.f), bInitializeWeaponAmmo(false),
+	HighPingRunningTime(0.f), PingAnimationRunningTime(0.f), HighPingDuration(5.f), CheckPingFrequency(20.f), HighPingThreshold(50.f)
 {
 	
 }
@@ -50,6 +52,36 @@ void AShooterPlayerController::Tick(float DeltaTime)
 	SetHUDTime();
 	CheckTimeSync(DeltaTime);
 	PollInit();
+	CheckPing(DeltaTime);
+}
+
+void AShooterPlayerController::CheckPing(const float DeltaTime)
+{
+	HighPingRunningTime += DeltaTime;
+	if (HighPingRunningTime > CheckPingFrequency)
+	{
+		PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
+		if (PlayerState)
+		{
+			if (PlayerState->GetPingInMilliseconds() > HighPingThreshold)
+			{
+				HighPingWarning();
+				PingAnimationRunningTime = 0.f;
+			}
+		}
+		HighPingRunningTime = 0.f;
+	}
+	if (ShooterHUD
+		&& ShooterHUD->CharacterOverlay
+		&& ShooterHUD->CharacterOverlay->HighPingAnimation
+		&& ShooterHUD->CharacterOverlay->IsAnimationPlaying(ShooterHUD->CharacterOverlay->HighPingAnimation))
+	{
+		PingAnimationRunningTime += DeltaTime;
+		if (PingAnimationRunningTime > HighPingDuration)
+		{
+			StopHighPingWarning();
+		}
+	}
 }
 
 void AShooterPlayerController::CheckTimeSync(const float DeltaTime)
@@ -59,6 +91,31 @@ void AShooterPlayerController::CheckTimeSync(const float DeltaTime)
 	{
 		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
 		TimeSyncRunningTime = 0.0f;
+	}
+}
+
+void AShooterPlayerController::HighPingWarning()
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	
+	if (ShooterHUD && ShooterHUD->CharacterOverlay && ShooterHUD->CharacterOverlay->HighPingImage && ShooterHUD->CharacterOverlay->HighPingAnimation)
+	{
+		ShooterHUD->CharacterOverlay->HighPingImage->SetOpacity(1.f);
+		ShooterHUD->CharacterOverlay->PlayAnimation(ShooterHUD->CharacterOverlay->HighPingAnimation, 0.f, 5);
+	}
+}
+
+void AShooterPlayerController::StopHighPingWarning()
+{
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	
+	if (ShooterHUD && ShooterHUD->CharacterOverlay && ShooterHUD->CharacterOverlay->HighPingImage && ShooterHUD->CharacterOverlay->HighPingAnimation)
+	{
+		ShooterHUD->CharacterOverlay->HighPingImage->SetOpacity(0.f);
+		if (ShooterHUD->CharacterOverlay->IsAnimationPlaying(ShooterHUD->CharacterOverlay->HighPingAnimation))
+		{
+			ShooterHUD->CharacterOverlay->StopAnimation(ShooterHUD->CharacterOverlay->HighPingAnimation);
+		}
 	}
 }
 

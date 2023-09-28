@@ -79,6 +79,10 @@ protected:
 		const float Cooldown,
 		const float StartingTime
 	);
+
+	void HighPingWarning();
+	void StopHighPingWarning();
+	void CheckPing(float DeltaTime);
 	
 private:
 
@@ -120,5 +124,14 @@ private:
 	bool bInitializeCarriedAmmo;
 	float HUDWeaponAmmo;
 	bool bInitializeWeaponAmmo;
+
+	float HighPingRunningTime;
+	float PingAnimationRunningTime;
+	UPROPERTY(EditAnywhere)
+	float HighPingDuration;
+	UPROPERTY(EditAnywhere)
+	float CheckPingFrequency;
+	UPROPERTY(EditAnywhere)
+	float HighPingThreshold;
 	
 };
