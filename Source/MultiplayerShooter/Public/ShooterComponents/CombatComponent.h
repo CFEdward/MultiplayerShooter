@@ -35,7 +35,8 @@ public:
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void SwapWeapons();
 	void FireButtonPressed(const bool bPressed);
-	
+
+	bool bLocallyReloading;
 	void Reload();
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();

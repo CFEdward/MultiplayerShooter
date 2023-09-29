@@ -849,6 +849,12 @@ bool AShooterCharacter::IsAiming() const
 	return (Combat && Combat->bAiming);
 }
 
+bool AShooterCharacter::IsLocallyReloading() const
+{
+	if (Combat == nullptr) return false;
+	return Combat->bLocallyReloading;
+}
+
 AWeapon* AShooterCharacter::GetEquippedWeapon() const
 {
 	if (Combat == nullptr) return nullptr;
