@@ -14,16 +14,8 @@
 
 
 AWeapon::AWeapon() :
-	FireDelay(0.15f),
-	bAutomatic(true),
-	bUseScatter(false),
-	ZoomedFOV(30.0f),
-	ZoomInterpSpeed(20.0f),
-	DropWeaponImpulse(1000.f),
-	DestroyDroppedWeaponTime(60.f),
-	BaseTurnRate(45.f),
-	DistanceToSphere(800.0f),
-	SphereRadius(75.0f)
+	FireDelay(0.15f), bAutomatic(true), bUseScatter(false), DistanceToSphere(800.0f), SphereRadius(75.0f), ZoomedFOV(30.0f),
+	ZoomInterpSpeed(20.0f), Sequence(0), DropWeaponImpulse(1000.f), DestroyDroppedWeaponTime(60.f), BaseTurnRate(45.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -85,7 +77,6 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, WeaponState);
-	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::OnSphereOverlap(
@@ -126,23 +117,6 @@ void AWeapon::SetHUDAmmo()
 			ShooterOwnerController->SetHUDWeaponAmmo(Ammo);
 		}
 	}
-}
-
-void AWeapon::SpendRound()
-{
-	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
-	SetHUDAmmo();
-}
-
-
-void AWeapon::OnRep_Ammo()
-{
-	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
-	if (ShooterOwnerCharacter && ShooterOwnerCharacter->GetCombat() && IsFull())
-	{
-		ShooterOwnerCharacter->GetCombat()->JumpToShotgunEnd();
-	}
-	SetHUDAmmo();
 }
 
 void AWeapon::OnRep_Owner()
@@ -329,10 +303,7 @@ void AWeapon::Fire(const FVector& HitTarget)
 			}
 		}
 	}
-	if (HasAuthority())
-	{
-		SpendRound();
-	}
+	SpendRound();
 }
 
 void AWeapon::Dropped()
@@ -345,9 +316,49 @@ void AWeapon::Dropped()
 	ShooterOwnerController = nullptr;
 }
 
+void AWeapon::SpendRound()
+{
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
+	SetHUDAmmo();
+	// Server Reconciliation
+	if (HasAuthority())
+	{
+		ClientUpdateAmmo(Ammo);
+	}
+	else if (ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
+			ShooterOwnerCharacter && ShooterOwnerCharacter->IsLocallyControlled())
+	{
+		++Sequence;
+	}
+}
+
+void AWeapon::ClientUpdateAmmo_Implementation(const int32 ServerAmmo)
+{
+	if (HasAuthority()) return;
+	
+	Ammo = ServerAmmo;
+	--Sequence;
+	Ammo -= Sequence;
+	SetHUDAmmo();
+}
+
 void AWeapon::AddAmmo(const int32 AmmoToAdd)
 {
 	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	SetHUDAmmo();
+	ClientAddAmmo(AmmoToAdd);
+}
+
+void AWeapon::ClientAddAmmo_Implementation(const int32 AmmoToAdd)
+{
+	if (HasAuthority()) return;
+	
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
+	if (ShooterOwnerCharacter && ShooterOwnerCharacter->GetCombat() && IsFull())
+	{
+		ShooterOwnerCharacter->GetCombat()->JumpToShotgunEnd();
+	}
 	SetHUDAmmo();
 }
 

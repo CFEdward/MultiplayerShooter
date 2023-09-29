@@ -36,7 +36,7 @@ enum class EFireType : uint8
 	EFT_Projectile	UMETA(DisplayName = "Projectile Weapon"),
 	EFT_Shotgun		UMETA(DisplayName = "Shotgun Weapon"),
 
-	EFT_MAX	UMETA(DisplayName = "DefaultMAX")
+	EFT_MAX			UMETA(DisplayName = "DefaultMAX")
 };
 
 UCLASS()
@@ -164,13 +164,18 @@ private:
 	UPROPERTY(EditAnywhere)
 	float ZoomInterpSpeed;
 
-	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo)
+	UPROPERTY(EditAnywhere)
 	int32 Ammo;
-
-	UFUNCTION()
-	void OnRep_Ammo();
-
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateAmmo(int32 ServerAmmo);
+	UFUNCTION(Client, Reliable)
+	void ClientAddAmmo(int32 AmmoToAdd);
 	void SpendRound();
+	/**
+	 * The number of unprocessed server requests for Ammo
+	 * Incremented in SpendRound, decremented in ClientUpdateAmmo
+	 */
+	int32 Sequence;
 
 	UPROPERTY(EditAnywhere)
 	int32 MagCapacity;
