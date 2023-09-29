@@ -154,8 +154,11 @@ private:
 	/**
 	 * Aiming and FOV
 	 */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Aiming)
 	bool bAiming;
+	UFUNCTION()
+	void OnRep_Aiming();
+	bool bAimButtonPressed;
 	// Field of view when not aiming; set to the camera's base FOV in BeginPlay
 	float DefaultFOV;
 	float CurrentFOV;
