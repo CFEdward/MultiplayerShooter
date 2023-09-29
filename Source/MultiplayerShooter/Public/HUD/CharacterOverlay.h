@@ -46,6 +46,8 @@ public:
 	TObjectPtr<UTextBlock> MatchCountdownText;
 
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> PingText;
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> HighPingImage;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> HighPingAnimation;

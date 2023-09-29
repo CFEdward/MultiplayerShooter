@@ -57,6 +57,19 @@ void AShooterPlayerController::Tick(float DeltaTime)
 
 void AShooterPlayerController::CheckPing(const float DeltaTime)
 {
+	if (HasAuthority()) return;
+
+	if (ShooterHUD && ShooterHUD->CharacterOverlay && ShooterHUD->CharacterOverlay->PingText)
+	{
+		PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
+		if (PlayerState)
+		{
+			const FString PingText = FString::Printf(TEXT("%d ms"), FMath::CeilToInt(PlayerState->GetPingInMilliseconds()));
+			ShooterHUD->CharacterOverlay->PingText->SetVisibility(ESlateVisibility::Visible);
+			ShooterHUD->CharacterOverlay->PingText->SetText(FText::FromString(PingText));
+		}
+	}
+	
 	HighPingRunningTime += DeltaTime;
 	if (HighPingRunningTime > CheckPingFrequency)
 	{
@@ -132,13 +145,7 @@ void AShooterPlayerController::ServerCheckMatchState_Implementation()
 	}
 }
 
-void AShooterPlayerController::ClientJoinMidgame_Implementation(
-	const FName StateOfMatch,
-	const float Warmup,
-	const float Match,
-	const float Cooldown,
-	const float StartingTime
-)
+void AShooterPlayerController::ClientJoinMidgame_Implementation(const FName StateOfMatch, const float Warmup, const float Match, const float Cooldown, const float StartingTime)
 {
 	WarmupTime = Warmup;
 	MatchTime = Match;
