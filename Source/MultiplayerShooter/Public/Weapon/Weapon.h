@@ -124,6 +124,15 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex
 	);
+
+	/**
+	 * Trace end with scatter
+	 */
+	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
+	float DistanceToSphere;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
+	float SphereRadius;
 	
 private:
 
@@ -184,15 +193,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float BaseTurnRate;
-
-	/**
-	 * Trace end with scatter
-	 */
-	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
-	float DistanceToSphere;
-
-	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
-	float SphereRadius;
 	
 public:	
 	
