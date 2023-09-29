@@ -308,7 +308,7 @@ void AShooterCharacter::EquipButtonPressed()
 {
 	if (bDisableGameplay) return;
 	
-	if (Combat)
+	if (Combat && OverlappingWeapon)
 	{
 		ServerEquipButtonPressed();
 	}
@@ -318,7 +318,7 @@ void AShooterCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if (Combat && OverlappingWeapon)
 	{
-		OverlappingWeapon->OnEquip.Broadcast();
+		if (OverlappingWeapon->GetWeaponState() == EWeaponState::EWS_Initial) OverlappingWeapon->OnEquip.Broadcast();
 		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }

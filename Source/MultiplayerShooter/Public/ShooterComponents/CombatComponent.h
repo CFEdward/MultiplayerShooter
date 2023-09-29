@@ -78,6 +78,9 @@ protected:
 	void DropEquippedWeapon() const;
 	
 	void Fire();
+	void FireProjectileWeapon();
+	void FireHitScanWeapon();
+	void FireShotgun();
 	void LocalFire(const FVector_NetQuantize& TraceHitTarget);
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);

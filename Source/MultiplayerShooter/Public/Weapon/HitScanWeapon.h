@@ -19,10 +19,9 @@ public:
 	AHitScanWeapon();
 	
 	virtual void Fire(const FVector& HitTarget) override;
-
+	
 protected:
 
-	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget) const;
 	void WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutHit) const;
 
 	UPROPERTY(EditAnywhere)
@@ -38,18 +37,5 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> BeamParticles;
-
-	/**
-	 * Trace end with scatter
-	 */
-
-	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
-	float DistanceToSphere;
-
-	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
-	float SphereRadius;
-
-	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
-	bool bUseScatter;
 	
 };

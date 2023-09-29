@@ -5,17 +5,12 @@
 #include "Character/ShooterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
-#include "Weapon/WeaponTypes.h"
 
 
 AHitScanWeapon::AHitScanWeapon() :
-	Damage(20.0f),
-	DistanceToSphere(800.0f),
-	SphereRadius(75.0f),
-	bUseScatter(false)
+	Damage(20.0f)
 {
 	
 }
@@ -67,12 +62,13 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 {
 	if (const UWorld* World = GetWorld())
 	{
-		const FVector End =
-			bUseScatter ? TraceEndWithScatter(TraceStart, HitTarget) : TraceStart + (HitTarget - TraceStart) * 1.25f;
+		const FVector End = TraceStart + (HitTarget - TraceStart) * 1.25f;
+		
 		World->LineTraceSingleByChannel(OutHit, TraceStart, End, ECollisionChannel::ECC_Visibility);
 		if (OutHit.bBlockingHit)
 		{
 			const FVector BeamEnd = OutHit.ImpactPoint;
+			DrawDebugSphere(World, BeamEnd, 16.f, 12, FColor::Orange, true);
 			if (BeamParticles)
 			{
 				if (UParticleSystemComponent* Beam =
@@ -88,25 +84,4 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 			}
 		}
 	}
-}
-
-FVector AHitScanWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget) const
-{
-	const FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
-	const FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
-	const FVector RandVec = UKismetMathLibrary::RandomUnitVector() * FMath::FRandRange(0.0f, SphereRadius);
-	const FVector EndLoc = SphereCenter + RandVec;
-	const FVector ToEndLoc = EndLoc - TraceStart;
-
-	// DrawDebugSphere(GetWorld(), SphereCenter, SphereRadius, 12, FColor::Red, true);
-	// DrawDebugSphere(GetWorld(), EndLoc, 4.0f, 12, FColor::Orange, true);
-	// DrawDebugLine(
-	// 	GetWorld(),
-	// 	TraceStart,
-	// 	FVector(TraceStart + ToEndLoc * TRACE_LENGTH / ToEndLoc.Size()),
-	// 	FColor::Cyan, 
-	// 	true
-	// );
-	
-	return FVector(TraceStart + ToEndLoc * TRACE_LENGTH / ToEndLoc.Size());
 }

@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "PlayerController/ShooterPlayerController.h"
 #include "ShooterComponents/CombatComponent.h"
@@ -15,11 +16,14 @@
 AWeapon::AWeapon() :
 	FireDelay(0.15f),
 	bAutomatic(true),
+	bUseScatter(false),
 	ZoomedFOV(30.0f),
 	ZoomInterpSpeed(20.0f),
 	DropWeaponImpulse(1000.f),
 	DestroyDroppedWeaponTime(60.f),
-	BaseTurnRate(45.f)
+	BaseTurnRate(45.f),
+	DistanceToSphere(800.0f),
+	SphereRadius(75.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -273,6 +277,34 @@ void AWeapon::ShowPickupWidget(const bool bShowWidget) const
 		PickupWidget->SetVisibility(bShowWidget);
 	}
 }
+
+FVector AWeapon::TraceEndWithScatter(const FVector& HitTarget) const
+{
+	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
+	if (MuzzleFlashSocket == nullptr) return FVector();
+
+	const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
+	const FVector TraceStart = SocketTransform.GetLocation();
+	
+	const FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
+	const FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
+	const FVector RandVec = UKismetMathLibrary::RandomUnitVector() * FMath::FRandRange(0.0f, SphereRadius);
+	const FVector EndLoc = SphereCenter + RandVec;
+	const FVector ToEndLoc = EndLoc - TraceStart;
+
+	// DrawDebugSphere(GetWorld(), SphereCenter, SphereRadius, 12, FColor::Red, true);
+	// DrawDebugSphere(GetWorld(), EndLoc, 4.0f, 12, FColor::Orange, true);
+	// DrawDebugLine(
+	// 	GetWorld(),
+	// 	TraceStart,
+	// 	FVector(TraceStart + ToEndLoc * TRACE_LENGTH / ToEndLoc.Size()),
+	// 	FColor::Cyan, 
+	// 	true
+	// );
+	
+	return FVector(TraceStart + ToEndLoc * TRACE_LENGTH / ToEndLoc.Size());
+}
+
 
 void AWeapon::Fire(const FVector& HitTarget)
 {

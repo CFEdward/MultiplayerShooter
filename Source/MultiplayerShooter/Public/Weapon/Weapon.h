@@ -29,6 +29,16 @@ enum class EWeaponState : uint8
 	EWS_MAX					UMETA(DisplayName = "DefaultMAX")
 };
 
+UENUM(BlueprintType)
+enum class EFireType : uint8
+{
+	EFT_HitScan		UMETA(DisplayName = "Hit Scan Weapon"),
+	EFT_Projectile	UMETA(DisplayName = "Projectile Weapon"),
+	EFT_Shotgun		UMETA(DisplayName = "Shotgun Weapon"),
+
+	EFT_MAX	UMETA(DisplayName = "DefaultMAX")
+};
+
 UCLASS()
 class MULTIPLAYERSHOOTER_API AWeapon : public AActor
 {
@@ -79,6 +89,14 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnEquip OnEquip;
+
+	UPROPERTY(EditAnywhere)
+	EFireType FireType;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
+	bool bUseScatter;
+
+	FVector TraceEndWithScatter(const FVector& HitTarget) const;
 	
 protected:
 	
@@ -166,11 +184,20 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float BaseTurnRate;
+
+	/**
+	 * Trace end with scatter
+	 */
+	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
+	float DistanceToSphere;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
+	float SphereRadius;
 	
 public:	
 	
 	void SetWeaponState(const EWeaponState State);
-	//FORCEINLINE EWeaponState GetWeaponState() const { return WeaponState; }
+	FORCEINLINE EWeaponState GetWeaponState() const { return WeaponState; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
