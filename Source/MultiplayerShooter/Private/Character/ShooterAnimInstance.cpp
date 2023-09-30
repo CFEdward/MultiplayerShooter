@@ -5,6 +5,7 @@
 #include "Character/ShooterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "ShooterComponents/CombatComponent.h"
 #include "Weapon/Weapon.h"
 #include "ShooterTypes/CombatState.h"
 
@@ -108,10 +109,27 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	}
 
 	bUseFABRIK = ShooterCharacter->GetCombatState() == ECombatState::ECS_Unoccupied;
-	if (ShooterCharacter->IsLocallyControlled() && ShooterCharacter->GetCombatState() == ECombatState::ECS_ThrowingGrenade)
+	if (ShooterCharacter->IsLocallyControlled() && ShooterCharacter->GetCombatState() != ECombatState::ECS_ThrowingGrenade)
 	{
 		bUseFABRIK = !ShooterCharacter->IsLocallyReloading();
 	}
 	bUseAimOffsets = ShooterCharacter->GetCombatState() == ECombatState::ECS_Unoccupied && !ShooterCharacter->GetDisableGameplay();
 	bTransformRightHand = ShooterCharacter->GetCombatState() == ECombatState::ECS_Unoccupied && !ShooterCharacter->GetDisableGameplay();
+}
+
+void UShooterAnimInstance::OnReloadFailedToBlendOut(UAnimMontage* AnimMontage, bool bInterrupted)
+{
+	if (bInterrupted)
+	{
+		ShooterCharacter->GetCombat()->FinishReloading();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Animation is blending out"));
+	}
+}
+
+void UShooterAnimInstance::OnReloadSucceedAnimationEnd(UAnimMontage* AnimMontage, bool bInterrupted)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Animation has completed"));
 }

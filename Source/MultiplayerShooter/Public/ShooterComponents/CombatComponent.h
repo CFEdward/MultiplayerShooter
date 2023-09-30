@@ -43,7 +43,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ShotgunShellReload();
 
-	void JumpToShotgunEnd() const;
+	void JumpToShotgunEnd();
 
 	UFUNCTION(BlueprintCallable)
 	void ThrowGrenadeFinished();
@@ -178,7 +178,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 MaxCarriedAmmo = 500;
 
-	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CombatState)
 	ECombatState CombatState;
 	UFUNCTION()
 	void OnRep_CombatState();

@@ -3,6 +3,7 @@
 
 #include "ShooterComponents/CombatComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Character/ShooterAnimInstance.h"
 #include "Character/ShooterCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -251,6 +252,18 @@ void UCombatComponent::HandleReload() const
 	if (Character)
 	{
 		Character->PlayReloadMontage();
+
+		UShooterAnimInstance* AnimInstance = Cast<UShooterAnimInstance>(Character->GetMesh()->GetAnimInstance());
+		if (AnimInstance)
+		{
+			FOnMontageEnded BlendOutDelegate;
+			BlendOutDelegate.BindUObject(AnimInstance, &UShooterAnimInstance::OnReloadFailedToBlendOut);
+			AnimInstance->Montage_SetBlendingOutDelegate(BlendOutDelegate, Character->GetReloadMontage());
+
+			FOnMontageEnded CompleteDelegate;
+			CompleteDelegate.BindUObject(AnimInstance, &UShooterAnimInstance::OnReloadSucceedAnimationEnd);
+			AnimInstance->Montage_SetEndDelegate(CompleteDelegate, Character->GetReloadMontage());
+		}
 	}
 }
 
@@ -293,13 +306,18 @@ void UCombatComponent::ShotgunShellReload()
 	}
 }
 
-void UCombatComponent::JumpToShotgunEnd() const
+void UCombatComponent::JumpToShotgunEnd()
 {
 	// Jump to ShotgunEnd section
 	UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
 	if (AnimInstance && Character->GetReloadMontage())
 	{
 		AnimInstance->Montage_JumpToSection(FName("ShotgunEnd"));
+	}
+	bLocallyReloading = false;
+	if(Character->HasAuthority())
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
 	}
 }
 

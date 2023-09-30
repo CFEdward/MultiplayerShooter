@@ -23,6 +23,9 @@ public:
 	virtual void NativeInitializeAnimation() override;
 
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
+	
+	void OnReloadFailedToBlendOut(UAnimMontage* AnimMontage, bool bInterrupted);
+	void OnReloadSucceedAnimationEnd(UAnimMontage* AnimMontage, bool bInterrupted);
 
 private:
 
