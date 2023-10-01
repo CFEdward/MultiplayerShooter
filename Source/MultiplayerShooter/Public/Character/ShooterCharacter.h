@@ -10,6 +10,7 @@
 #include "ShooterTypes/CombatState.h"
 #include "ShooterCharacter.generated.h"
 
+class UBoxComponent;
 class UBuffComponent;
 class USpringArmComponent;
 class UCameraComponent;
@@ -21,18 +22,31 @@ class AShooterPlayerController;
 class USoundCue;
 class AShooterPlayerState;
 
+USTRUCT(BlueprintType)
+struct FPhysAssetInformation
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName BoneName;
+	UPROPERTY()
+	float HalfHeight = 0.f;
+	UPROPERTY()
+	float Radius = 0.f;
+	UPROPERTY()
+	FTransform BoneWorldTransform;
+};
+
 UCLASS()
 class MULTIPLAYERSHOOTER_API AShooterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
 public:
-
-	// Sets default values for this character's properties
+	
 	AShooterCharacter();
-	// Called every frame
+	
 	virtual void Tick(float DeltaTime) override;
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
@@ -59,8 +73,7 @@ public:
 	bool bDisableGameplay;
 	
 protected:
-
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
 	
 	void RotateInPlace(const float DeltaTime);
@@ -88,7 +101,7 @@ protected:
 	void FireButtonReleased();
 	void GrenadeButtonPressed();
 	
-	// Poll for any relevant classes and initialize our HUD
+	/** Poll for any relevant classes and initialize our HUD */
 	void PollInit();
 
 	UFUNCTION()
@@ -98,6 +111,59 @@ protected:
 		const UDamageType* DamageType,
 		AController* InstigatorController,
 		AActor* DamageCauser);
+
+	UPROPERTY()
+	TMap<FName, TObjectPtr<UBoxComponent>> HitCollisionBox;
+	UPROPERTY()
+	TMap<FName, TObjectPtr<UCapsuleComponent>> HitCollisionCapsule;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TObjectPtr<UCapsuleComponent>> HitCapsuleBones;
+	UPROPERTY(EditAnywhere)
+	TArray<FPhysAssetInformation> PhysAssetInfo;
+	bool bDrawPhysAssets;
+	void HitCapsuleConstruction();
+	void SetupHitCapsule(FPhysAssetInformation PhysicsAssetInfo);
+	
+	/**
+	 * Hit boxes used for server-side rewind
+	 *
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Head;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Pelvis;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Spine_02;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Spine_03;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> UpperArm_L;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> UpperArm_R;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LowerArm_L;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> LowerArm_R;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Hand_L;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Hand_R;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Backpack;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Blanket;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Thigh_L;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Thigh_R;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Calf_L;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Calf_R;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Foot_L;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> Foot_R;
+	*/
 
 private:
 
@@ -204,10 +270,10 @@ private:
 	UFUNCTION()
 	void UpdateDissolveMaterial(const float DissolveValue);
 	void StartDissolve();
-	// Dynamic instance that we can change at runtime
+	/** Dynamic instance that we can change at runtime */
 	UPROPERTY(VisibleAnywhere, Category = "Elim")
 	TObjectPtr<UMaterialInstanceDynamic> DynamicDissolveMaterialInstance;
-	// Material instance set on the Blueprint, used with the dynamic material instance
+	/** Material instance set on the Blueprint, used with the dynamic material instance */
 	UPROPERTY(EditAnywhere, Category = "Elim")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
 
