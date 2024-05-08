@@ -171,6 +171,7 @@ private:
 	UFUNCTION(Client, Reliable)
 	void ClientAddAmmo(int32 AmmoToAdd);
 	void SpendRound();
+	
 	/**
 	 * The number of unprocessed server requests for Ammo
 	 * Incremented in SpendRound, decremented in ClientUpdateAmmo

@@ -17,10 +17,12 @@ void AShooterPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 void AShooterPlayerState::AddToScore(const float ScoreAmount)
 {
 	SetScore(GetScore() + ScoreAmount);
-	Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
+	if (Character == nullptr) Character = Cast<AShooterCharacter>(GetPawn());
+	//Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
 	if (Character)
 	{
-		Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+		if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+		//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 		if (Controller)
 		{
 			Controller->SetHUDScore(GetScore());
@@ -32,10 +34,12 @@ void AShooterPlayerState::OnRep_Score()
 {
 	Super::OnRep_Score();
 
-	Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
+	if (Character == nullptr) Character = Cast<AShooterCharacter>(GetPawn());
+	//Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
 	if (Character)
 	{
-		Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+		if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+		//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 		if (Controller)
 		{
 			Controller->SetHUDScore(GetScore());
@@ -46,10 +50,12 @@ void AShooterPlayerState::OnRep_Score()
 void AShooterPlayerState::AddToDefeats(const int32 DefeatsAmount)
 {
 	Defeats += DefeatsAmount;
-	Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
+	if (Character == nullptr) Character = Cast<AShooterCharacter>(GetPawn());
+	//Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
 	if (Character)
 	{
-		Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+		if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+		//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 		if (Controller)
 		{
 			Controller->SetHUDDefeats(Defeats);
@@ -59,10 +65,12 @@ void AShooterPlayerState::AddToDefeats(const int32 DefeatsAmount)
 
 void AShooterPlayerState::OnRep_Defeats()
 {
-	Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
+	if (Character == nullptr) Character = Cast<AShooterCharacter>(GetPawn());
+	//Character = Character == nullptr ? Cast<AShooterCharacter>(GetPawn()) : Character;
 	if (Character)
 	{
-		Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+		if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+		//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 		if (Controller)
 		{
 			Controller->SetHUDDefeats(Defeats);

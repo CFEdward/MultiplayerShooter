@@ -60,10 +60,7 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	if (bWeaponEquipped && EquippedWeapon && EquippedWeapon->GetWeaponMesh() && ShooterCharacter->GetMesh())
 	{
-		LeftHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(
-			FName("LeftHandSocket"),
-			ERelativeTransformSpace::RTS_World
-		);
+		LeftHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"), ERelativeTransformSpace::RTS_World);
 		FVector OutPosition;
 		FRotator OutRotation;
 		ShooterCharacter->GetMesh()->TransformToBoneSpace(
@@ -79,10 +76,7 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		if (ShooterCharacter->IsLocallyControlled())
 		{
 			bLocallyControlled = true;
-			const FTransform RightHandTransform = ShooterCharacter->GetMesh()->GetSocketTransform(
-				FName("Hand_R"),
-				ERelativeTransformSpace::RTS_World
-				);
+			const FTransform RightHandTransform = ShooterCharacter->GetMesh()->GetSocketTransform(FName("Hand_R"), ERelativeTransformSpace::RTS_World);
 			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
 				RightHandTransform.GetLocation(),
 				RightHandTransform.GetLocation() + (RightHandTransform.GetLocation() - ShooterCharacter->GetHitTarget())

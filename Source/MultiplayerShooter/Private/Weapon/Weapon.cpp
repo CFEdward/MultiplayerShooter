@@ -108,10 +108,12 @@ void AWeapon::OnSphereEndOverlap(
 
 void AWeapon::SetHUDAmmo()
 {
-	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
+	if (ShooterOwnerCharacter == nullptr) ShooterOwnerCharacter = Cast<AShooterCharacter>(GetOwner());
+	//ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
 	if (ShooterOwnerCharacter)
 	{
-		ShooterOwnerController = ShooterOwnerController == nullptr ? Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController;
+		if (ShooterOwnerController == nullptr) ShooterOwnerController = Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller);
+		//ShooterOwnerController = ShooterOwnerController == nullptr ? Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController;
 		if (ShooterOwnerController)
 		{
 			ShooterOwnerController->SetHUDWeaponAmmo(Ammo);
@@ -130,7 +132,8 @@ void AWeapon::OnRep_Owner()
 	}
 	else
 	{
-		ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(Owner) : ShooterOwnerCharacter;
+		if (ShooterOwnerCharacter == nullptr) ShooterOwnerCharacter = Cast<AShooterCharacter>(Owner);
+		//ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(Owner) : ShooterOwnerCharacter;
 		if (ShooterOwnerCharacter && ShooterOwnerCharacter->GetEquippedWeapon() && ShooterOwnerCharacter->GetEquippedWeapon() == this)
 		{
 			SetHUDAmmo();
@@ -325,7 +328,7 @@ void AWeapon::SpendRound()
 	{
 		ClientUpdateAmmo(Ammo);
 	}
-	else if (ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
+	else if (ShooterOwnerCharacter = Cast<AShooterCharacter>(GetOwner()); //ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
 			ShooterOwnerCharacter && ShooterOwnerCharacter->IsLocallyControlled())
 	{
 		++Sequence;
@@ -354,7 +357,8 @@ void AWeapon::ClientAddAmmo_Implementation(const int32 AmmoToAdd)
 	if (HasAuthority()) return;
 	
 	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
-	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
+	if (ShooterOwnerCharacter == nullptr) ShooterOwnerCharacter = Cast<AShooterCharacter>(GetOwner());
+	//ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter;
 	if (ShooterOwnerCharacter && ShooterOwnerCharacter->GetCombat() && IsFull())
 	{
 		ShooterOwnerCharacter->GetCombat()->JumpToShotgunEnd();

@@ -10,6 +10,7 @@ public class MultiplayerShooterTarget : TargetRules
 		Type = TargetType.Game;
 		bUsesSteam = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 		ExtraModuleNames.AddRange( new string[] { "MultiplayerShooter" } );
 	}
 }

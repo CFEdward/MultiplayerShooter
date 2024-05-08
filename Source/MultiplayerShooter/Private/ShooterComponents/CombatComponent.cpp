@@ -198,7 +198,8 @@ void UCombatComponent::UpdateCarriedAmmo()
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
 	}
 	
-	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+	if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+	//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 	if (Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
@@ -361,7 +362,8 @@ void UCombatComponent::ServerThrowGrenade_Implementation()
 
 void UCombatComponent::UpdateHUDGrenades()
 {
-	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+	if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+	//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 	if (Controller)
 	{
 		Controller->SetHUDGrenades(Grenades);
@@ -436,7 +438,8 @@ void UCombatComponent::SetAiming(const bool bIsAiming)
 	
 	if (Character->IsLocallyControlled() && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
 	{
-		Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+		if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+		//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 		if (Controller)
 		{
 			Controller->SetHUDSniperScope(bIsAiming);
@@ -666,10 +669,12 @@ void UCombatComponent::SetHUDCrosshairs(const float DeltaTime)
 {
 	if (Character == nullptr || Character->Controller == nullptr) return;
 
-	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+	if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+	//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 	if (Controller)
 	{
-		HUD = HUD == nullptr ? Cast<AShooterHUD>(Controller->GetHUD()) : HUD;
+		if (HUD == nullptr) HUD = Cast<AShooterHUD>(Controller->GetHUD());
+		//HUD = HUD == nullptr ? Cast<AShooterHUD>(Controller->GetHUD()) : HUD;
 		if (HUD)
 		{
 			if (EquippedWeapon)
@@ -769,7 +774,8 @@ void UCombatComponent::PickupAmmo(const EWeaponType WeaponType, const int32 Ammo
 
 void UCombatComponent::OnRep_CarriedAmmo()
 {
-	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+	if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+	//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 	if (Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
@@ -821,7 +827,8 @@ void UCombatComponent::UpdateAmmoValues()
 		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= ReloadAmount;
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
 	}
-	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+	if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+	//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 	if (Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
@@ -838,7 +845,8 @@ void UCombatComponent::UpdateShotgunAmmoValues()
 		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= 1;
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
 	}
-	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+	if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
+	//Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
 	if (Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);

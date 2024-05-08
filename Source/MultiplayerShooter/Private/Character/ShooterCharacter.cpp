@@ -4,6 +4,7 @@
 #include "Character/ShooterCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
@@ -13,7 +14,6 @@
 #include "MultiplayerShooter/MultiplayerShooter.h"
 #include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "PhysicsEngine/PhysicsAsset.h"
 #include "PlayerController/ShooterPlayerController.h"
 #include "PlayerState/ShooterPlayerState.h"
 #include "ShooterComponents/BuffComponent.h"
@@ -25,7 +25,6 @@
 
 AShooterCharacter::AShooterCharacter() :
 	bDisableGameplay(false),
-	bDrawPhysAssets(false),
 	bShouldStopReload(false),
 	CameraThreshold(200.0f),
 	TurnThreshold(0.5f),
@@ -79,7 +78,7 @@ AShooterCharacter::AShooterCharacter() :
 
 	/**
 	 * Hit boxes for server-side rewind
-	 *
+	 */
 	{
 		Head = CreateDefaultSubobject<UBoxComponent>(TEXT("head"));
 		Head->SetupAttachment(GetMesh(), FName("head"));
@@ -125,8 +124,8 @@ AShooterCharacter::AShooterCharacter() :
 		Backpack->SetupAttachment(GetMesh(), FName("backpack"));
 		Backpack->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-		Blanket = CreateDefaultSubobject<UBoxComponent>(TEXT("backpack"));
-		Blanket->SetupAttachment(GetMesh(), FName("backpack"));
+		Blanket = CreateDefaultSubobject<UBoxComponent>(TEXT("blanket"));
+		Blanket->SetupAttachment(GetMesh(), FName("blanket_l"));
 		Blanket->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 		Thigh_L = CreateDefaultSubobject<UBoxComponent>(TEXT("thigh_l"));
@@ -153,7 +152,6 @@ AShooterCharacter::AShooterCharacter() :
 		Foot_R->SetupAttachment(GetMesh(), FName("foot_r"));
 		Foot_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-	*/
 }
 
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -177,11 +175,6 @@ void AShooterCharacter::BeginPlay()
 	if (AttachedGrenade)
 	{
 		AttachedGrenade->SetVisibility(false);
-	}
-	
-	if (GetMesh())
-	{
-		HitCapsuleConstruction();
 	}
 }
 
@@ -636,8 +629,8 @@ void AShooterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	{
 		if (AShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<AShooterGameMode>())
 		{
-			ShooterPlayerController =
-				ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+			if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+			//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
 			AShooterPlayerController* AttackerController = Cast<AShooterPlayerController>(InstigatorController);
 			ShooterGameMode->PlayerEliminated(this, ShooterPlayerController, AttackerController);
 		}
@@ -807,7 +800,8 @@ void AShooterCharacter::OnRep_Shield(const float LastShield)
 
 void AShooterCharacter::UpdateHUDHealth()
 {
-	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
 	
 	if (ShooterPlayerController)
 	{
@@ -817,7 +811,8 @@ void AShooterCharacter::UpdateHUDHealth()
 
 void AShooterCharacter::UpdateHUDShield()
 {
-	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
 	
 	if (ShooterPlayerController)
 	{
@@ -827,7 +822,8 @@ void AShooterCharacter::UpdateHUDShield()
 
 void AShooterCharacter::UpdateHUDAmmo()
 {
-	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
 	
 	if (ShooterPlayerController && Combat && Combat->EquippedWeapon)
 	{
@@ -854,7 +850,8 @@ void AShooterCharacter::PollInit()
 {
 	if (ShooterPlayerController == nullptr)
 	{
-		ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+		ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+		//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
 		if (ShooterPlayerController)
 		{
 			SpawnDefaultWeapon();
@@ -891,48 +888,6 @@ void AShooterCharacter::StartDissolve()
 		DissolveTimeline->AddInterpFloat(DissolveCurve, DissolveTrack);
 		DissolveTimeline->Play();
 	}
-}
-
-void AShooterCharacter::HitCapsuleConstruction()
-{
-	if (GetMesh() == nullptr) return;
-
-	for (auto x : GetMesh()->GetPhysicsAsset()->SkeletalBodySetups)
-	{
-		auto BName = x->BoneName;
-		auto BoneWorldTransform = GetMesh()->GetBoneTransform(GetMesh()->GetBoneIndex(BName));
-		for (auto y : x->AggGeom.SphylElems)
-		{
-			auto LocTransform = y.GetTransform();
-			auto WorldTransform = LocTransform * BoneWorldTransform;
-
-			FPhysAssetInformation AssetInfo;
-			AssetInfo.BoneName = BName;
-			AssetInfo.HalfHeight = y.Length / 2 + y.Radius;
-			AssetInfo.Radius = y.Radius;
-			AssetInfo.BoneWorldTransform = WorldTransform;
-			PhysAssetInfo.Add(AssetInfo);
-		}
-	}
-
-	for (int i = 0; i < PhysAssetInfo.Num(); i++)
-	{
-		SetupHitCapsule(PhysAssetInfo[i]);
-	}
-}
-
-void AShooterCharacter::SetupHitCapsule(FPhysAssetInformation PhysicsAssetInfo)
-{
-	UCapsuleComponent* HitCapsule = NewObject<UCapsuleComponent>(this, UCapsuleComponent::StaticClass(), PhysicsAssetInfo.BoneName, RF_Transient);
-	HitCapsule->SetupAttachment(GetMesh(), PhysicsAssetInfo.BoneName);
-	HitCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HitCapsule->SetWorldTransform(PhysicsAssetInfo.BoneWorldTransform);
-	HitCapsule->SetCapsuleHalfHeight(PhysicsAssetInfo.HalfHeight);
-	HitCapsule->SetCapsuleRadius(PhysicsAssetInfo.Radius);
-
-	HitCapsule->RegisterComponent();
-	HitCapsuleBones.Add(HitCapsule);
-	HitCollisionCapsule.Add(PhysicsAssetInfo.BoneName, HitCapsule);
 }
 
 void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)

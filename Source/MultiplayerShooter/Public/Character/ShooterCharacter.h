@@ -22,21 +22,6 @@ class AShooterPlayerController;
 class USoundCue;
 class AShooterPlayerState;
 
-USTRUCT(BlueprintType)
-struct FPhysAssetInformation
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FName BoneName;
-	UPROPERTY()
-	float HalfHeight = 0.f;
-	UPROPERTY()
-	float Radius = 0.f;
-	UPROPERTY()
-	FTransform BoneWorldTransform;
-};
-
 UCLASS()
 class MULTIPLAYERSHOOTER_API AShooterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
@@ -111,22 +96,10 @@ protected:
 		const UDamageType* DamageType,
 		AController* InstigatorController,
 		AActor* DamageCauser);
-
-	UPROPERTY()
-	TMap<FName, TObjectPtr<UBoxComponent>> HitCollisionBox;
-	UPROPERTY()
-	TMap<FName, TObjectPtr<UCapsuleComponent>> HitCollisionCapsule;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TObjectPtr<UCapsuleComponent>> HitCapsuleBones;
-	UPROPERTY(EditAnywhere)
-	TArray<FPhysAssetInformation> PhysAssetInfo;
-	bool bDrawPhysAssets;
-	void HitCapsuleConstruction();
-	void SetupHitCapsule(FPhysAssetInformation PhysicsAssetInfo);
 	
 	/**
 	 * Hit boxes used for server-side rewind
-	 *
+	 */
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> Head;
 	UPROPERTY(EditAnywhere)
@@ -163,7 +136,6 @@ protected:
 	TObjectPtr<UBoxComponent> Foot_L;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> Foot_R;
-	*/
 
 private:
 
