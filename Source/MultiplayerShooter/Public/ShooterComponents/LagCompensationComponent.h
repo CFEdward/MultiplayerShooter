@@ -6,6 +6,34 @@
 #include "Components/ActorComponent.h"
 #include "LagCompensationComponent.generated.h"
 
+class AShooterPlayerController;
+
+USTRUCT(BlueprintType)
+struct FBoxInformation
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FVector Location;
+
+	UPROPERTY()
+	FRotator Rotation;
+
+	UPROPERTY()
+	FVector BoxExtent;
+};
+
+USTRUCT(BlueprintType)
+struct FFramePackage
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	float Time;
+
+	UPROPERTY()
+	TMap<FName, FBoxInformation> HitBoxInfo;
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MULTIPLAYERSHOOTER_API ULagCompensationComponent : public UActorComponent
@@ -15,11 +43,24 @@ class MULTIPLAYERSHOOTER_API ULagCompensationComponent : public UActorComponent
 public:	
 	
 	ULagCompensationComponent();
+	friend class AShooterCharacter;
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void ShowFramePackage(const FFramePackage& Package, const FColor& Color);
 	
 protected:
 	
 	virtual void BeginPlay() override;
+
+	void SaveFramePackage(FFramePackage& Package);
+
+private:
+
+	UPROPERTY()
+	TObjectPtr<AShooterCharacter> Character;
+
+	UPROPERTY()
+	TObjectPtr<AShooterPlayerController> Controller;
 		
 };

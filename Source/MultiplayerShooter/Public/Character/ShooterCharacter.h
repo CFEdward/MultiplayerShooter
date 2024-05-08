@@ -10,6 +10,7 @@
 #include "ShooterTypes/CombatState.h"
 #include "ShooterCharacter.generated.h"
 
+class ULagCompensationComponent;
 class UBoxComponent;
 class UBuffComponent;
 class USpringArmComponent;
@@ -56,6 +57,9 @@ public:
 
 	UPROPERTY(Replicated)
 	bool bDisableGameplay;
+
+	UPROPERTY()
+	TMap<FName, TObjectPtr<UBoxComponent>> HitCollisionBoxes;
 	
 protected:
 	
@@ -141,7 +145,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<USpringArmComponent> CameraBoom;
-
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> FollowCamera;
 
@@ -153,12 +156,16 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(const AWeapon* LastWeapon) const;
 
+	/**
+	 * Shooter components
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCombatComponent> Combat;
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBuffComponent> Buff;
-
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<ULagCompensationComponent> LagCompensation;
+	
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 	UFUNCTION(Server, Reliable)
@@ -177,17 +184,13 @@ private:
 	 */
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<UAnimMontage> ReloadMontage;
 	bool bShouldStopReload;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<UAnimMontage> HitReactMontage;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<UAnimMontage> ElimMontage;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<UAnimMontage> ThrowGrenadeMontage;
 
