@@ -25,17 +25,8 @@
 
 
 AShooterCharacter::AShooterCharacter() :
-	bDisableGameplay(false),
-	bShouldStopReload(false),
-	CameraThreshold(200.0f),
-	TurnThreshold(0.5f),
-	TimeSinceLastMovementReplication(0.0f),
-	MaxHealth(100.0f),
-	Health(MaxHealth),
-	MaxShield(100.f),
-	Shield(0.f),
-	bElimmed(false),
-	ElimDelay(3.0f)
+	bDisableGameplay(false), bShouldStopReload(false), CameraThreshold(200.0f), TurnThreshold(0.5f), TimeSinceLastMovementReplication(0.0f),
+	MaxHealth(100.0f), Health(MaxHealth), MaxShield(100.f), Shield(0.f), bElimmed(false), ElimDelay(3.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -658,8 +649,8 @@ void AShooterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	{
 		if (AShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<AShooterGameMode>())
 		{
-			if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
-			//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+			//if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+			ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
 			AShooterPlayerController* AttackerController = Cast<AShooterPlayerController>(InstigatorController);
 			ShooterGameMode->PlayerEliminated(this, ShooterPlayerController, AttackerController);
 		}
@@ -829,8 +820,8 @@ void AShooterCharacter::OnRep_Shield(const float LastShield)
 
 void AShooterCharacter::UpdateHUDHealth()
 {
-	if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
-	//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	//if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
 	
 	if (ShooterPlayerController)
 	{
@@ -840,8 +831,8 @@ void AShooterCharacter::UpdateHUDHealth()
 
 void AShooterCharacter::UpdateHUDShield()
 {
-	if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
-	//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	//if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
 	
 	if (ShooterPlayerController)
 	{
@@ -851,8 +842,8 @@ void AShooterCharacter::UpdateHUDShield()
 
 void AShooterCharacter::UpdateHUDAmmo()
 {
-	if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
-	//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+	//if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
 	
 	if (ShooterPlayerController && Combat && Combat->EquippedWeapon)
 	{
@@ -879,8 +870,8 @@ void AShooterCharacter::PollInit()
 {
 	if (ShooterPlayerController == nullptr)
 	{
-		ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
-		//ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController;
+		//ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+		ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
 		if (ShooterPlayerController)
 		{
 			SpawnDefaultWeapon();

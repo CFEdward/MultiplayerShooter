@@ -87,10 +87,8 @@ void AShooterGameMode::PlayerEliminated(
 	AShooterPlayerController* VictimController,
 	AShooterPlayerController* AttackerController)
 {
-	AShooterPlayerState* AttackerPlayerState =
-		AttackerController ? Cast<AShooterPlayerState>(AttackerController->PlayerState) : nullptr;
-	AShooterPlayerState* VictimPlayerState =
-		VictimController ? Cast<AShooterPlayerState>(VictimController->PlayerState) : nullptr;
+	AShooterPlayerState* AttackerPlayerState = AttackerController ? Cast<AShooterPlayerState>(AttackerController->PlayerState) : nullptr;
+	AShooterPlayerState* VictimPlayerState = VictimController ? Cast<AShooterPlayerState>(VictimController->PlayerState) : nullptr;
 	AShooterGameState* ShooterGameState = GetGameState<AShooterGameState>();
 	
 	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState && ShooterGameState)

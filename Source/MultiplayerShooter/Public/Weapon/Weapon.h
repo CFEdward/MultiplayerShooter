@@ -125,6 +125,11 @@ protected:
 		int32 OtherBodyIndex
 	);
 
+	UPROPERTY()
+	TObjectPtr<AShooterCharacter> ShooterOwnerCharacter;
+	UPROPERTY()
+	TObjectPtr<AShooterPlayerController> ShooterOwnerController;
+	
 	/**
 	 * Trace end with scatter
 	 */
@@ -133,6 +138,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
 	float SphereRadius;
+
+	UPROPERTY(EditAnywhere)
+	float Damage;
+
+	UPROPERTY(EditAnywhere)
+	bool bUseServerSideRewind;
 	
 private:
 
@@ -181,11 +192,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 MagCapacity;
 
-	UPROPERTY()
-	TObjectPtr<AShooterCharacter> ShooterOwnerCharacter;
-	UPROPERTY()
-	TObjectPtr<AShooterPlayerController> ShooterOwnerController;
-
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
 
@@ -203,15 +209,16 @@ private:
 public:	
 	
 	void SetWeaponState(const EWeaponState State);
+	bool IsEmpty() const;
+	bool IsFull() const;
 	FORCEINLINE EWeaponState GetWeaponState() const { return WeaponState; }
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
 	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
-	bool IsEmpty() const;
-	bool IsFull() const;
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }
 	FORCEINLINE int32 GetMagCapacity() const { return MagCapacity; }
+	FORCEINLINE float GetDamage() const { return Damage; }
 	
 };

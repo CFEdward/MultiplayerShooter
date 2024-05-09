@@ -9,7 +9,8 @@ public class MultiplayerShooterTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		bUsesSteam = true;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
+		bOverrideBuildEnvironment = true;
+		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 		ExtraModuleNames.AddRange( new string[] { "MultiplayerShooter" } );
 	}

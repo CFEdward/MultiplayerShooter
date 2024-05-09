@@ -19,7 +19,7 @@
 
 
 AShooterPlayerController::AShooterPlayerController() :
-	ClientServerDelta(0.f), TimeSyncFrequency(5.f), TimeSyncRunningTime(0.f), LevelStartingTime(0.f), MatchTime(0.f),
+	SingleTripTime(0.f), ClientServerDelta(0.f), TimeSyncFrequency(5.f), TimeSyncRunningTime(0.f), LevelStartingTime(0.f), MatchTime(0.f),
 	WarmupTime(0.f), CooldownTime(0.f), CountdownInt(0), HUDHealth(0.f), bInitializeHealth(false),
 	HUDMaxHealth(0.f), HUDShield(0.f), bInitializeShield(false), HUDMaxShield(0.f), HUDScore(0.f),
 	bInitializeScore(false), HUDDefeats(0), bInitializeDefeats(false), HUDGrenades(0), bInitializeGrenades(false),
@@ -61,8 +61,8 @@ void AShooterPlayerController::CheckPing(const float DeltaTime)
 
 	if (ShooterHUD && ShooterHUD->CharacterOverlay && ShooterHUD->CharacterOverlay->PingText)
 	{
-		if (PlayerState == nullptr) PlayerState = GetPlayerState<APlayerState>();
-		//PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
+		//if (PlayerState == nullptr) PlayerState = GetPlayerState<APlayerState>();
+		PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState.Get();
 		if (PlayerState)
 		{
 			const FString PingText = FString::Printf(TEXT("%d ms"), FMath::CeilToInt(PlayerState->GetPingInMilliseconds()));
@@ -74,8 +74,8 @@ void AShooterPlayerController::CheckPing(const float DeltaTime)
 	HighPingRunningTime += DeltaTime;
 	if (HighPingRunningTime > CheckPingFrequency)
 	{
-		if (PlayerState == nullptr) PlayerState = GetPlayerState<APlayerState>();
-		//PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
+		//if (PlayerState == nullptr) PlayerState = GetPlayerState<APlayerState>();
+		PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState.Get();
 		if (PlayerState)
 		{
 			if (PlayerState->GetPingInMilliseconds() > HighPingThreshold)
@@ -111,8 +111,8 @@ void AShooterPlayerController::CheckTimeSync(const float DeltaTime)
 
 void AShooterPlayerController::HighPingWarning()
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 	
 	if (ShooterHUD && ShooterHUD->CharacterOverlay && ShooterHUD->CharacterOverlay->HighPingImage && ShooterHUD->CharacterOverlay->HighPingAnimation)
 	{
@@ -123,8 +123,8 @@ void AShooterPlayerController::HighPingWarning()
 
 void AShooterPlayerController::StopHighPingWarning()
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 	
 	if (ShooterHUD && ShooterHUD->CharacterOverlay && ShooterHUD->CharacterOverlay->HighPingImage && ShooterHUD->CharacterOverlay->HighPingAnimation)
 	{
@@ -177,8 +177,8 @@ void AShooterPlayerController::OnPossess(APawn* InPawn)
 
 void AShooterPlayerController::SetHUDHealth(const float Health, const float MaxHealth)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 	
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -200,8 +200,8 @@ void AShooterPlayerController::SetHUDHealth(const float Health, const float MaxH
 
 void AShooterPlayerController::SetHUDShield(const float Shield, const float MaxShield)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 	
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -223,8 +223,8 @@ void AShooterPlayerController::SetHUDShield(const float Shield, const float MaxS
 
 void AShooterPlayerController::SetHUDScore(const float Score)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -242,8 +242,8 @@ void AShooterPlayerController::SetHUDScore(const float Score)
 
 void AShooterPlayerController::SetHUDDefeats(const int32 Defeats)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -261,8 +261,8 @@ void AShooterPlayerController::SetHUDDefeats(const int32 Defeats)
 
 void AShooterPlayerController::SetHUDWeaponAmmo(const int32 Ammo)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -280,8 +280,8 @@ void AShooterPlayerController::SetHUDWeaponAmmo(const int32 Ammo)
 
 void AShooterPlayerController::SetHUDCarriedAmmo(const int32 Ammo)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -299,8 +299,8 @@ void AShooterPlayerController::SetHUDCarriedAmmo(const int32 Ammo)
 
 void AShooterPlayerController::SetHUDMatchCountdown(const float CountdownTime)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -322,8 +322,8 @@ void AShooterPlayerController::SetHUDMatchCountdown(const float CountdownTime)
 
 void AShooterPlayerController::SetHUDAnnouncementCountdown(const float CountdownTime)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 
 	if (ShooterHUD &&
 		ShooterHUD->Announcement &&
@@ -345,8 +345,8 @@ void AShooterPlayerController::SetHUDAnnouncementCountdown(const float Countdown
 
 void AShooterPlayerController::SetHUDSniperScope(const bool bIsAiming)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 	if (!ShooterHUD->SniperScope)
 	{
 		ShooterHUD->AddSniperScope();
@@ -371,8 +371,8 @@ void AShooterPlayerController::SetHUDSniperScope(const bool bIsAiming)
 
 void AShooterPlayerController::SetHUDGrenades(const int32 Grenades)
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 
 	if (ShooterHUD &&
 		ShooterHUD->CharacterOverlay &&
@@ -390,8 +390,8 @@ void AShooterPlayerController::SetHUDGrenades(const int32 Grenades)
 
 void AShooterPlayerController::SetHUDTime()
 {
-	if (ShooterGameMode == nullptr) ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
-	//ShooterGameMode = ShooterGameMode == nullptr ? Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this)) : ShooterGameMode;
+	//if (ShooterGameMode == nullptr) ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
+	ShooterGameMode = ShooterGameMode == nullptr ? Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this)) : ShooterGameMode.Get();
 	
 	if (HasAuthority() && ShooterGameMode)
 	{
@@ -472,7 +472,8 @@ void AShooterPlayerController::ClientReportServerTime_Implementation(
 	const float TimeServerReceivedClientRequest)
 {
 	const float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfClientRequest;
-	const float CurrentServerTime = TimeServerReceivedClientRequest + (0.5f * RoundTripTime);
+	SingleTripTime = (0.5f * RoundTripTime);
+	const float CurrentServerTime = TimeServerReceivedClientRequest + SingleTripTime;
 	ClientServerDelta = CurrentServerTime - GetWorld()->GetTimeSeconds();
 }
 
@@ -520,8 +521,8 @@ void AShooterPlayerController::OnRep_MatchState()
 
 void AShooterPlayerController::HandleMatchHasStarted()
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 	if (ShooterHUD)
 	{
 		if (ShooterHUD->CharacterOverlay == nullptr) ShooterHUD->AddCharacterOverlay();
@@ -534,8 +535,8 @@ void AShooterPlayerController::HandleMatchHasStarted()
 
 void AShooterPlayerController::HandleCooldown()
 {
-	if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
-	//ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD;
+	//if (ShooterHUD == nullptr) ShooterHUD = Cast<AShooterHUD>(GetHUD());
+	ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
 	if (ShooterHUD)
 	{
 		ShooterHUD->CharacterOverlay->RemoveFromParent();
