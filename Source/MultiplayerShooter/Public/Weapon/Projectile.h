@@ -36,8 +36,10 @@ public:
 	FVector_NetQuantize TraceStart;
 	FVector_NetQuantize100 InitialVelocity;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Master Speed")
 	float InitialSpeed;
+	
+	float Damage;
 	
 protected:
 	
@@ -57,9 +59,6 @@ protected:
 	void StartDestroyTimer();
 	void DestroyTimerFinished();
 	void ExplodeDamage();
-
-	UPROPERTY(EditAnywhere)
-	float Damage;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> ImpactParticles;
