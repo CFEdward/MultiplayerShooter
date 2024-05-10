@@ -20,6 +20,8 @@ public:
 
 protected:
 
+	virtual void BeginPlay() override;
+
 	virtual void OnHit(
 		UPrimitiveComponent* HitComp,
 		AActor* OtherActor,
