@@ -72,6 +72,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
 
+	FTimerHandle DestroyTimer;
+	
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -79,8 +81,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> TracerComponent;
-
-	FTimerHandle DestroyTimer;
 
 	UPROPERTY(EditAnywhere)
 	float DestroyTime;

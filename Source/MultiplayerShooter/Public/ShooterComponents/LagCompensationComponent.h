@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "LagCompensationComponent.generated.h"
 
+class AShooterCharacter;
 class AWeapon;
 class AShooterPlayerController;
 
@@ -15,13 +16,13 @@ struct FBoxInformation
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FVector Location;
+	FVector Location = FVector(0.f);
 
 	UPROPERTY()
-	FRotator Rotation;
+	FRotator Rotation = FRotator(0.f);
 
 	UPROPERTY()
-	FVector BoxExtent;
+	FVector BoxExtent = FVector(0.f);
 };
 
 USTRUCT(BlueprintType)
@@ -30,10 +31,13 @@ struct FFramePackage
 	GENERATED_BODY()
 
 	UPROPERTY()
-	float Time;
+	float Time = 0.f;
 
 	UPROPERTY()
-	TMap<FName, FBoxInformation> HitBoxInfo;
+	TMap<FName, FBoxInformation> HitBoxInfo = TMap<FName, FBoxInformation>();
+
+	UPROPERTY()
+	TObjectPtr<AShooterCharacter> Character = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -42,10 +46,22 @@ struct FServerSideRewindResult
 	GENERATED_BODY()
 
 	UPROPERTY()
-	bool bHitConfirmed;
+	bool bHitConfirmed = false;
 
 	UPROPERTY()
-	bool bHeadshot;
+	bool bHeadshot = false;
+};
+
+USTRUCT(BlueprintType)
+struct FShotgunServerSideRewindResult
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TMap<TObjectPtr<AShooterCharacter>, uint32> HeadShots = TMap<TObjectPtr<AShooterCharacter>, uint32>();
+	
+	UPROPERTY()
+	TMap<TObjectPtr<AShooterCharacter>, uint32> BodyShots = TMap<TObjectPtr<AShooterCharacter>, uint32>();
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -66,15 +82,26 @@ public:
 		AShooterCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation,
-		float HitTime);
+		const float HitTime);
+	FShotgunServerSideRewindResult ShotgunServerSideRewind(
+		const TArray<AShooterCharacter*>& HitCharacters,
+		const FVector_NetQuantize& TraceStart,
+		const TArray<FVector_NetQuantize>& HitLocations,
+		const float HitTime);
 
 	UFUNCTION(Server, Reliable)
 	void ServerScoreRequest(
 		AShooterCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation,
-		float HitTime,
+		const float HitTime,
 		AWeapon* DamageCauser);
+	UFUNCTION(Server, Reliable)
+	void ShotgunServerScoreRequest(
+		const TArray<AShooterCharacter*>& HitCharacters,
+		const FVector_NetQuantize& TraceStart,
+		const TArray<FVector_NetQuantize>& HitLocations,
+		const float HitTime);
 	
 protected:
 	
@@ -83,18 +110,27 @@ protected:
 	void SaveFramePackage();
 	void SaveFramePackage(FFramePackage& Package);
 
+	FFramePackage GetFrameToCheck(AShooterCharacter* HitCharacter, const float HitTime);
 	FFramePackage InterpBetweenFrames(const FFramePackage& OlderFrame, const FFramePackage& YoungerFrame, const float HitTime);
-
 	FServerSideRewindResult ConfirmHit(
 		const FFramePackage& Package,
 		AShooterCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation);
+	
 	void CacheBoxPositions(AShooterCharacter* HitCharacter, FFramePackage& OutFramePackage);
 	void MoveHitBoxes(AShooterCharacter* HitCharacter, const FFramePackage& Package);
 	void ResetHitBoxes(AShooterCharacter* HitCharacter, const FFramePackage& Package);
 	void EnableCharacterMeshCollision(const AShooterCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
 
+	/**
+	 * Shotgun
+	 */
+	FShotgunServerSideRewindResult ShotgunConfirmHit(
+		const TArray<FFramePackage>& FramePackages,
+		const FVector_NetQuantize& TraceStart,
+		const TArray<FVector_NetQuantize>& HitLocations);
+	
 private:
 
 	UPROPERTY()
