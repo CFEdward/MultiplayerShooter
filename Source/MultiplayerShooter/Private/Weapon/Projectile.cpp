@@ -81,14 +81,6 @@ void AProjectile::SpawnTrailSystem()
 	}
 }
 
-// Called every frame
-// ReSharper disable once CppParameterMayBeConst
-void AProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void AProjectile::StartDestroyTimer()
 {
 	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ThisClass::DestroyTimerFinished, DestroyTime);

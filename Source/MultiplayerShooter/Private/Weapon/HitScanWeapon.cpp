@@ -35,7 +35,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 		if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(FireHit.GetActor());
 			ShooterCharacter && InstigatorController)
 		{
-			if (HasAuthority() && !bUseServerSideRewind)
+			if (const bool bCauseAuthDamage = !bUseServerSideRewind || OwnerPawn->IsLocallyControlled(); HasAuthority() && bCauseAuthDamage)
 			{
 				UGameplayStatics::ApplyDamage(
 					ShooterCharacter,
@@ -86,7 +86,7 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 		if (OutHit.bBlockingHit)
 		{
 			const FVector BeamEnd = OutHit.ImpactPoint;
-			DrawDebugSphere(World, BeamEnd, 16.f, 12, FColor::Orange, true);
+			DrawDebugSphere(World, BeamEnd, 16.f, 12, FColor::Orange, false, 8.f);
 			if (BeamParticles)
 			{
 				if (UParticleSystemComponent* Beam =

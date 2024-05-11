@@ -24,9 +24,6 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void Destroyed() override;
 
 	/**

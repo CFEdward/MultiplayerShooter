@@ -23,8 +23,6 @@ public:
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& Event) override;
 #endif
-
-	virtual void Destroyed() override;
 	
 protected:
 
