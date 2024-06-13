@@ -48,6 +48,8 @@ public:
 	float SingleTripTime;
 
 	FHighPingDelegate HighPingDelegate;
+
+	virtual void PawnLeavingGame() override;
 	
 protected:
 	

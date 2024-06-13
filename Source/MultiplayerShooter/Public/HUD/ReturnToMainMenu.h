@@ -28,7 +28,10 @@ protected:
 	virtual bool Initialize() override;
 
 	UFUNCTION()
-	void OnDestroySession(bool bWasSuccessful);
+	void OnDestroySession(const bool bWasSuccessful);
+
+	UFUNCTION()
+	void OnPlayerLeftGame();
 
 private:
 

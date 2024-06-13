@@ -12,6 +12,7 @@ namespace MatchState
 }
 
 class AShooterCharacter;
+class AShooterPlayerState;
 class AShooterPlayerController;
 
 /**
@@ -25,25 +26,27 @@ class MULTIPLAYERSHOOTER_API AShooterGameMode : public AGameMode
 public:
 
 	AShooterGameMode();
+	
 	virtual void Tick(float DeltaTime) override;
+	
 	virtual void PlayerEliminated(
 		AShooterCharacter* ElimmedCharacter,
 		AShooterPlayerController* VictimController,
 		AShooterPlayerController* AttackerController
 	);
-
 	virtual void RequestRespawn(ACharacter* ElimmedCharacter, AController* ElimmedController);
+
+	void PlayerLeftGame(AShooterPlayerState* PlayerLeaving) const;
 
 	UPROPERTY(EditDefaultsOnly)
 	float WarmupTime;
-
 	UPROPERTY(EditDefaultsOnly)
 	float MatchTime;
-
 	UPROPERTY(EditDefaultsOnly)
 	float CooldownTime;
-	
 	float LevelStartingTime;
+
+	virtual void Logout(AController* Exiting) override;
 
 protected:
 

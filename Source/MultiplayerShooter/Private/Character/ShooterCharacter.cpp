@@ -25,8 +25,8 @@
 
 
 AShooterCharacter::AShooterCharacter() :
-	bDisableGameplay(false), bFinishedSwapping(false), bShouldStopReload(false), CameraThreshold(200.0f), TurnThreshold(0.5f),
-	TimeSinceLastMovementReplication(0.0f), MaxHealth(100.0f), Health(MaxHealth), MaxShield(100.f), Shield(0.f), bElimmed(false), ElimDelay(3.0f)
+	bDisableGameplay(false), bFinishedSwapping(false), bShouldStopReload(false), CameraThreshold(200.0f), TurnThreshold(0.5f), TimeSinceLastMovementReplication(0.0f),
+	MaxHealth(100.0f), Health(MaxHealth), MaxShield(100.f), Shield(0.f), bElimmed(false), ElimDelay(3.0f), bLeftGame(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -183,7 +183,7 @@ void AShooterCharacter::BeginPlay()
 	}
 }
 
-void AShooterCharacter::Tick(float DeltaTime)
+void AShooterCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -281,32 +281,15 @@ void AShooterCharacter::DropWeapons() const
 	}
 }
 
-void AShooterCharacter::Elim()
+void AShooterCharacter::Elim(const bool bPlayerLeftGame)
 {
 	DropWeapons();
-	MulticastElim();
-	GetWorldTimerManager().SetTimer(ElimTimer, this, &ThisClass::ElimTimerFinished, ElimDelay);
+	MulticastElim(bPlayerLeftGame);
 }
 
-void AShooterCharacter::Destroyed()
+void AShooterCharacter::MulticastElim_Implementation(const bool bPlayerLeftGame)
 {
-	Super::Destroyed();
-
-	if (ElimBotComponent)
-	{
-		ElimBotComponent->DestroyComponent();
-	}
-
-	const AShooterGameMode* ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
-	const bool bMatchNotInProgress = ShooterGameMode && ShooterGameMode->GetMatchState() != MatchState::InProgress;
-	if (Combat && Combat->EquippedWeapon && bMatchNotInProgress)
-	{
-		Combat->EquippedWeapon->Destroy();
-	}
-}
-
-void AShooterCharacter::MulticastElim_Implementation()
-{
+	bLeftGame = bPlayerLeftGame;
 	if (ShooterPlayerController)
 	{
 		ShooterPlayerController->SetHUDWeaponAmmo(0);
@@ -351,13 +334,50 @@ void AShooterCharacter::MulticastElim_Implementation()
 	{
 		UGameplayStatics::SpawnSoundAtLocation(this, ElimBotSound, GetActorLocation());
 	}
+	//if (IsLocallyControlled() && Combat && Combat->bAiming && Combat->EquippedWeapon && Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
+	//{
+		//ShowSniperScopeWidget(false);
+	//}
+	
+	GetWorldTimerManager().SetTimer(ElimTimer, this, &ThisClass::ElimTimerFinished, ElimDelay);
 }
 
 void AShooterCharacter::ElimTimerFinished()
 {
-	if (AShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<AShooterGameMode>())
+	if (AShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<AShooterGameMode>(); ShooterGameMode && !bLeftGame)
 	{
 		ShooterGameMode->RequestRespawn(this, Controller);
+	}
+	if (bLeftGame && IsLocallyControlled())
+	{
+		OnLeftGame.Broadcast();
+	}
+}
+
+void AShooterCharacter::Destroyed()
+{
+	Super::Destroyed();
+
+	if (ElimBotComponent)
+	{
+		ElimBotComponent->DestroyComponent();
+	}
+
+	const AShooterGameMode* ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
+	const bool bMatchNotInProgress = ShooterGameMode && ShooterGameMode->GetMatchState() != MatchState::InProgress;
+	if (Combat && Combat->EquippedWeapon && bMatchNotInProgress)
+	{
+		Combat->EquippedWeapon->Destroy();
+	}
+}
+
+void AShooterCharacter::ServerLeaveGame_Implementation()
+{
+	const AShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<AShooterGameMode>();
+ 	ShooterPlayerState = ShooterPlayerState == nullptr ? GetPlayerState<AShooterPlayerState>() : ShooterPlayerState.Get();
+	if (ShooterGameMode && ShooterPlayerState)
+	{
+		ShooterGameMode->PlayerLeftGame(ShooterPlayerState);
 	}
 }
 
@@ -619,7 +639,7 @@ void AShooterCharacter::Jump()
 	}
 }
 
-void AShooterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser)
+void AShooterCharacter::ReceiveDamage(AActor* DamagedActor, const float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser)
 {
 	if (bElimmed) return;
 

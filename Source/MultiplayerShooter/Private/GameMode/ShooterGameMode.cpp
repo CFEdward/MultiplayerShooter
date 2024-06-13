@@ -103,7 +103,7 @@ void AShooterGameMode::PlayerEliminated(
 	
 	if (ElimmedCharacter)
 	{
-		ElimmedCharacter->Elim();
+		ElimmedCharacter->Elim(false);
 	}
 }
 
@@ -121,4 +121,33 @@ void AShooterGameMode::RequestRespawn(ACharacter* ElimmedCharacter, AController*
 		const int32 Selection = FMath::RandRange(0, PlayerStarts.Num() - 1);
 		RestartPlayerAtPlayerStart(ElimmedController, PlayerStarts[Selection]);
 	}
+}
+
+void AShooterGameMode::PlayerLeftGame(AShooterPlayerState* PlayerLeaving) const
+{
+	if (PlayerLeaving == nullptr) return;
+	
+	if (AShooterGameState* ShooterGameState = GetGameState<AShooterGameState>(); ShooterGameState && ShooterGameState->TopScoringPlayers.Contains(PlayerLeaving))
+	{
+		ShooterGameState->TopScoringPlayers.Remove(PlayerLeaving);
+	}
+	if (AShooterCharacter* CharacterLeaving = Cast<AShooterCharacter>(PlayerLeaving->GetPawn()))
+	{
+		CharacterLeaving->Elim(true);
+	}
+}
+
+void AShooterGameMode::Logout(AController* Exiting)
+{
+	if (Exiting == nullptr) return;
+
+	AShooterGameState* ShooterGameState = GetGameState<AShooterGameState>();
+	AShooterPlayerState* ShooterPlayerState = Cast<AShooterPlayerState>(Exiting->PlayerState);
+	if (ShooterGameState && ShooterGameState->TopScoringPlayers.Contains(ShooterPlayerState))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Logout"));
+		ShooterGameState->TopScoringPlayers.Remove(ShooterPlayerState);
+	}
+	
+	Super::Logout(Exiting);
 }

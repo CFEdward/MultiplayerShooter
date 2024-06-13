@@ -3,6 +3,7 @@
 
 #include "HUD/ReturnToMainMenu.h"
 #include "MultiplayerSessionsSubsystem.h"
+#include "Character/ShooterCharacter.h"
 #include "Components/Button.h"
 #include "GameFramework/GameModeBase.h"
 
@@ -11,31 +12,6 @@ bool UReturnToMainMenu::Initialize()
 	if (!Super::Initialize()) return false;
 
 	return true;
-}
-
-void UReturnToMainMenu::OnDestroySession(bool bWasSuccessful)
-{
-	if (!bWasSuccessful)
-	{
-		ReturnButton->SetIsEnabled(true);
-		return;
-	}
-	
-	if (const UWorld* World = GetWorld())
-	{
-		if (AGameModeBase* GameMode = World->GetAuthGameMode<AGameModeBase>())
-		{
-			GameMode->ReturnToMainMenuHost();
-		}
-		else
-		{
-			PlayerController = PlayerController == nullptr ? World->GetFirstPlayerController() : PlayerController.Get();
-			if (PlayerController)
-			{
-				PlayerController->ClientReturnToMainMenuWithTextReason(FText());
-			}
-		}
-	}
 }
 
 void UReturnToMainMenu::MenuSetup()
@@ -71,6 +47,60 @@ void UReturnToMainMenu::MenuSetup()
 	}
 }
 
+void UReturnToMainMenu::ReturnButtonClicked()
+{
+	ReturnButton->SetIsEnabled(false);
+	
+	if (const UWorld* World = GetWorld())
+	{
+		if (const APlayerController* FirstPlayerController = World->GetFirstPlayerController())
+		{
+			if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(FirstPlayerController->GetPawn()))
+			{
+				ShooterCharacter->ServerLeaveGame();
+				ShooterCharacter->OnLeftGame.AddDynamic(this, &ThisClass::OnPlayerLeftGame);
+			}
+			else
+			{
+				ReturnButton->SetIsEnabled(true);
+			}
+		}
+	}
+}
+
+void UReturnToMainMenu::OnDestroySession(const bool bWasSuccessful)
+{
+	if (!bWasSuccessful)
+	{
+		ReturnButton->SetIsEnabled(true);
+		return;
+	}
+	
+	if (const UWorld* World = GetWorld())
+	{
+		if (AGameModeBase* GameMode = World->GetAuthGameMode<AGameModeBase>())
+		{
+			GameMode->ReturnToMainMenuHost();
+		}
+		else
+		{
+			PlayerController = PlayerController == nullptr ? World->GetFirstPlayerController() : PlayerController.Get();
+			if (PlayerController)
+			{
+				PlayerController->ClientReturnToMainMenuWithTextReason(FText());
+			}
+		}
+	}
+}
+
+void UReturnToMainMenu::OnPlayerLeftGame()
+{
+	if (MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->DestroySession();
+	}
+}
+
 void UReturnToMainMenu::MenuTearDown()
 {
 	RemoveFromParent();
@@ -91,15 +121,5 @@ void UReturnToMainMenu::MenuTearDown()
 	if (MultiplayerSessionsSubsystem && MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.IsAlreadyBound(this, &ThisClass::OnDestroySession))
 	{
 		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.RemoveDynamic(this, &ThisClass::OnDestroySession);
-	}
-}
-
-void UReturnToMainMenu::ReturnButtonClicked()
-{
-	ReturnButton->SetIsEnabled(false);
-	
-	if (MultiplayerSessionsSubsystem)
-	{
-		MultiplayerSessionsSubsystem->DestroySession();
 	}
 }

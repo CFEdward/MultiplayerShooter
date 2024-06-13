@@ -10,6 +10,8 @@
 #include "ShooterTypes/CombatState.h"
 #include "ShooterCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
+
 class ULagCompensationComponent;
 class UBoxComponent;
 class UBuffComponent;
@@ -48,16 +50,15 @@ public:
 	void PlaySwapMontage() const;
 	
 	virtual void OnRep_ReplicatedMovement() override;
-	void Elim();
+	void Elim(const bool bPlayerLeftGame);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastElim(const bool bPlayerLeftGame);
 	void DropWeapons() const;
 	virtual void Destroyed() override;
 	
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
 	void UpdateHUDAmmo();
-	
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastElim();
 
 	void SpawnDefaultWeapon();
 
@@ -68,6 +69,11 @@ public:
 	TMap<FName, TObjectPtr<UBoxComponent>> HitCollisionBoxes;
 
 	bool bFinishedSwapping;
+
+	FOnLeftGame OnLeftGame;
+	UFUNCTION(Server, Reliable)
+	void ServerLeaveGame();
+	bool bLeftGame;
 	
 protected:
 	

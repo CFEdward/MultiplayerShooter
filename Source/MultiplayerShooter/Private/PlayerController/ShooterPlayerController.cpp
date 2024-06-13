@@ -624,3 +624,14 @@ void AShooterPlayerController::HandleCooldown()
 		ShooterCharacter->GetCombat()->FireButtonPressed(false);
 	}
 }
+
+void AShooterPlayerController::PawnLeavingGame()
+{
+	if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn()); ShooterCharacter && !ShooterCharacter->bLeftGame)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PawnLeavingGame"));
+		ShooterCharacter->Elim(true);
+	}
+	
+	Super::PawnLeavingGame();
+}
