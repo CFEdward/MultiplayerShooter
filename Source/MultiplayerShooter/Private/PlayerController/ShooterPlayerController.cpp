@@ -10,6 +10,7 @@
 #include "GameState/ShooterGameState.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
+#include "HUD/ReturnToMainMenu.h"
 #include "HUD/ShooterHUD.h"
 #include "HUD/SniperScope.h"
 #include "Kismet/GameplayStatics.h"
@@ -19,11 +20,10 @@
 
 
 AShooterPlayerController::AShooterPlayerController() :
-	SingleTripTime(0.f), ClientServerDelta(0.f), TimeSyncFrequency(5.f), TimeSyncRunningTime(0.f), LevelStartingTime(0.f), MatchTime(0.f),
-	WarmupTime(0.f), CooldownTime(0.f), CountdownInt(0), HUDHealth(0.f), bInitializeHealth(false),
-	HUDMaxHealth(0.f), HUDShield(0.f), bInitializeShield(false), HUDMaxShield(0.f), HUDScore(0.f),
-	bInitializeScore(false), HUDDefeats(0), bInitializeDefeats(false), HUDGrenades(0), bInitializeGrenades(false),
-	HUDCarriedAmmo(0.f), bInitializeCarriedAmmo(false), HUDWeaponAmmo(0.f), bInitializeWeaponAmmo(false),
+	SingleTripTime(0.f), ClientServerDelta(0.f), TimeSyncFrequency(5.f), TimeSyncRunningTime(0.f), bReturnToMainMenuOpen(false), LevelStartingTime(0.f),
+	MatchTime(0.f), WarmupTime(0.f), CooldownTime(0.f), CountdownInt(0), HUDHealth(0.f), bInitializeHealth(false), HUDMaxHealth(0.f),
+	HUDShield(0.f), bInitializeShield(false), HUDMaxShield(0.f), HUDScore(0.f), bInitializeScore(false), HUDDefeats(0), bInitializeDefeats(false),
+	HUDGrenades(0), bInitializeGrenades(false), HUDCarriedAmmo(0.f), bInitializeCarriedAmmo(false), HUDWeaponAmmo(0.f), bInitializeWeaponAmmo(false),
 	HighPingRunningTime(0.f), PingAnimationRunningTime(0.f), HighPingDuration(5.f), CheckPingFrequency(20.f), HighPingThreshold(50.f)
 {
 	
@@ -101,6 +101,27 @@ void AShooterPlayerController::CheckPing(const float DeltaTime)
 		if (PingAnimationRunningTime > HighPingDuration)
 		{
 			StopHighPingWarning();
+		}
+	}
+}
+
+void AShooterPlayerController::ShowReturnToMainMenu()
+{
+	if (ReturnToMainMenuWidget == nullptr) return;
+	if (ReturnToMainMenu == nullptr)
+	{
+		ReturnToMainMenu = CreateWidget<UReturnToMainMenu>(this, ReturnToMainMenuWidget);
+	}
+	if (ReturnToMainMenu)
+	{
+		bReturnToMainMenuOpen = !bReturnToMainMenuOpen;
+		if (bReturnToMainMenuOpen)
+		{
+			ReturnToMainMenu->MenuSetup();
+		}
+		else
+		{
+			ReturnToMainMenu->MenuTearDown();
 		}
 	}
 }
@@ -185,6 +206,14 @@ void AShooterPlayerController::OnPossess(APawn* InPawn)
 		SetHUDHealth(ShooterCharacter->GetHealth(), ShooterCharacter->GetMaxHealth());
 		SetHUDShield(ShooterCharacter->GetShield(), ShooterCharacter->GetMaxShield());
 	}
+}
+
+void AShooterPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	if (InputComponent == nullptr) return;
+
+	InputComponent->BindAction("Menu", IE_Pressed, this, &ThisClass::ShowReturnToMainMenu);
 }
 
 void AShooterPlayerController::SetHUDHealth(const float Health, const float MaxHealth)
@@ -450,24 +479,21 @@ void AShooterPlayerController::SetHUDTime()
 
 void AShooterPlayerController::PollInit()
 {
-	if (CharacterOverlay == nullptr)
+	if (CharacterOverlay == nullptr && ShooterHUD && ShooterHUD->CharacterOverlay)
 	{
-		if (ShooterHUD && ShooterHUD->CharacterOverlay)
+		CharacterOverlay = ShooterHUD->CharacterOverlay;
+		if (CharacterOverlay)
 		{
-			CharacterOverlay = ShooterHUD->CharacterOverlay;
-			if (CharacterOverlay)
-			{
-				if (bInitializeHealth) SetHUDHealth(HUDHealth, HUDMaxHealth);
-				if (bInitializeShield) SetHUDShield(HUDShield, HUDMaxShield);
-				if (bInitializeScore) SetHUDScore(HUDScore);
-				if (bInitializeDefeats) SetHUDDefeats(HUDDefeats);
-				if (bInitializeWeaponAmmo) SetHUDWeaponAmmo(HUDWeaponAmmo);
-				if (bInitializeCarriedAmmo) SetHUDCarriedAmmo(HUDCarriedAmmo);
+			if (bInitializeHealth) SetHUDHealth(HUDHealth, HUDMaxHealth);
+			if (bInitializeShield) SetHUDShield(HUDShield, HUDMaxShield);
+			if (bInitializeScore) SetHUDScore(HUDScore);
+			if (bInitializeDefeats) SetHUDDefeats(HUDDefeats);
+			if (bInitializeWeaponAmmo) SetHUDWeaponAmmo(HUDWeaponAmmo);
+			if (bInitializeCarriedAmmo) SetHUDCarriedAmmo(HUDCarriedAmmo);
 
-				if (const AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn()); ShooterCharacter && ShooterCharacter->GetCombat())
-				{
-					if (bInitializeGrenades) SetHUDGrenades(ShooterCharacter->GetCombat()->GetGrenades());
-				}
+			if (const AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn()); ShooterCharacter && ShooterCharacter->GetCombat())
+			{
+				if (bInitializeGrenades) SetHUDGrenades(ShooterCharacter->GetCombat()->GetGrenades());
 			}
 		}
 	}

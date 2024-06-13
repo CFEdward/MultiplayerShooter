@@ -15,6 +15,9 @@ public class MultiplayerShooter : ModuleRules
 			"Engine",
 			"InputCore",
 			"Niagara",
+			"MultiplayerSessions",
+			"OnlineSubsystem",
+			"OnlineSubsystemSteam",
 			"Networking",
 			"Sockets",
 			"UMG"

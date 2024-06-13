@@ -9,6 +9,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bPingTooHigh);
 
 class AShooterHUD;
+class UUserWidget;
+class UReturnToMainMenu;
 class UCharacterOverlay;
 class AShooterGameMode;
 
@@ -24,7 +26,6 @@ public:
 
 	AShooterPlayerController();
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetHUDHealth(const float Health, const float MaxHealth);
 	void SetHUDShield(const float Shield, const float MaxShield);
 	void SetHUDScore(const float Score);
@@ -35,6 +36,8 @@ public:
 	void SetHUDAnnouncementCountdown(const float CountdownTime);
 	void SetHUDSniperScope(const bool bIsAiming);
 	void SetHUDGrenades(int32 Grenades);
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 
@@ -49,6 +52,8 @@ public:
 protected:
 	
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
+	
 	void SetHUDTime();
 	void PollInit();
 	void HandleMatchHasStarted();
@@ -89,12 +94,23 @@ protected:
 	void HighPingWarning();
 	void StopHighPingWarning();
 	void CheckPing(float DeltaTime);
+
+	void ShowReturnToMainMenu();
 	
 private:
 
 	UPROPERTY()
 	TObjectPtr<AShooterHUD> ShooterHUD;
 
+	/**
+	 * Return to Main Menu
+	 */
+	UPROPERTY(EditAnywhere, Category = HUD)
+	TSubclassOf<UUserWidget> ReturnToMainMenuWidget;
+	UPROPERTY()
+	TObjectPtr<UReturnToMainMenu> ReturnToMainMenu;
+	bool bReturnToMainMenuOpen;
+	
 	UPROPERTY()
 	TObjectPtr<AShooterGameMode> ShooterGameMode;
 
