@@ -135,15 +135,16 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
 	float DistanceToSphere;
-
 	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
 	float SphereRadius;
 
 	UPROPERTY(EditAnywhere)
 	float Damage;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Replicated, EditAnywhere)
 	bool bUseServerSideRewind;
+	UFUNCTION()
+	void OnPingTooHigh(const bool bPingTooHigh);
 	
 private:
 

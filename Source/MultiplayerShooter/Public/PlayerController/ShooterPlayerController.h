@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "ShooterPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bPingTooHigh);
+
 class AShooterHUD;
 class UCharacterOverlay;
 class AShooterGameMode;
@@ -41,6 +43,8 @@ public:
 	void OnMatchStateSet(const FName State);
 
 	float SingleTripTime;
+
+	FHighPingDelegate HighPingDelegate;
 	
 protected:
 	
@@ -133,6 +137,8 @@ private:
 	float HighPingDuration;
 	UPROPERTY(EditAnywhere)
 	float CheckPingFrequency;
+	UFUNCTION(Server, Reliable)
+	void ServerReportPingStatus(bool bHighPing);
 	UPROPERTY(EditAnywhere)
 	float HighPingThreshold;
 	

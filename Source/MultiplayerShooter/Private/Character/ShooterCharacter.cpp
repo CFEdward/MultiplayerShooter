@@ -25,8 +25,8 @@
 
 
 AShooterCharacter::AShooterCharacter() :
-	bDisableGameplay(false), bShouldStopReload(false), CameraThreshold(200.0f), TurnThreshold(0.5f), TimeSinceLastMovementReplication(0.0f),
-	MaxHealth(100.0f), Health(MaxHealth), MaxShield(100.f), Shield(0.f), bElimmed(false), ElimDelay(3.0f)
+	bDisableGameplay(false), bFinishedSwapping(false), bShouldStopReload(false), CameraThreshold(200.0f), TurnThreshold(0.5f),
+	TimeSinceLastMovementReplication(0.0f), MaxHealth(100.0f), Health(MaxHealth), MaxShield(100.f), Shield(0.f), bElimmed(false), ElimDelay(3.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -420,7 +420,13 @@ void AShooterCharacter::SwapWeaponsPressed()
 	
 	if (Combat && Combat->ShouldSwapWeapons())
 	{
-		ServerSwapWeaponPressed();
+		if (Combat->CombatState == ECombatState::ECS_Unoccupied) ServerSwapWeaponPressed();
+		if (!HasAuthority() && Combat->CombatState == ECombatState::ECS_Unoccupied && OverlappingWeapon == nullptr)
+		{
+			PlaySwapMontage();
+			Combat->CombatState = ECombatState::ECS_SwappingWeapons;
+			bFinishedSwapping = false;
+		}
 	}
 }
 
@@ -734,6 +740,14 @@ void AShooterCharacter::PlayThrowGrenadeMontage() const
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ThrowGrenadeMontage)
 	{
 		AnimInstance->Montage_Play(ThrowGrenadeMontage);
+	}
+}
+
+void AShooterCharacter::PlaySwapMontage() const
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && SwapMontage)
+	{
+		AnimInstance->Montage_Play(SwapMontage);
 	}
 }
 
