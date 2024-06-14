@@ -93,8 +93,32 @@ void AShooterGameMode::PlayerEliminated(
 	
 	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState && ShooterGameState)
 	{
+		TArray<AShooterPlayerState*> PlayersCurrentlyInTheLead;
+		for (auto LeadPlayer : ShooterGameState->TopScoringPlayers)
+		{
+			PlayersCurrentlyInTheLead.Add(LeadPlayer.Get());
+		}
+		
 		AttackerPlayerState->AddToScore(1.0f);
 		ShooterGameState->UpdateTopScore(AttackerPlayerState);
+		if (ShooterGameState->TopScoringPlayers.Contains(AttackerPlayerState))
+		{
+			if (AShooterCharacter* Leader = Cast<AShooterCharacter>(AttackerPlayerState->GetPawn()))
+			{
+				Leader->MulticastGainedTheLead();
+			}
+		}
+
+		for (int32 i = 0; i < PlayersCurrentlyInTheLead.Num(); i++)
+		{
+			if (!ShooterGameState->TopScoringPlayers.Contains(PlayersCurrentlyInTheLead[i]))
+			{
+				if (AShooterCharacter* Loser = Cast<AShooterCharacter>(PlayersCurrentlyInTheLead[i]->GetPawn()))
+				{
+					Loser->MulticastLostTheLead();
+				}
+			}
+		}
 	}
 	if (VictimPlayerState)
 	{

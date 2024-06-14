@@ -12,6 +12,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
 
+class UNiagaraComponent;
+class UNiagaraSystem;
 class ULagCompensationComponent;
 class UBoxComponent;
 class UBuffComponent;
@@ -74,6 +76,11 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerLeaveGame();
 	bool bLeftGame;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastGainedTheLead();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLostTheLead();
 	
 protected:
 	
@@ -269,7 +276,7 @@ private:
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
 
 	/**
-	 * Elim bot
+	 * Elim effects
 	 */
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> ElimBotEffect;
@@ -277,6 +284,10 @@ private:
 	TObjectPtr<UParticleSystemComponent> ElimBotComponent;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundCue> ElimBotSound;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> CrownSystem;
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> CrownComponent;
 
 	UPROPERTY()
 	TObjectPtr<AShooterPlayerState> ShooterPlayerState;

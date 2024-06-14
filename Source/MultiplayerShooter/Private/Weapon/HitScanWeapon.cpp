@@ -86,7 +86,7 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 		if (OutHit.bBlockingHit)
 		{
 			const FVector BeamEnd = OutHit.ImpactPoint;
-			DrawDebugSphere(World, BeamEnd, 16.f, 12, FColor::Orange, false, 8.f);
+			//DrawDebugSphere(World, BeamEnd, 16.f, 12, FColor::Orange, false, 8.f);
 			if (BeamParticles)
 			{
 				if (UParticleSystemComponent* Beam =

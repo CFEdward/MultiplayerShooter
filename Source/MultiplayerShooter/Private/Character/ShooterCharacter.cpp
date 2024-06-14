@@ -2,6 +2,9 @@
 
 
 #include "Character/ShooterCharacter.h"
+
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
@@ -9,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameMode/ShooterGameMode.h"
+#include "GameState/ShooterGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "MultiplayerShooter/MultiplayerShooter.h"
@@ -25,8 +29,8 @@
 
 
 AShooterCharacter::AShooterCharacter() :
-	bDisableGameplay(false), bFinishedSwapping(false), bShouldStopReload(false), CameraThreshold(200.0f), TurnThreshold(0.5f), TimeSinceLastMovementReplication(0.0f),
-	MaxHealth(100.0f), Health(MaxHealth), MaxShield(100.f), Shield(0.f), bElimmed(false), ElimDelay(3.0f), bLeftGame(false)
+	bDisableGameplay(false), bFinishedSwapping(false), bLeftGame(false), bShouldStopReload(false), CameraThreshold(200.0f), TurnThreshold(0.5f),
+	TimeSinceLastMovementReplication(0.0f), MaxHealth(100.0f), Health(MaxHealth), MaxShield(100.f), Shield(0.f), bElimmed(false), ElimDelay(3.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -159,6 +163,38 @@ AShooterCharacter::AShooterCharacter() :
 	}
 }
 
+void AShooterCharacter::PollInit()
+{
+	if (ShooterPlayerController == nullptr)
+	{
+		//ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+		ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
+		if (ShooterPlayerController)
+		{
+			SpawnDefaultWeapon();
+			UpdateHUDAmmo();
+			UpdateHUDHealth();
+			UpdateHUDShield();
+		}
+	}
+	
+	if (ShooterPlayerState == nullptr)
+	{
+		ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
+		if (ShooterPlayerState)
+		{
+			ShooterPlayerState->AddToScore(0.0f);
+			ShooterPlayerState->AddToDefeats(0);
+
+			if (const AShooterGameState* ShooterGameState = Cast<AShooterGameState>(UGameplayStatics::GetGameState(this));
+				ShooterGameState && ShooterGameState->TopScoringPlayers.Contains(ShooterPlayerState))
+			{
+				MulticastGainedTheLead();
+			}
+		}
+	}
+}
+
 void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -190,6 +226,34 @@ void AShooterCharacter::Tick(const float DeltaTime)
 	RotateInPlace(DeltaTime);
 	HideCharacterIfCameraClose();
 	PollInit();
+}
+
+void AShooterCharacter::MulticastGainedTheLead_Implementation()
+{
+	if (CrownSystem == nullptr) return;
+	if (CrownComponent == nullptr)
+	{
+		CrownComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			CrownSystem,
+			GetCapsuleComponent(),
+			FName(),
+			GetActorLocation() + FVector(0.f, 0.f, 110.f),
+			GetActorRotation(),
+			EAttachLocation::KeepWorldPosition,
+			false);
+	}
+	if (CrownComponent && !CrownComponent->IsActive())
+	{
+		CrownComponent->Activate();
+	}
+}
+
+void AShooterCharacter::MulticastLostTheLead_Implementation()
+{
+	if (CrownComponent)
+	{
+		CrownComponent->DestroyComponent();
+	}
 }
 
 void AShooterCharacter::RotateInPlace(const float DeltaTime)
@@ -338,6 +402,10 @@ void AShooterCharacter::MulticastElim_Implementation(const bool bPlayerLeftGame)
 	//{
 		//ShowSniperScopeWidget(false);
 	//}
+	if (CrownComponent)
+	{
+		CrownComponent->DestroyComponent();
+	}
 	
 	GetWorldTimerManager().SetTimer(ElimTimer, this, &ThisClass::ElimTimerFinished, ElimDelay);
 }
@@ -889,32 +957,6 @@ void AShooterCharacter::SpawnDefaultWeapon()
 		if (Combat)
 		{
 			Combat->EquipWeapon(StartingWeapon);
-		}
-	}
-}
-
-void AShooterCharacter::PollInit()
-{
-	if (ShooterPlayerController == nullptr)
-	{
-		//ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
-		ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
-		if (ShooterPlayerController)
-		{
-			SpawnDefaultWeapon();
-			UpdateHUDAmmo();
-			UpdateHUDHealth();
-			UpdateHUDShield();
-		}
-	}
-	
-	if (ShooterPlayerState == nullptr)
-	{
-		ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
-		if (ShooterPlayerState)
-		{
-			ShooterPlayerState->AddToScore(0.0f);
-			ShooterPlayerState->AddToDefeats(0);
 		}
 	}
 }
