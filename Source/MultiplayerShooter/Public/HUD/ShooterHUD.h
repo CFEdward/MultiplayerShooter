@@ -90,6 +90,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UElimAnnouncement> ElimAnnouncementClass;
+	UPROPERTY(EditAnywhere)
+	float ElimAnnouncementTime;
+	UFUNCTION()
+	void ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove);
+	UPROPERTY()
+	TArray<TObjectPtr<UElimAnnouncement>> ElimMessages;
 
 public:
 

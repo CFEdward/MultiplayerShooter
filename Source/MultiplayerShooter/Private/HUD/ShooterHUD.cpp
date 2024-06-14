@@ -3,6 +3,9 @@
 
 #include "HUD/ShooterHUD.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/HorizontalBox.h"
 #include "GameFramework/PlayerController.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
@@ -12,7 +15,8 @@
 
 AShooterHUD::AShooterHUD() :
 	HUDPackage(),
-	CrosshairSpreadMax(16.0f)
+	CrosshairSpreadMax(16.0f),
+	ElimAnnouncementTime(2.5f)
 {
 	
 }
@@ -50,8 +54,33 @@ void AShooterHUD::AddElimAnnouncement(const FString& Attacker, const FString& Vi
 		{
 			ElimAnnouncementWidget->SetElimAnnouncementText(Attacker, Victim);
 			ElimAnnouncementWidget->AddToViewport();
+			for (const auto Msg : ElimMessages)
+			{
+				if (Msg && Msg->AnnouncementBox)
+				{
+					if (UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Msg->AnnouncementBox))
+					{
+						const FVector2D Position = CanvasSlot->GetPosition();
+						const FVector2D NewPosition(CanvasSlot->GetPosition().X, Position.Y - CanvasSlot->GetSize().Y);
+						CanvasSlot->SetPosition(NewPosition);
+					}
+				}
+			}
+			ElimMessages.Add(ElimAnnouncementWidget);
+
+			FTimerHandle ElimMsgTimer;
+			FTimerDelegate ElimMsgDelegate;
+			ElimMsgDelegate.BindUFunction(this, FName("ElimAnnouncementTimerFinished"), ElimAnnouncementWidget);
+			GetWorldTimerManager().SetTimer(ElimMsgTimer, ElimMsgDelegate, ElimAnnouncementTime, false);
 		}
-		
+	}
+}
+
+void AShooterHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove)
+{
+	if (MsgToRemove)
+	{
+		MsgToRemove->RemoveFromParent();
 	}
 }
 
