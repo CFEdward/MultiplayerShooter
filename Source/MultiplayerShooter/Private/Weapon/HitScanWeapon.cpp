@@ -26,8 +26,8 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 
 	if (const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash"))
 	{
-		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
-		FVector Start = SocketTransform.GetLocation();
+		const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
+		const FVector Start = SocketTransform.GetLocation();
 		
 		FHitResult FireHit;
 		WeaponTraceHit(Start, HitTarget, FireHit);
@@ -37,9 +37,11 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 		{
 			if (const bool bCauseAuthDamage = !bUseServerSideRewind || OwnerPawn->IsLocallyControlled(); HasAuthority() && bCauseAuthDamage)
 			{
+				const float DamageToCause = FireHit.BoneName.ToString() == FString("head") ? HeadShotDamage : Damage;
+				
 				UGameplayStatics::ApplyDamage(
 					ShooterCharacter,
-					Damage,
+					DamageToCause,
 					InstigatorController,
 					this, 
 					UDamageType::StaticClass()
@@ -100,6 +102,10 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 					Beam->SetVectorParameter(FName("Target"), BeamEnd);
 				}
 			}
+		}
+		else
+		{
+			OutHit.ImpactPoint = End;
 		}
 	}
 }

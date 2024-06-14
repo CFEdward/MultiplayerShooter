@@ -14,7 +14,7 @@
 
 
 AWeapon::AWeapon() :
-	FireDelay(0.15f), bAutomatic(true), bUseScatter(false), DistanceToSphere(800.0f), SphereRadius(75.0f), Damage(20.f), bUseServerSideRewind(false),
+	FireDelay(0.15f), bAutomatic(true), bUseScatter(false), DistanceToSphere(800.0f), SphereRadius(75.0f), Damage(20.f), HeadShotDamage(40.f), bUseServerSideRewind(false),
 	ZoomedFOV(30.0f), ZoomInterpSpeed(20.0f), Sequence(0), DropWeaponImpulse(1000.f), DestroyDroppedWeaponTime(60.f), BaseTurnRate(45.f)
 {
 	PrimaryActorTick.bCanEverTick = true;

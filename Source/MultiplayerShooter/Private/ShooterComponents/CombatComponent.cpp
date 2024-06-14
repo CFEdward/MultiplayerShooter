@@ -307,8 +307,7 @@ void UCombatComponent::ShotgunShellReload()
 void UCombatComponent::JumpToShotgunEnd()
 {
 	// Jump to ShotgunEnd section
-	UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
-	if (AnimInstance && Character->GetReloadMontage())
+	if (UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance(); AnimInstance && Character->GetReloadMontage())
 	{
 		AnimInstance->Montage_JumpToSection(FName("ShotgunEnd"));
 	}
