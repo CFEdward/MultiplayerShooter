@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "ShooterHUD.generated.h"
 
+class UElimAnnouncement;
 class UTexture2D;
 class UCharacterOverlay;
 class UAnnouncement;
@@ -51,21 +52,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
 	void AddCharacterOverlay();
-
 	UPROPERTY()
 	TObjectPtr<UCharacterOverlay> CharacterOverlay;
 	
 	UPROPERTY(EditAnywhere, Category = "Announcements")
 	TSubclassOf<UUserWidget> AnnouncementClass;
 	void AddAnnouncement();
-
 	UPROPERTY()
 	TObjectPtr<UAnnouncement> Announcement;
+
+	void AddElimAnnouncement(const FString& Attacker, const FString& Victim);
 
 	UPROPERTY(EditAnywhere, Category = "Sniper")
 	TSubclassOf<UUserWidget> SniperScopeClass;
 	void AddSniperScope();
-	
 	UPROPERTY()
 	TObjectPtr<USniperScope> SniperScope;
 	
@@ -75,17 +75,21 @@ protected:
 
 private:
 
-	FHUDPackage HUDPackage;
+	UPROPERTY()
+	TObjectPtr<APlayerController> OwningPlayer;
 
+	FHUDPackage HUDPackage;
 	void DrawCrosshair(
 		UTexture2D* Texture,
 		const FVector2D ViewportCenter,
 		const FVector2D Spread,
 		const FLinearColor CrosshairColor
 	);
-
 	UPROPERTY(EditAnywhere)
 	float CrosshairSpreadMax;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UElimAnnouncement> ElimAnnouncementClass;
 
 public:
 

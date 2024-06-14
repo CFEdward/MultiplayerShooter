@@ -49,6 +49,8 @@ public:
 
 	FHighPingDelegate HighPingDelegate;
 
+	void BroadcastElim(APlayerState* Attacker, APlayerState* Victim);
+	
 	virtual void PawnLeavingGame() override;
 	
 protected:
@@ -98,6 +100,9 @@ protected:
 	void CheckPing(float DeltaTime);
 
 	void ShowReturnToMainMenu();
+
+	UFUNCTION(Client, Reliable)
+	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
 	
 private:
 

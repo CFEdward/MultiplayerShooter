@@ -87,6 +87,8 @@ void AShooterGameMode::PlayerEliminated(
 	AShooterPlayerController* VictimController,
 	AShooterPlayerController* AttackerController)
 {
+	if (AttackerController == nullptr || AttackerController->PlayerState == nullptr) return;
+	if (VictimController == nullptr || VictimController->PlayerState == nullptr) return;
 	AShooterPlayerState* AttackerPlayerState = AttackerController ? Cast<AShooterPlayerState>(AttackerController->PlayerState) : nullptr;
 	AShooterPlayerState* VictimPlayerState = VictimController ? Cast<AShooterPlayerState>(VictimController->PlayerState) : nullptr;
 	AShooterGameState* ShooterGameState = GetGameState<AShooterGameState>();
@@ -96,7 +98,7 @@ void AShooterGameMode::PlayerEliminated(
 		TArray<AShooterPlayerState*> PlayersCurrentlyInTheLead;
 		for (auto LeadPlayer : ShooterGameState->TopScoringPlayers)
 		{
-			PlayersCurrentlyInTheLead.Add(LeadPlayer.Get());
+			PlayersCurrentlyInTheLead.Add(LeadPlayer);
 		}
 		
 		AttackerPlayerState->AddToScore(1.0f);
@@ -128,6 +130,14 @@ void AShooterGameMode::PlayerEliminated(
 	if (ElimmedCharacter)
 	{
 		ElimmedCharacter->Elim(false);
+	}
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (AShooterPlayerController* ShooterPlayer = Cast<AShooterPlayerController>(*It); ShooterPlayer && AttackerPlayerState && VictimPlayerState)
+		{
+			ShooterPlayer->BroadcastElim(AttackerPlayerState, VictimPlayerState);
+		}
 	}
 }
 

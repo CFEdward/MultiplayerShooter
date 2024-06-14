@@ -625,6 +625,43 @@ void AShooterPlayerController::HandleCooldown()
 	}
 }
 
+void AShooterPlayerController::BroadcastElim(APlayerState* Attacker, APlayerState* Victim)
+{
+	ClientElimAnnouncement(Attacker, Victim);
+}
+
+void AShooterPlayerController::ClientElimAnnouncement_Implementation(APlayerState* Attacker, APlayerState* Victim)
+{
+	if (const APlayerState* Self = GetPlayerState<APlayerState>(); Attacker && Victim && Self)
+	{
+		ShooterHUD = ShooterHUD == nullptr ? Cast<AShooterHUD>(GetHUD()) : ShooterHUD.Get();
+		if (ShooterHUD)
+		{
+			if (Attacker == Self && Victim != Self)
+			{
+				ShooterHUD->AddElimAnnouncement("You", Victim->GetPlayerName());
+				return;
+			}
+			if (Victim == Self && Attacker != Self)
+			{
+				ShooterHUD->AddElimAnnouncement(Attacker->GetPlayerName(), "you");
+				return;
+			}
+			if (Attacker == Victim && Attacker == Self)
+			{
+				ShooterHUD->AddElimAnnouncement("You", "yourself");
+				return;
+			}
+			if (Attacker == Victim && Attacker != Self)
+			{
+				ShooterHUD->AddElimAnnouncement(Attacker->GetPlayerName(), "themselves");
+				return;
+			}
+			ShooterHUD->AddElimAnnouncement(Attacker->GetPlayerName(), Victim->GetPlayerName());
+		}
+	}
+}
+
 void AShooterPlayerController::PawnLeavingGame()
 {
 	if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn()); ShooterCharacter && !ShooterCharacter->bLeftGame)

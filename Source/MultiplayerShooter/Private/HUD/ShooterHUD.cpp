@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
+#include "HUD/ElimAnnouncement.h"
 #include "HUD/SniperScope.h"
 
 
@@ -19,7 +20,7 @@ AShooterHUD::AShooterHUD() :
 void AShooterHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 }
 
 void AShooterHUD::AddCharacterOverlay()
@@ -37,6 +38,20 @@ void AShooterHUD::AddAnnouncement()
 	{
 		Announcement = CreateWidget<UAnnouncement>(PlayerController, AnnouncementClass);
 		Announcement->AddToViewport();
+	}
+}
+
+void AShooterHUD::AddElimAnnouncement(const FString& Attacker, const FString& Victim)
+{
+	OwningPlayer = OwningPlayer == nullptr ? GetOwningPlayerController() : OwningPlayer.Get();
+	if (OwningPlayer && ElimAnnouncementClass)
+	{
+		if (UElimAnnouncement* ElimAnnouncementWidget = CreateWidget<UElimAnnouncement>(OwningPlayer, ElimAnnouncementClass))
+		{
+			ElimAnnouncementWidget->SetElimAnnouncementText(Attacker, Victim);
+			ElimAnnouncementWidget->AddToViewport();
+		}
+		
 	}
 }
 
