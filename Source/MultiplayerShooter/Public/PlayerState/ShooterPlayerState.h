@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "ShooterTypes/Team.h"
 #include "ShooterPlayerState.generated.h"
 
 class AShooterCharacter;
@@ -19,6 +20,8 @@ class MULTIPLAYERSHOOTER_API AShooterPlayerState : public APlayerState
 
 public:
 
+	AShooterPlayerState();
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/**
@@ -36,11 +39,18 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<AShooterCharacter> Character;
-	
 	UPROPERTY()
 	TObjectPtr<AShooterPlayerController> Controller;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Defeats)
 	int32 Defeats;
+
+	UPROPERTY(Replicated)
+	ETeam Team;
+
+public:
+
+	FORCEINLINE ETeam GetTeam() const { return Team; }
+	FORCEINLINE void SetTeam(const ETeam TeamToSet) { Team = TeamToSet; }
 	
 };

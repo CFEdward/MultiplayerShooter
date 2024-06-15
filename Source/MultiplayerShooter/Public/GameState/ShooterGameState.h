@@ -21,11 +21,29 @@ public:
 	AShooterGameState();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void UpdateTopScore(AShooterPlayerState* ScoringPlayer);
 	
+	void UpdateTopScore(AShooterPlayerState* ScoringPlayer);
 	UPROPERTY(Replicated)
 	TArray<TObjectPtr<AShooterPlayerState>> TopScoringPlayers;
 
+	/**
+	 * Teams
+	 */
+
+	UPROPERTY()
+	TArray<TObjectPtr<AShooterPlayerState>> RedTeam;
+	UPROPERTY(ReplicatedUsing = OnRep_RedTeamScore)
+	float RedTeamScore;
+	UFUNCTION()
+	void OnRep_RedTeamScore();
+	
+	UPROPERTY()
+	TArray<TObjectPtr<AShooterPlayerState>> BlueTeam;
+	UPROPERTY(ReplicatedUsing = OnRep_BlueTeamScore)
+	float BlueTeamScore;
+	UFUNCTION()
+	void OnRep_BlueTeamScore();
+	
 private:
 
 	float TopScore;

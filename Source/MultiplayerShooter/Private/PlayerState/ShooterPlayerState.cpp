@@ -7,11 +7,18 @@
 #include "Net/UnrealNetwork.h"
 
 
+AShooterPlayerState::AShooterPlayerState() :
+	Defeats(0),
+	Team(ETeam::ET_NoTeam)
+{
+}
+
 void AShooterPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AShooterPlayerState, Defeats);
+	DOREPLIFETIME(AShooterPlayerState, Team);
 }
 
 void AShooterPlayerState::AddToScore(const float ScoreAmount)
