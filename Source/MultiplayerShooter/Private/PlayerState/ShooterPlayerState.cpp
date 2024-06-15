@@ -84,3 +84,21 @@ void AShooterPlayerState::OnRep_Defeats()
 		}
 	}
 }
+
+void AShooterPlayerState::SetTeam(const ETeam TeamToSet)
+{
+	Team = TeamToSet;
+
+	if (AShooterCharacter* SCharacter = Cast<AShooterCharacter>(GetPawn()))
+	{
+		SCharacter->SetTeamColor(Team);
+	}
+}
+
+void AShooterPlayerState::OnRep_Team()
+{
+	if (AShooterCharacter* SCharacter = Cast<AShooterCharacter>(GetPawn()))
+	{
+		SCharacter->SetTeamColor(Team);
+	}
+}

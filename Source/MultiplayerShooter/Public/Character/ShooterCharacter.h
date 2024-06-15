@@ -8,6 +8,7 @@
 #include "Interfaces/InteractWithCrosshairsInterface.h"
 #include "Components/TimelineComponent.h"
 #include "ShooterTypes/CombatState.h"
+#include "ShooterTypes/Team.h"
 #include "ShooterCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
@@ -44,6 +45,7 @@ public:
 	/**
 	* Play montages
 	*/
+	
 	void PlayFireMontage(const bool bAiming) const;
 	void PlayReloadMontage();
 	void ReloadMontageInterrupted(UAnimMontage* Montage, bool bInterrupted);
@@ -81,6 +83,8 @@ public:
 	void MulticastGainedTheLead();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLostTheLead();
+
+	void SetTeamColor(const ETeam Team);
 	
 protected:
 	
@@ -125,6 +129,7 @@ protected:
 	/**
 	 * Hit boxes used for server-side rewind
 	 */
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> Head;
 	UPROPERTY(EditAnywhere)
@@ -180,6 +185,7 @@ private:
 	/**
 	 * Shooter components
 	 */
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCombatComponent> Combat;
 	UPROPERTY(VisibleAnywhere)
@@ -203,6 +209,7 @@ private:
 	/**
 	 * Animation montages
 	 */
+	
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TObjectPtr<UAnimMontage> FireWeaponMontage;
 	UPROPERTY(EditAnywhere, Category = Combat)
@@ -231,6 +238,7 @@ private:
 	/**
 	 * Player Health
 	 */
+	
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	float MaxHealth;
 	UPROPERTY(ReplicatedUsing = OnRep_Health, VisibleAnywhere, Category = "Player Stats")
@@ -241,6 +249,7 @@ private:
 	/**
 	 * Player Shield
 	 */
+	
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	float MaxShield;
 	UPROPERTY(ReplicatedUsing = OnRep_Shield, EditAnywhere, Category = "Player Stats")
@@ -260,6 +269,7 @@ private:
 	/**
 	 * Dissolve effect
 	 */
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UTimelineComponent> DissolveTimeline;
 	FOnTimelineFloat DissolveTrack;
@@ -272,12 +282,28 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Elim")
 	TObjectPtr<UMaterialInstanceDynamic> DynamicDissolveMaterialInstance;
 	/** Material instance set on the Blueprint, used with the dynamic material instance */
-	UPROPERTY(EditAnywhere, Category = "Elim")
+	UPROPERTY(VisibleAnywhere, Category = "Elim")
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
+
+	/**
+	 * Team colors
+	 */
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	TObjectPtr<UMaterialInstance> RedDissolveMatInst;
+	UPROPERTY(EditAnywhere, Category = Elim)
+	TObjectPtr<UMaterialInstance> RedMaterial;
+	UPROPERTY(EditAnywhere, Category = Elim)
+	TObjectPtr<UMaterialInstance> BlueDissolveMatInst;
+	UPROPERTY(EditAnywhere, Category = Elim)
+	TObjectPtr<UMaterialInstance> BlueMaterial;
+	UPROPERTY(EditAnywhere, Category = Elim)
+	TObjectPtr<UMaterialInstance> OriginalMaterial;
 
 	/**
 	 * Elim effects
 	 */
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> ElimBotEffect;
 	UPROPERTY(VisibleAnywhere)
@@ -295,12 +321,14 @@ private:
 	/**
 	 * Grenade
 	 */
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> AttachedGrenade;
 
 	/**
 	 * Default Weapon
 	 */
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> DefaultWeaponClass;
 	

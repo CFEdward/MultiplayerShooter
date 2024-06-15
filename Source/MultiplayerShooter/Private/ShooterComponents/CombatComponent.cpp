@@ -335,6 +335,10 @@ void UCombatComponent::FinishSwapAttachWeapons()
 	EquippedWeapon->SetHUDAmmo();
 	UpdateCarriedAmmo();
 	PlayEquippedWeaponSound(EquippedWeapon);
+	if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle && bAiming)
+	{
+		Controller->SetHUDSniperScope(bAiming);
+	}
 
 	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
 	AttachActorToBackpack(SecondaryWeapon);
