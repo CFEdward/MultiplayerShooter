@@ -35,8 +35,13 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Master Speed")
 	float InitialSpeed;
-	
+
+	// Only set this for Grenades and Rockets
+	UPROPERTY(EditAnywhere)
 	float Damage;
+	// Doesn't matter for Grenades and Rockets
+	UPROPERTY(EditAnywhere)
+	float HeadShotDamage;
 	
 protected:
 	
@@ -59,7 +64,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> ImpactParticles;
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundCue> ImpactSound;
 
@@ -71,7 +75,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> TrailSystem;
-
 	UPROPERTY()
 	TObjectPtr<UNiagaraComponent> TrailSystemComponent;
 
@@ -84,7 +87,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UParticleSystem> Tracer;
-
 	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> TracerComponent;
 
@@ -93,7 +95,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DamageInnerRadius;
-
 	UPROPERTY(EditAnywhere)
 	float DamageOuterRadius;
 	

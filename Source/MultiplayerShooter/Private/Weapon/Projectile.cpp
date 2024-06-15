@@ -14,6 +14,7 @@ AProjectile::AProjectile() :
 	bUseServerSideRewind(false),
 	InitialSpeed(15'000.f),
 	Damage(20.0f),
+	HeadShotDamage(40.f),
 	DestroyTime(3.0f),
 	DamageInnerRadius(200.0f),
 	DamageOuterRadius(500.0f)
