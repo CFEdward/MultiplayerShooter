@@ -38,6 +38,8 @@ public:
 
 	void PlayerLeftGame(AShooterPlayerState* PlayerLeaving) const;
 
+	virtual float CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage);
+
 	UPROPERTY(EditDefaultsOnly)
 	float WarmupTime;
 	UPROPERTY(EditDefaultsOnly)

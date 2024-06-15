@@ -11,6 +11,7 @@
 #include "ShooterTypes/Team.h"
 #include "ShooterCharacter.generated.h"
 
+class AShooterGameMode;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
 
 class UNiagaraComponent;
@@ -331,6 +332,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> DefaultWeaponClass;
+
+	UPROPERTY()
+	TObjectPtr<AShooterGameMode> ShooterGameMode;
 	
 public:
 
