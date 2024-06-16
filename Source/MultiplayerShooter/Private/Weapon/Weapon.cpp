@@ -14,8 +14,8 @@
 
 
 AWeapon::AWeapon() :
-	FireDelay(0.15f), bAutomatic(true), bUseScatter(false), DistanceToSphere(800.0f), SphereRadius(75.0f), Damage(20.f), HeadShotDamage(40.f), bUseServerSideRewind(false),
-	ZoomedFOV(30.0f), ZoomInterpSpeed(20.0f), Sequence(0), DropWeaponImpulse(1000.f), DestroyDroppedWeaponTime(60.f), BaseTurnRate(45.f)
+	FireDelay(0.15f), bAutomatic(true), bUseScatter(false), DropWeaponImpulse(1000.f), DistanceToSphere(800.0f), SphereRadius(75.0f), Damage(20.f), HeadShotDamage(40.f),
+	bUseServerSideRewind(false), ZoomedFOV(30.0f), ZoomInterpSpeed(20.0f), Sequence(0), DestroyDroppedWeaponTime(60.f), BaseTurnRate(45.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -90,6 +90,9 @@ void AWeapon::OnSphereOverlap(
 {
 	if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor); ShooterCharacter && PickupWidget)
 	{
+		if (WeaponType == EWeaponType::EWT_Flag && ShooterCharacter->GetTeam() == Team) return;
+		if (ShooterCharacter->IsHoldingTheFlag()) return;
+		
 		ShooterCharacter->SetOverlappingWeapon(this);
 	}
 }
@@ -103,6 +106,9 @@ void AWeapon::OnSphereEndOverlap(
 	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
 	if (ShooterCharacter && PickupWidget)
 	{
+		if (WeaponType == EWeaponType::EWT_Flag && ShooterCharacter->GetTeam() == Team) return;
+		if (ShooterCharacter->IsHoldingTheFlag()) return;
+		
 		ShooterCharacter->SetOverlappingWeapon(nullptr);
 	}
 }

@@ -3,8 +3,10 @@
 
 #include "Weapon/Flag.h"
 
+#include "Character/ShooterCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "ShooterComponents/CombatComponent.h"
 
 AFlag::AFlag()
 {
@@ -45,7 +47,7 @@ void AFlag::OnEquipped()
 	//FlagMesh->SetSimulatePhysics(false);
 	//FlagMesh->SetEnableGravity(false);
 	//FlagMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	FlagPoleMesh->GetOwner()->
+	//FlagPoleMesh->GetOwner()->
 	
 	SetReplicateMovement(false);
 }
@@ -56,6 +58,7 @@ void AFlag::OnDropped()
 	{
 		GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
+	FlagPoleMesh->GetOwner()->SetActorScale3D(FVector(1.5f));
 	FlagPoleMesh->SetSimulatePhysics(true);
 	FlagPoleMesh->SetEnableGravity(true);
 	FlagPoleMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -63,7 +66,6 @@ void AFlag::OnDropped()
 	FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	FlagPoleMesh->AddImpulse(GetActorRightVector() * DropWeaponImpulse);
-	FlagPoleMesh->GetOwner()->SetActorScale3D(FVector(1.5f));
 	
 	//FlagMesh->SetSimulatePhysics(true);
 	//FlagMesh->SetEnableGravity(true);

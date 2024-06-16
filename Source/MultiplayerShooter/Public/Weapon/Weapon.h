@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "WeaponTypes.h"
+#include "ShooterTypes/Team.h"
 #include "Weapon.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquip);
@@ -207,6 +208,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float BaseTurnRate;
+
+	UPROPERTY(EditAnywhere)
+	ETeam Team;
 	
 public:	
 	

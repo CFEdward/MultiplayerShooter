@@ -19,6 +19,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "PlayerController/ShooterPlayerController.h"
+#include "PlayerStart/TeamPlayerStart.h"
 #include "PlayerState/ShooterPlayerState.h"
 #include "ShooterComponents/BuffComponent.h"
 #include "ShooterComponents/CombatComponent.h"
@@ -167,7 +168,6 @@ void AShooterCharacter::PollInit()
 {
 	if (ShooterPlayerController == nullptr)
 	{
-		//ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
 		ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
 		if (ShooterPlayerController)
 		{
@@ -183,9 +183,7 @@ void AShooterCharacter::PollInit()
 		ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
 		if (ShooterPlayerState)
 		{
-			ShooterPlayerState->AddToScore(0.0f);
-			ShooterPlayerState->AddToDefeats(0);
-			SetTeamColor(ShooterPlayerState->GetTeam());
+			OnPlayerStateInitialized();
 
 			if (const AShooterGameState* ShooterGameState = Cast<AShooterGameState>(UGameplayStatics::GetGameState(this));
 				ShooterGameState && ShooterGameState->TopScoringPlayers.Contains(ShooterPlayerState))
@@ -217,6 +215,36 @@ void AShooterCharacter::BeginPlay()
 	if (AttachedGrenade)
 	{
 		AttachedGrenade->SetVisibility(false);
+	}
+}
+
+void AShooterCharacter::OnPlayerStateInitialized()
+{
+	ShooterPlayerState->AddToScore(0.0f);
+	ShooterPlayerState->AddToDefeats(0);
+	SetTeamColor(ShooterPlayerState->GetTeam());
+	SetSpawnPoint();
+}
+
+void AShooterCharacter::SetSpawnPoint()
+{
+	if (HasAuthority() && ShooterPlayerState->GetTeam() != ETeam::ET_NoTeam)
+	{
+		TArray<AActor*> PlayerStarts;
+		UGameplayStatics::GetAllActorsOfClass(this, ATeamPlayerStart::StaticClass(), PlayerStarts);
+		TArray<ATeamPlayerStart*> TeamPlayerStarts;
+		for (const auto Start : PlayerStarts)
+		{
+			if (ATeamPlayerStart* TeamStart = Cast<ATeamPlayerStart>(Start); TeamStart && TeamStart->Team == ShooterPlayerState->GetTeam())
+			{
+				TeamPlayerStarts.Add(TeamStart);
+			}
+		}
+		if (TeamPlayerStarts.Num() > 0)
+		{
+			const ATeamPlayerStart* ChosenPlayerStart = TeamPlayerStarts[FMath::RandRange(0, TeamPlayerStarts.Num() - 1)];
+			SetActorLocationAndRotation(ChosenPlayerStart->GetActorLocation(), ChosenPlayerStart->GetActorRotation());
+		}
 	}
 }
 
@@ -1104,6 +1132,13 @@ ECombatState AShooterCharacter::GetCombatState() const
 {
 	if (Combat == nullptr) return ECombatState::ECS_MAX;
 	return Combat->CombatState;
+}
+
+ETeam AShooterCharacter::GetTeam()
+{
+	ShooterPlayerState = ShooterPlayerState == nullptr ? GetPlayerState<AShooterPlayerState>() : ShooterPlayerState.Get();
+	if (ShooterPlayerState == nullptr) return ETeam::ET_NoTeam;
+	return ShooterPlayerState->GetTeam();
 }
 
 bool AShooterCharacter::IsHoldingTheFlag() const

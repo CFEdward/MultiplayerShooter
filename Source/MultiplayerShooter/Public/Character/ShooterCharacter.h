@@ -90,6 +90,9 @@ public:
 protected:
 	
 	virtual void BeginPlay() override;
+	void OnPlayerStateInitialized();
+
+	void SetSpawnPoint();
 	
 	void RotateInPlace(const float DeltaTime);
 	void MoveForward(const float Value);
@@ -345,6 +348,7 @@ public:
 	AWeapon* GetEquippedWeapon() const;
 	FVector GetHitTarget() const;
 	ECombatState GetCombatState() const;
+	ETeam GetTeam();
 	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
