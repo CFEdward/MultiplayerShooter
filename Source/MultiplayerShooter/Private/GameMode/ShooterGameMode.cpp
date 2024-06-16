@@ -20,7 +20,8 @@ AShooterGameMode::AShooterGameMode() :
 	MatchTime(120.0f),
 	CooldownTime(10.0f),
 	LevelStartingTime(0.0f),
-	CountdownTime(0.0f)
+	CountdownTime(0.0f),
+	bTeamsMatch(false)
 {
 	bDelayedStart = true;
 }
@@ -77,7 +78,7 @@ void AShooterGameMode::OnMatchStateSet()
 	{
 		if (AShooterPlayerController* ShooterPlayer = Cast<AShooterPlayerController>(*It))
 		{
-			ShooterPlayer->OnMatchStateSet(MatchState);
+			ShooterPlayer->OnMatchStateSet(MatchState, bTeamsMatch);
 		}
 	}
 }

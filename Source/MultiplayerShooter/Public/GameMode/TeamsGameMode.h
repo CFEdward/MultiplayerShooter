@@ -16,9 +16,16 @@ class MULTIPLAYERSHOOTER_API ATeamsGameMode : public AShooterGameMode
 
 public:
 
+	ATeamsGameMode();
+
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	virtual float CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage) override;
+	virtual void PlayerEliminated(
+			AShooterCharacter* ElimmedCharacter,
+			AShooterPlayerController* VictimController,
+			AShooterPlayerController* AttackerController
+		) override;
 	
 	virtual void Logout(AController* Exiting) override;
 

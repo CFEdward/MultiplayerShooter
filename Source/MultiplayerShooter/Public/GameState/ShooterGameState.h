@@ -36,6 +36,7 @@ public:
 	float RedTeamScore;
 	UFUNCTION()
 	void OnRep_RedTeamScore();
+	void RedTeamScores();
 	
 	UPROPERTY()
 	TArray<TObjectPtr<AShooterPlayerState>> BlueTeam;
@@ -43,6 +44,7 @@ public:
 	float BlueTeamScore;
 	UFUNCTION()
 	void OnRep_BlueTeamScore();
+	void BlueTeamScores();
 	
 private:
 

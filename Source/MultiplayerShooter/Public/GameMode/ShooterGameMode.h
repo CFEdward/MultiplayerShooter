@@ -48,6 +48,8 @@ public:
 	float CooldownTime;
 	float LevelStartingTime;
 
+	bool bTeamsMatch;
+
 	virtual void Logout(AController* Exiting) override;
 
 protected:

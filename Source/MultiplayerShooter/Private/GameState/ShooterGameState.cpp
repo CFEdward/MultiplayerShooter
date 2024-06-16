@@ -3,6 +3,7 @@
 
 #include "GameState/ShooterGameState.h"
 #include "Net/UnrealNetwork.h"
+#include "PlayerController/ShooterPlayerController.h"
 #include "PlayerState/ShooterPlayerState.h"
 
 
@@ -43,10 +44,36 @@ void AShooterGameState::UpdateTopScore(AShooterPlayerState* ScoringPlayer)
 
 void AShooterGameState::OnRep_RedTeamScore()
 {
-	
+	if (AShooterPlayerController* SPlayer = Cast<AShooterPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		SPlayer->SetHUDRedTeamScore(RedTeamScore);
+	}
+}
+
+void AShooterGameState::RedTeamScores()
+{
+	++RedTeamScore;
+
+	if (AShooterPlayerController* SPlayer = Cast<AShooterPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		SPlayer->SetHUDRedTeamScore(RedTeamScore);
+	}
 }
 
 void AShooterGameState::OnRep_BlueTeamScore()
 {
-	
+	if (AShooterPlayerController* SPlayer = Cast<AShooterPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		SPlayer->SetHUDBlueTeamScore(BlueTeamScore);
+	}
+}
+
+void AShooterGameState::BlueTeamScores()
+{
+	++BlueTeamScore;
+
+	if (AShooterPlayerController* SPlayer = Cast<AShooterPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		SPlayer->SetHUDBlueTeamScore(BlueTeamScore);
+	}
 }

@@ -4,7 +4,13 @@
 #include "GameMode/TeamsGameMode.h"
 
 #include "GameState/ShooterGameState.h"
+#include "PlayerController/ShooterPlayerController.h"
 #include "PlayerState/ShooterPlayerState.h"
+
+ATeamsGameMode::ATeamsGameMode()
+{
+	bTeamsMatch = true;
+}
 
 void ATeamsGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -37,6 +43,25 @@ float ATeamsGameMode::CalculateDamage(AController* Attacker, AController* Victim
 	if (AttackerPState->GetTeam() == VictimPState->GetTeam()) return 0.f;
 	
 	return BaseDamage;
+}
+
+void ATeamsGameMode::PlayerEliminated(AShooterCharacter* ElimmedCharacter, AShooterPlayerController* VictimController, AShooterPlayerController* AttackerController)
+{
+	Super::PlayerEliminated(ElimmedCharacter, VictimController, AttackerController);
+
+	AShooterGameState* SGameState = GetGameState<AShooterGameState>();
+	const AShooterPlayerState* AttackerPlayerState = AttackerController ? Cast<AShooterPlayerState>(AttackerController->PlayerState) : nullptr;
+	if (SGameState && AttackerPlayerState && VictimController != AttackerController)
+	{
+		if (AttackerPlayerState->GetTeam() == ETeam::ET_BlueTeam)
+		{
+			SGameState->BlueTeamScores();
+		}
+		if (AttackerPlayerState->GetTeam() == ETeam::ET_RedTeam)
+		{
+			SGameState->RedTeamScores();
+		}
+	}
 }
 
 void ATeamsGameMode::HandleMatchHasStarted()

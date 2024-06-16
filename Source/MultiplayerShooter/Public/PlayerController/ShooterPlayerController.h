@@ -35,7 +35,12 @@ public:
 	void SetHUDMatchCountdown(const float CountdownTime);
 	void SetHUDAnnouncementCountdown(const float CountdownTime);
 	void SetHUDSniperScope(const bool bIsAiming);
-	void SetHUDGrenades(int32 Grenades);
+	void SetHUDGrenades(const int32 Grenades);
+	void SetHUDRedTeamScore(const int32 RedScore);
+	void SetHUDBlueTeamScore(const int32 BlueScore);
+
+	void InitTeamScores();
+	void HideTeamScores();
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void OnPossess(APawn* InPawn) override;
@@ -43,7 +48,7 @@ public:
 
 	virtual float GetServerTime();	// Synced with server world clock
 	virtual void ReceivedPlayer() override;	// Sync with server clock as soon as possible
-	void OnMatchStateSet(const FName State);
+	void OnMatchStateSet(const FName State, bool bTeamsMatch = false);
 
 	float SingleTripTime;
 
@@ -60,7 +65,7 @@ protected:
 	
 	void SetHUDTime();
 	void PollInit();
-	void HandleMatchHasStarted();
+	void HandleMatchHasStarted(bool bTeamsMatch = false);
 	void HandleCooldown();
 
 	/**
@@ -92,7 +97,8 @@ protected:
 		const float Warmup,
 		const float Match,
 		const float Cooldown,
-		const float StartingTime
+		const float StartingTime,
+		bool bIsTeamMatch
 	);
 
 	void HighPingWarning();
@@ -103,6 +109,11 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
+
+	UPROPERTY(ReplicatedUsing = OnRep_ShowTeamScores)
+	bool bShowTeamScores;
+	UFUNCTION()
+	void OnRep_ShowTeamScores();
 	
 private:
 
@@ -153,6 +164,8 @@ private:
 	bool bInitializeCarriedAmmo;
 	float HUDWeaponAmmo;
 	bool bInitializeWeaponAmmo;
+
+	bool bInitializeTeamScore;
 
 	float HighPingRunningTime;
 	float PingAnimationRunningTime;
