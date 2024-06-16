@@ -18,10 +18,10 @@ public:
 
 	AFlag();
 
-private:
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> FlagPoleMesh;
+private:
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> FlagMesh;
 };

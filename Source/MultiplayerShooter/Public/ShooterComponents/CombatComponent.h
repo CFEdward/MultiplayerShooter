@@ -76,6 +76,7 @@ protected:
 	void OnRep_SecondaryWeapon();
 	void AttachActorToRightHand(AActor* ActorToAttach) const;
 	void AttachActorToLeftHand(AActor* ActorToAttach) const;
+	void AttachFlagToLeftHand(AWeapon* Flag) const;
 	void AttachActorToBackpack(AActor* ActorToAttach) const;
 	void UpdateCarriedAmmo();
 	void PlayEquippedWeaponSound(const AWeapon* WeaponToEquip) const;
@@ -204,6 +205,7 @@ private:
 	int32 MaxGrenades = 4;
 	void UpdateHUDGrenades();
 
+	UPROPERTY(Replicated)
 	bool bHoldingTheFlag;
 	
 public:

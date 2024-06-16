@@ -66,7 +66,7 @@ void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (WeaponState == EWeaponState::EWS_Initial)
+	if (WeaponState == EWeaponState::EWS_Initial && WeaponType != EWeaponType::EWT_Flag)
 	{
 		AddActorWorldRotation(FRotator(0.f, BaseTurnRate * DeltaTime, 0.f));
 	}
