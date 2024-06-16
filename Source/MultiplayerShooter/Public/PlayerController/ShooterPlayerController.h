@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "ShooterPlayerController.generated.h"
 
+class AShooterGameState;
+class AShooterPlayerState;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bPingTooHigh);
 
 class AShooterHUD;
@@ -114,6 +116,9 @@ protected:
 	bool bShowTeamScores;
 	UFUNCTION()
 	void OnRep_ShowTeamScores();
+
+	FString GetInfoText(const TArray<AShooterPlayerState*>& Players);
+	FString GetTeamsInfoText(AShooterGameState* ShooterGameState);
 	
 private:
 
