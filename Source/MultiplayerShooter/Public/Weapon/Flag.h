@@ -18,10 +18,17 @@ public:
 
 	AFlag();
 
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> FlagPoleMesh;
+	virtual void Dropped() override;
+
+protected:
+
+	virtual void OnEquipped() override;
+	virtual void OnDropped() override;
+
 private:
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> FlagPoleMesh;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> FlagMesh;
 };

@@ -207,6 +207,8 @@ private:
 
 	UPROPERTY(Replicated)
 	bool bHoldingTheFlag;
+	UPROPERTY()
+	TObjectPtr<AWeapon> TheFlag;
 	
 public:
 

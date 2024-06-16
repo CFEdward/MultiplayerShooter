@@ -109,11 +109,9 @@ void AWeapon::OnSphereEndOverlap(
 
 void AWeapon::SetHUDAmmo()
 {
-	//if (ShooterOwnerCharacter == nullptr) ShooterOwnerCharacter = Cast<AShooterCharacter>(GetOwner());
 	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter.Get();
 	if (ShooterOwnerCharacter)
 	{
-		//if (ShooterOwnerController == nullptr) ShooterOwnerController = Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller);
 		ShooterOwnerController = ShooterOwnerController == nullptr ? Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController.Get();
 		if (ShooterOwnerController)
 		{
@@ -133,7 +131,6 @@ void AWeapon::OnRep_Owner()
 	}
 	else
 	{
-		//if (ShooterOwnerCharacter == nullptr) ShooterOwnerCharacter = Cast<AShooterCharacter>(Owner);
 		ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(Owner) : ShooterOwnerCharacter.Get();
 		if (ShooterOwnerCharacter && ShooterOwnerCharacter->GetEquippedWeapon() && ShooterOwnerCharacter->GetEquippedWeapon() == this)
 		{
@@ -206,7 +203,6 @@ void AWeapon::OnEquipped()
 	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter.Get();
 	if (ShooterOwnerCharacter && bUseServerSideRewind)
 	{
-		//if (ShooterOwnerController == nullptr) ShooterOwnerController = Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller);
 		ShooterOwnerController = ShooterOwnerController == nullptr ? Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController.Get();
 		if (ShooterOwnerController && HasAuthority() && !ShooterOwnerController->HighPingDelegate.IsBound())
 		{
@@ -242,7 +238,6 @@ void AWeapon::OnEquippedSecondary()
 
 	if (ShooterOwnerCharacter && bUseServerSideRewind)
 	{
-		//if (ShooterOwnerController == nullptr) ShooterOwnerController = Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller);
 		ShooterOwnerController = ShooterOwnerController == nullptr ? Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController.Get();
 		if (ShooterOwnerController && HasAuthority() && ShooterOwnerController->HighPingDelegate.IsBound())
 		{
@@ -274,7 +269,6 @@ void AWeapon::OnDropped()
 	
 	if (ShooterOwnerCharacter && bUseServerSideRewind)
 	{
-		//if (ShooterOwnerController == nullptr) ShooterOwnerController = Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller);
 		ShooterOwnerController = ShooterOwnerController == nullptr ? Cast<AShooterPlayerController>(ShooterOwnerCharacter->Controller) : ShooterOwnerController.Get();
 		if (ShooterOwnerController && HasAuthority() && ShooterOwnerController->HighPingDelegate.IsBound())
 		{
@@ -364,8 +358,7 @@ void AWeapon::SpendRound()
 	{
 		ClientUpdateAmmo(Ammo);
 	}
-	else if (//ShooterOwnerCharacter = Cast<AShooterCharacter>(GetOwner());
-			ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter.Get();
+	else if (ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter.Get();
 			ShooterOwnerCharacter && ShooterOwnerCharacter->IsLocallyControlled())
 	{
 		++Sequence;
@@ -394,7 +387,6 @@ void AWeapon::ClientAddAmmo_Implementation(const int32 AmmoToAdd)
 	if (HasAuthority()) return;
 	
 	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
-	//if (ShooterOwnerCharacter == nullptr) ShooterOwnerCharacter = Cast<AShooterCharacter>(GetOwner());
 	ShooterOwnerCharacter = ShooterOwnerCharacter == nullptr ? Cast<AShooterCharacter>(GetOwner()) : ShooterOwnerCharacter.Get();
 	if (ShooterOwnerCharacter && ShooterOwnerCharacter->GetCombat() && IsFull())
 	{

@@ -377,6 +377,10 @@ void AShooterCharacter::DropWeapons() const
 	{
 		Combat->SecondaryWeapon->Dropped();
 	}
+	if (Combat && Combat->TheFlag)
+	{
+		Combat->TheFlag->Dropped();
+	}
 }
 
 void AShooterCharacter::Elim(const bool bPlayerLeftGame)

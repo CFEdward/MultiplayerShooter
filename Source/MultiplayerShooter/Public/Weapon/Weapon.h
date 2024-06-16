@@ -54,7 +54,7 @@ public:
 	void SetHUDAmmo();
 	void ShowPickupWidget(const bool bShowWidget) const;
 	virtual void Fire(const FVector& HitTarget);
-	void Dropped();
+	virtual void Dropped();
 	void AddAmmo(const int32 AmmoToAdd);
 	
 	/**
@@ -95,8 +95,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
 	bool bUseScatter;
-
 	FVector TraceEndWithScatter(const FVector& HitTarget) const;
+
+	UPROPERTY(EditAnywhere)
+	float DropWeaponImpulse;
 	
 protected:
 	
@@ -197,9 +199,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
-
-	UPROPERTY(EditAnywhere)
-	float DropWeaponImpulse;
 
 	FTimerHandle DestroyDroppedWeaponTimerHandle;
 	UPROPERTY(EditAnywhere)
