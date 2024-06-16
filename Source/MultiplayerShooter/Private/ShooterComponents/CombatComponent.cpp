@@ -19,7 +19,7 @@
 UCombatComponent::UCombatComponent() :
 	bLocallyReloading(false), bCanFire(true), bFireButtonPressed(false), HUDPackage(), CrosshairVelocityFactor(0.f), CrosshairInAirFactor(0.f),
 	CrosshairAimFactor(0.f), CrosshairShootingFactor(0.f), bAiming(false), bAimButtonPressed(false), DefaultFOV(0.f),
-	CurrentFOV(0.f), ZoomInterpSpeed(20.f), CarriedAmmo(0), CombatState(ECombatState::ECS_Unoccupied)
+	CurrentFOV(0.f), ZoomInterpSpeed(20.f), CarriedAmmo(0), CombatState(ECombatState::ECS_Unoccupied), bHoldingTheFlag(false)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 

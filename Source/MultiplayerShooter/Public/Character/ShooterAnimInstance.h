@@ -43,7 +43,6 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	bool bWeaponEquipped;
-
 	UPROPERTY()
 	TObjectPtr<AWeapon> EquippedWeapon;
 
@@ -95,5 +94,7 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	bool bTransformRightHand;
-	
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	bool bHoldingTheFlag;
 };

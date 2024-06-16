@@ -203,6 +203,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 MaxGrenades = 4;
 	void UpdateHUDGrenades();
+
+	bool bHoldingTheFlag;
 	
 public:
 

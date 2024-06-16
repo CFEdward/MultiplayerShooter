@@ -1081,3 +1081,9 @@ ECombatState AShooterCharacter::GetCombatState() const
 	if (Combat == nullptr) return ECombatState::ECS_MAX;
 	return Combat->CombatState;
 }
+
+bool AShooterCharacter::IsHoldingTheFlag() const
+{
+	if (Combat == nullptr) return false;
+	return Combat->bHoldingTheFlag;
+}
