@@ -219,7 +219,6 @@ void UCombatComponent::UpdateCarriedAmmo()
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
 	}
 	
-	//if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
 	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller.Get();
 	if (Controller)
 	{
@@ -413,6 +412,14 @@ void UCombatComponent::UpdateHUDGrenades()
 	if (Controller)
 	{
 		Controller->SetHUDGrenades(Grenades);
+	}
+}
+
+void UCombatComponent::OnRep_HoldingTheFlag()
+{
+	if (bHoldingTheFlag && Character && Character->IsLocallyControlled())
+	{
+		Character->GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	}
 }
 

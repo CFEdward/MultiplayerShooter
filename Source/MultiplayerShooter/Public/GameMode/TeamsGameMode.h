@@ -24,8 +24,7 @@ public:
 	virtual void PlayerEliminated(
 			AShooterCharacter* ElimmedCharacter,
 			AShooterPlayerController* VictimController,
-			AShooterPlayerController* AttackerController
-		) override;
+			AShooterPlayerController* AttackerController) override;
 	
 	virtual void Logout(AController* Exiting) override;
 

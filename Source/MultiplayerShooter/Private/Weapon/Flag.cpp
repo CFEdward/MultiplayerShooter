@@ -6,10 +6,13 @@
 #include "Character/ShooterCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
-#include "ShooterComponents/CombatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AFlag::AFlag()
 {
+	bReplicates = true;
+	SetReplicateMovement(true);
+	
 	FlagPoleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FlagPoleMesh"));
 	FlagPoleMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	FlagPoleMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -19,53 +22,78 @@ AFlag::AFlag()
 	FlagMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FlagMesh->SetupAttachment(FlagPoleMesh);
 
-	GetAreaSphere()->SetupAttachment(FlagPoleMesh);
-	GetPickupWidget()->SetupAttachment(FlagPoleMesh);
-	
+	GetAreaSphere()->SetupAttachment(RootComponent);
+	GetAreaSphere()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetPickupWidget()->SetupAttachment(RootComponent);
 }
 
-void AFlag::Dropped()
+void AFlag::BeginPlay()
 {
-	SetWeaponState(EWeaponState::EWS_Dropped);
-	const FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
-	FlagPoleMesh->DetachFromComponent(DetachRules);
-	SetOwner(nullptr);
-	ShooterOwnerCharacter = nullptr;
-	ShooterOwnerController = nullptr;
+	Super::BeginPlay();
+
+	InitialTransform = GetActorTransform();
 }
 
 void AFlag::OnEquipped()
 {
 	ShowPickupWidget(false);
+
 	GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
 	FlagPoleMesh->SetSimulatePhysics(false);
 	FlagPoleMesh->SetEnableGravity(false);
-	FlagPoleMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	FlagPoleMesh->GetOwner()->SetActorScale3D(FVector(1.f));
+	FlagPoleMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	//FlagPoleMesh->SetRelativeScale3D(FVector(1.f));
+}
+
+void AFlag::Dropped()
+{
+	FVector LocationToMove = FVector::Zero();
+	if (AShooterCharacter* FlagBearer = Cast<AShooterCharacter>(GetOwner()))
+	{
+		FlagBearer->SetHoldingTheFlag(false);
+		FlagBearer->SetOverlappingWeapon(nullptr);
+		LocationToMove = FlagBearer->GetActorLocation();
+		if (HasAuthority()) FlagBearer->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	}
+	//FlagPoleMesh->SetRelativeScale3D(FVector(1.5f));
+	if (!HasAuthority()) return;
+
+	SetReplicateMovement(true);
+	const FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
+	FlagPoleMesh->DetachFromComponent(DetachRules);
+	SetWeaponState(EWeaponState::EWS_Dropped);
 	
-	//FlagMesh->SetSimulatePhysics(false);
-	//FlagMesh->SetEnableGravity(false);
-	//FlagMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//FlagPoleMesh->GetOwner()->
-	
-	SetReplicateMovement(false);
+	SetOwner(nullptr);
+	ShooterOwnerCharacter = nullptr;
+	ShooterOwnerController = nullptr;
+
+	GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetAreaSphere()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	FlagPoleMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	if (LocationToMove != FVector::Zero()) SetActorLocation(FVector(LocationToMove.X, LocationToMove.Y, LocationToMove.Z - 88.f));
 }
 
 void AFlag::OnDropped()
 {
-	if (HasAuthority())
-	{
-		GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	}
-	FlagPoleMesh->GetOwner()->SetActorScale3D(FVector(1.5f));
-	FlagPoleMesh->SetSimulatePhysics(true);
-	FlagPoleMesh->SetEnableGravity(true);
-	FlagPoleMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	FlagPoleMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-	FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
-	FlagPoleMesh->AddImpulse(GetActorRightVector() * DropWeaponImpulse);
+
+	// if (HasAuthority())
+	// {
+	// 	GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	// }
+	// //FlagPoleMesh->SetRelativeScale3D(FVector(1.5f));
+	// FlagPoleMesh->SetRelativeScale3D(FVector(1.5f));
+	// FlagPoleMesh->SetSimulatePhysics(true);
+	// FlagPoleMesh->SetEnableGravity(true);
+	// FlagPoleMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// SetReplicateMovement(true); // new
+	// FlagPoleMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	// FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	// FlagPoleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	// FlagPoleMesh->AddImpulse(GetActorRightVector() * DropWeaponImpulse);
 	
 	//FlagMesh->SetSimulatePhysics(true);
 	//FlagMesh->SetEnableGravity(true);
@@ -73,9 +101,30 @@ void AFlag::OnDropped()
 	//FlagMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	//FlagMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	//FlagMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
-	
-	SetReplicateMovement(true);
 	//WeaponMesh->AddImpulse(GetActorRightVector() * DropWeaponImpulse);
-	
+}
 
+void AFlag::ResetFlag()
+{
+	if (AShooterCharacter* FlagBearer = Cast<AShooterCharacter>(GetOwner()))
+	{
+		FlagBearer->SetHoldingTheFlag(false);
+		FlagBearer->SetOverlappingWeapon(nullptr);
+		if (HasAuthority()) FlagBearer->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	}
+	if (!HasAuthority()) return;
+
+	SetReplicateMovement(true);
+	const FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
+	FlagPoleMesh->DetachFromComponent(DetachRules);
+	SetWeaponState(EWeaponState::EWS_Initial);
+	
+	SetOwner(nullptr);
+	ShooterOwnerCharacter = nullptr;
+	ShooterOwnerController = nullptr;
+
+	SetActorTransform(InitialTransform);
+	
+	GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetAreaSphere()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }

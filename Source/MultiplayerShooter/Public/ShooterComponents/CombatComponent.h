@@ -205,8 +205,10 @@ private:
 	int32 MaxGrenades = 4;
 	void UpdateHUDGrenades();
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_HoldingTheFlag)
 	bool bHoldingTheFlag;
+	UFUNCTION()
+	void OnRep_HoldingTheFlag();
 	UPROPERTY()
 	TObjectPtr<AWeapon> TheFlag;
 	

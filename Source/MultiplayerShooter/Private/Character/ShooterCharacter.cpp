@@ -319,6 +319,11 @@ void AShooterCharacter::RotateInPlace(const float DeltaTime)
 		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 		return;
 	}
+	if (Combat && Combat->EquippedWeapon)
+	{
+		bUseControllerRotationYaw = true;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
 	if (bDisableGameplay)
 	{
 		bUseControllerRotationYaw = false;
@@ -556,7 +561,7 @@ void AShooterCharacter::EquipButtonPressed()
 	if (bDisableGameplay) return;
 	if (Combat && Combat->bHoldingTheFlag) return;
 	
-	if (Combat && OverlappingWeapon)
+	if (Combat && OverlappingWeapon && Combat->CombatState == ECombatState::ECS_Unoccupied)
 	{
 		ServerEquipButtonPressed();
 	}
@@ -1139,6 +1144,12 @@ ETeam AShooterCharacter::GetTeam()
 	ShooterPlayerState = ShooterPlayerState == nullptr ? GetPlayerState<AShooterPlayerState>() : ShooterPlayerState.Get();
 	if (ShooterPlayerState == nullptr) return ETeam::ET_NoTeam;
 	return ShooterPlayerState->GetTeam();
+}
+
+void AShooterCharacter::SetHoldingTheFlag(const bool bHolding)
+{
+	if (Combat == nullptr) return;
+	Combat->bHoldingTheFlag = bHolding;
 }
 
 bool AShooterCharacter::IsHoldingTheFlag() const

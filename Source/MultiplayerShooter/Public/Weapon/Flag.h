@@ -20,8 +20,12 @@ public:
 
 	virtual void Dropped() override;
 
+	void ResetFlag();
+
 protected:
 
+	virtual void BeginPlay() override;
+	
 	virtual void OnEquipped() override;
 	virtual void OnDropped() override;
 
@@ -31,4 +35,11 @@ private:
 	TObjectPtr<UStaticMeshComponent> FlagPoleMesh;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> FlagMesh;
+
+	FTransform InitialTransform;
+
+public:
+
+	FORCEINLINE UStaticMeshComponent* GetFlagPoleMesh() const { return FlagPoleMesh; }
+	FORCEINLINE FTransform GetInitialTransform() const { return InitialTransform; }
 };

@@ -349,6 +349,7 @@ public:
 	FVector GetHitTarget() const;
 	ECombatState GetCombatState() const;
 	ETeam GetTeam();
+	void SetHoldingTheFlag(const bool bHolding);
 	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
