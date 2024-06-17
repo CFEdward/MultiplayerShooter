@@ -58,6 +58,8 @@ public:
 	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
 
 	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
+
+	void UpdateHUDGrenades();
 	
 protected:
 	
@@ -203,7 +205,6 @@ private:
 	void OnRep_Grenades();
 	UPROPERTY(EditAnywhere)
 	int32 MaxGrenades = 4;
-	void UpdateHUDGrenades();
 
 	UPROPERTY(ReplicatedUsing = OnRep_HoldingTheFlag)
 	bool bHoldingTheFlag;

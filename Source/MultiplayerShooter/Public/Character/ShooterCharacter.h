@@ -350,6 +350,7 @@ public:
 	ECombatState GetCombatState() const;
 	ETeam GetTeam();
 	void SetHoldingTheFlag(const bool bHolding);
+	bool IsHoldingTheFlag() const;
 	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
@@ -368,6 +369,5 @@ public:
 	FORCEINLINE UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
 	FORCEINLINE UStaticMeshComponent* GetAttachedGrenade() const { return AttachedGrenade; }
 	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
-	FORCEINLINE bool IsHoldingTheFlag() const;
 	
 };

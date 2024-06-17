@@ -407,7 +407,6 @@ void UCombatComponent::ServerThrowGrenade_Implementation()
 
 void UCombatComponent::UpdateHUDGrenades()
 {
-	//if (Controller == nullptr) Controller = Cast<AShooterPlayerController>(Character->Controller);
 	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller.Get();
 	if (Controller)
 	{

@@ -104,8 +104,7 @@ void AWeapon::OnSphereEndOverlap(
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex)
 {
-	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
-	if (ShooterCharacter && PickupWidget)
+	if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor); ShooterCharacter && PickupWidget)
 	{
 		if (WeaponType == EWeaponType::EWT_Flag && ShooterCharacter->GetTeam() == Team && WeaponState == EWeaponState::EWS_Initial) return;
 		if (ShooterCharacter->IsHoldingTheFlag()) return;

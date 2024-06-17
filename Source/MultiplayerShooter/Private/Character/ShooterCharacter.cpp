@@ -176,6 +176,7 @@ void AShooterCharacter::PollInit()
 			UpdateHUDAmmo();
 			UpdateHUDHealth();
 			UpdateHUDShield();
+			GetCombat()->UpdateHUDGrenades();
 		}
 	}
 	
@@ -1026,7 +1027,6 @@ void AShooterCharacter::UpdateHUDHealth()
 
 void AShooterCharacter::UpdateHUDShield()
 {
-	//if (ShooterPlayerController == nullptr) ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
 	ShooterPlayerController = ShooterPlayerController == nullptr ? Cast<AShooterPlayerController>(Controller) : ShooterPlayerController.Get();
 	
 	if (ShooterPlayerController)

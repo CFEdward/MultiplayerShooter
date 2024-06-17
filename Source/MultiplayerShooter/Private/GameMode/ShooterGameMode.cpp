@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "PlayerController/ShooterPlayerController.h"
 #include "PlayerState/ShooterPlayerState.h"
+#include "ShooterComponents/CombatComponent.h"
 
 
 namespace MatchState
@@ -160,6 +161,8 @@ void AShooterGameMode::RequestRespawn(ACharacter* ElimmedCharacter, AController*
 		UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), PlayerStarts);
 		const int32 Selection = FMath::RandRange(0, PlayerStarts.Num() - 1);
 		RestartPlayerAtPlayerStart(ElimmedController, PlayerStarts[Selection]);
+		//if (const AShooterCharacter* SCharacter = Cast<AShooterCharacter>(ElimmedController->GetCharacter()))
+		//SCharacter->GetCombat()->UpdateHUDGrenades();
 	}
 }
 
