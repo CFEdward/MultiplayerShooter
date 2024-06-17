@@ -91,7 +91,7 @@ void AWeapon::OnSphereOverlap(
 {
 	if (AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor); ShooterCharacter && PickupWidget)
 	{
-		if (WeaponType == EWeaponType::EWT_Flag && ShooterCharacter->GetTeam() == Team) return;
+		if (WeaponType == EWeaponType::EWT_Flag && ShooterCharacter->GetTeam() == Team && WeaponState == EWeaponState::EWS_Initial) return;
 		if (ShooterCharacter->IsHoldingTheFlag()) return;
 		
 		ShooterCharacter->SetOverlappingWeapon(this);
@@ -107,7 +107,7 @@ void AWeapon::OnSphereEndOverlap(
 	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(OtherActor);
 	if (ShooterCharacter && PickupWidget)
 	{
-		if (WeaponType == EWeaponType::EWT_Flag && ShooterCharacter->GetTeam() == Team) return;
+		if (WeaponType == EWeaponType::EWT_Flag && ShooterCharacter->GetTeam() == Team && WeaponState == EWeaponState::EWS_Initial) return;
 		if (ShooterCharacter->IsHoldingTheFlag()) return;
 		
 		ShooterCharacter->SetOverlappingWeapon(nullptr);

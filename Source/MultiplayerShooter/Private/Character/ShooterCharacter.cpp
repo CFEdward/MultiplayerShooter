@@ -26,6 +26,7 @@
 #include "ShooterComponents/LagCompensationComponent.h"
 #include "Weapon/Weapon.h"
 #include "Sound/SoundCue.h"
+#include "Weapon/Flag.h"
 #include "Weapon/WeaponTypes.h"
 
 
@@ -572,7 +573,11 @@ void AShooterCharacter::ServerEquipButtonPressed_Implementation()
 	if (Combat && OverlappingWeapon)
 	{
 		if (OverlappingWeapon->GetWeaponState() == EWeaponState::EWS_Initial) OverlappingWeapon->OnEquip.Broadcast();
-		Combat->EquipWeapon(OverlappingWeapon);
+		
+		if (OverlappingWeapon->GetWeaponType() == EWeaponType::EWT_Flag && OverlappingWeapon->GetWeaponState() == EWeaponState::EWS_Dropped &&
+			OverlappingWeapon->GetTeam() == GetTeam())
+		{ Cast<AFlag>(OverlappingWeapon)->ResetFlag(); SetOverlappingWeapon(nullptr); }
+		else Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
 
